@@ -1,0 +1,62 @@
+﻿<controls:MetroWindow x:Class="ModPlus.Windows.Reclame"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      mc:Ignorable="d" ShowCloseButton="False" ShowIconOnTitleBar="False" ShowMaxRestoreButton="False"
+                      ShowMinButton="False" ShowTitleBar="False" 
+                      WindowStartupLocation="CenterScreen" AllowsTransparency="True" Width="500" Height="300"
+                      ResizeMode="NoResize" Topmost="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Image Name="ImgLogo" Grid.Row="0" Stretch="None" HorizontalAlignment="Left"></Image>
+        <StackPanel Orientation="Vertical" Grid.Row="1" Background="#7FFFFFFF">
+            <TextBlock Text="Понравилась функция? Считаете её полезной?!"
+                       FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="Black"></TextBlock>
+            <TextBlock Text="Но не нравится каждый раз видеть это окно?!"
+                       FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="Black"></TextBlock>
+            <TextBlock Text="Просто купите себе эту функцию!"
+                       FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="Black"></TextBlock>
+            <TextBlock Text="И поверьте - это совсем не дорого!"
+                       FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="Black"></TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="2" VerticalAlignment="Center">
+            <TextBlock FontSize="50" HorizontalAlignment="Center" FontWeight="DemiBold"
+                       Foreground="{DynamicResource AccentColorBrush}" Name="TbPrice"
+                       Background="#7FFFFFFF"></TextBlock>
+            <TextBlock Text="включая налог в размере 5%" HorizontalAlignment="Center"
+                       Background="#7FFFFFFF" Foreground="Black"></TextBlock>
+        </StackPanel>
+        <Button Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Content="Закрыть через: 3" Style="{StaticResource BtStyle}" Margin="5"
+                Name="BtClose" Click="BtClose_OnClick" Foreground="Black"
+                BorderBrush="Black" Background="White"
+                ></Button>
+    </Grid>
+</controls:MetroWindow>

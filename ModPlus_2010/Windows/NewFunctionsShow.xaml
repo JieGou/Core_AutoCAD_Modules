@@ -1,0 +1,119 @@
+﻿<controls:MetroWindow x:Class="ModPlus.Windows.NewFunctionsShow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                      xmlns:local="clr-namespace:ModPlus.Windows"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      mc:Ignorable="d" ShowTitleBar="False" ShowMaxRestoreButton="False"
+                      WindowStartupLocation="CenterScreen" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+            <Style x:Key="LbFunctionsTemplate" TargetType="{x:Type ListBoxItem}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Border Background="Transparent"
+                                CornerRadius="0"
+                                BorderThickness="1"
+                                BorderBrush="Transparent"
+                                x:Name="IconBorder"
+                                Margin="0"
+                                >
+                                <ContentPresenter />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="IconBorder" Property="BorderBrush" Value="{DynamicResource AccentColorBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" FontSize="16">НОВЫЕ ФУНКЦИИ</Label>
+        <ListBox Grid.Row="1" Name="LbFunctions" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
+                 Margin="2"
+                 ItemContainerStyle="{StaticResource LbFunctionsTemplate}"
+                 SelectionMode="Single" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 Width="400" MaxHeight="300">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.Resources>
+                            <Canvas x:Key="appbar_youtube_play" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+                                <Path Width="41.1666" Height="30.0833" Canvas.Left="17.4167" Canvas.Top="22.9583" Stretch="Fill" Fill="Black" Data="F1 M 25.3333,23.75C 25.3333,23.75 31.7986,22.9583 38.066,22.9583C 44.3333,22.9583 50.6667,23.75 50.6666,23.75C 55.0389,23.75 58.5833,27.2944 58.5833,31.6667L 58.5833,44.3333C 58.5833,48.7056 53.8333,52.25 50.6666,52.25C 50.6666,52.25 44.2013,53.0416 37.934,53.0416C 31.6666,53.0416 25.3333,52.25 25.3333,52.25C 20.9611,52.25 17.4167,48.7056 17.4167,44.3333L 17.4167,31.6667C 17.4167,27.2944 22.1667,23.75 25.3333,23.75 Z M 34.8333,28.5L 34.8333,47.5L 44.3333,38L 34.8333,28.5 Z "/>
+                            </Canvas>
+                        </Grid.Resources>
+                        <!--Icon-->
+                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Padding="1"
+                                Margin="1" Background="White" VerticalAlignment="Center"
+                                BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1">
+                            <local:DevicePixels>
+                                <Image Source="{Binding Path=Attribute[BigIconUrl].Value}" Stretch="None"></Image>
+                            </local:DevicePixels>
+                        </Border>
+                        <!--Name-->
+                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   FontSize="14" FontWeight="DemiBold"
+                                   Foreground="{DynamicResource AccentColorBrush}">
+                            <TextBlock Text="{Binding Path=Attribute[LName].Value}"></TextBlock>
+                            <TextBlock Text="["></TextBlock>
+                            <TextBlock Text="{Binding Path=Attribute[Name].Value}"></TextBlock>
+                            <TextBlock Text="]"></TextBlock>
+                        </TextBlock>
+                        <!--Video-->
+                        <Button Style="{StaticResource BtStyle}" Padding="2"
+                                Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                HorizontalAlignment="Center" Margin="2"
+                                Name="BtFunctionVideo" Click="BtFunctionVideo_OnClick"
+                                Tag="{Binding Path=Attribute[VideoUrl].Value}"
+                                Visibility="{Binding Path=Attribute[BtVideoVisibility].Value}"
+                                ToolTip="Посмотреть видео к функции">
+                            <Rectangle Width="32" Height="32" Fill="{DynamicResource AccentColorBrush}">
+                                <Rectangle.OpacityMask>
+                                    <VisualBrush Stretch="Uniform"
+                                                 Visual="{DynamicResource appbar_youtube_play}"></VisualBrush>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                        </Button>
+                        <!--Description-->
+                        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   TextWrapping="Wrap" Margin="2" Text="{Binding Path=Attribute[Description].Value}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                   Text="Для установки запустите конфигуратор ModPlus" FontSize="16"></TextBlock>
+    </Grid>
+</controls:MetroWindow>

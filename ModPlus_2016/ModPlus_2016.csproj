@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8A5BA515-EA41-4048-8A3C-7E5617B6FD29}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ModPlus</RootNamespace>
+    <AssemblyName>ModPlus_2016</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\ModPlus_builded\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ac2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="accoremgd">
+      <HintPath>..\..\_Acad dlls\2016\accoremgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcCui">
+      <HintPath>..\..\_Acad dlls\2016\AcCui.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acdbmgd">
+      <HintPath>..\..\_Acad dlls\2016\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>..\..\_Acad dlls\2016\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdWindows">
+      <HintPath>..\..\_Acad dlls\2016\AdWindows.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\ModPlus_builded\MahApps.Metro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpCustomThemes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\ModPlus_builded\mpCustomThemes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpMsg, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ModPlus_builded\mpMsg.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpPInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ModPlus_builded\mpPInterface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpRegistry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ModPlus_builded\mpRegistry.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpSettings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ModPlus_builded\mpSettings.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mpSite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ModPlus_builded\mpSite.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ModPlus_2010\App\mpMainSettings.xaml.cs">
+      <Link>App\mpMainSettings.xaml.cs</Link>
+      <DependentUpon>mpMainSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\App\RibbonBuilder.cs">
+      <Link>App\RibbonBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\GeometryHelpers.cs">
+      <Link>Helpers\GeometryHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\LoadFunctionsHelper.cs">
+      <Link>Helpers\LoadFunctionsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\RibbonHelpers.cs">
+      <Link>Helpers\RibbonHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\MinFuncWins\FastBlockSelection.xaml.cs">
+      <Link>MinFuncWins\FastBlockSelection.xaml.cs</Link>
+      <DependentUpon>FastBlockSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\MinFuncWins\FastBlocksSettings.xaml.cs">
+      <Link>MinFuncWins\FastBlocksSettings.xaml.cs</Link>
+      <DependentUpon>FastBlocksSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\MiniFunctions.cs">
+      <Link>MiniFunctions.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\ModPlus.cs">
+      <Link>ModPlus.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\mpDrawings.xaml.cs">
+      <Link>mpDrawings.xaml.cs</Link>
+      <DependentUpon>mpDrawings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\MpFloatMenu.xaml.cs">
+      <Link>MpFloatMenu.xaml.cs</Link>
+      <DependentUpon>MpFloatMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\mpPaletteDrawings.xaml.cs">
+      <Link>Windows\mpPaletteDrawings.xaml.cs</Link>
+      <DependentUpon>mpPaletteDrawings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\mpPaletteFunctions.xaml.cs">
+      <Link>Windows\mpPaletteFunctions.xaml.cs</Link>
+      <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\NewFunctionsShow.xaml.cs">
+      <Link>Windows\NewFunctionsShow.xaml.cs</Link>
+      <DependentUpon>NewFunctionsShow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\OpenVideo.xaml.cs">
+      <Link>Windows\OpenVideo.xaml.cs</Link>
+      <DependentUpon>OpenVideo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\Reclame.xaml.cs">
+      <Link>Windows\Reclame.xaml.cs</Link>
+      <DependentUpon>Reclame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\SelectNumberWin.xaml.cs">
+      <Link>Windows\SelectNumberWin.xaml.cs</Link>
+      <DependentUpon>SelectNumberWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Windows\SetPrefixSuffixWin.xaml.cs">
+      <Link>Windows\SetPrefixSuffixWin.xaml.cs</Link>
+      <DependentUpon>SetPrefixSuffixWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VersionData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Reclame.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\ModPlus_2010\App\mpMainSettings.xaml">
+      <Link>App\mpMainSettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\MinFuncWins\FastBlockSelection.xaml">
+      <Link>MinFuncWins\FastBlockSelection.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\MinFuncWins\FastBlocksSettings.xaml">
+      <Link>MinFuncWins\FastBlocksSettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\mpDrawings.xaml">
+      <Link>mpDrawings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\MpFloatMenu.xaml">
+      <Link>MpFloatMenu.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\mpPaletteDrawings.xaml">
+      <Link>Windows\mpPaletteDrawings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\mpPaletteFunctions.xaml">
+      <Link>Windows\mpPaletteFunctions.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\NewFunctionsShow.xaml">
+      <Link>Windows\NewFunctionsShow.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\OpenVideo.xaml">
+      <Link>Windows\OpenVideo.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\Reclame.xaml">
+      <Link>Windows\Reclame.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\SelectNumberWin.xaml">
+      <Link>Windows\SelectNumberWin.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\ModPlus_2010\Windows\SetPrefixSuffixWin.xaml">
+      <Link>Windows\SetPrefixSuffixWin.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\HelpBt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MpStampFields_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dwg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\ModPlus_2010\Resources\mpIcon.ico">
+      <Link>Resources\mpIcon.ico</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
