@@ -2,15 +2,11 @@
 
 namespace ModPlus.Helpers
 {
-    /// <summary>
-    /// Вспомогательные методы построения геометрии
-    /// </summary>
+    /// <summary>Вспомогательные методы построения геометрии</summary>
     public static class GeometryHelpers
     {
-        /// <summary>
-        /// 3Д точка по направлению. Направление берется как единычный вектор из точки pt2 к точке pt1, перемножается на указанную
-        /// длину и откладывается от указанной точки
-        /// </summary>
+        /// <summary>3Д точка по направлению. Направление берется как единычный вектор из точки pt2 к точке pt1, перемножается на указанную
+        /// длину и откладывается от указанной точки</summary>
         /// <param name="pt1">Первая точка для получения единичного вектора</param>
         /// <param name="pt2">Вторая точка для получения единичного вектора</param>
         /// <param name="ptFrom">Точка от которой откладывается расстояние</param>
@@ -21,10 +17,8 @@ namespace ModPlus.Helpers
             Point3d pt3 = ptFrom + (pt2 - pt1).GetNormal() * lenght;
             return pt3;
         }
-        /// <summary>
-        /// 2Д точка по направлению. Направление берется как единычный вектор из точки pt2 к точке pt1, перемножается на указанную
-        /// длину и откладывается от указанной точки
-        /// </summary>
+        /// <summary>2Д точка по направлению. Направление берется как единычный вектор из точки pt2 к точке pt1, перемножается на указанную
+        /// длину и откладывается от указанной точки</summary>
         /// <param name="pt1">Первая точка для получения единичного вектора</param>
         /// <param name="pt2">Вторая точка для получения единичного вектора</param>
         /// <param name="ptFrom">Точка от которой откладывается расстояние</param>
@@ -48,18 +42,14 @@ namespace ModPlus.Helpers
         {
             return (p2 + (p2 - p1).GetPerpendicularVector() * distance);
         }
-        /// <summary>
-        /// Конвертирование 2Д точки в 3Д точку
-        /// </summary>
+        /// <summary>Конвертирование 2Д точки в 3Д точку</summary>
         /// <param name="point2D">Исходная 2Д точка</param>
         /// <returns>Результирующая 3Д точка</returns>
         public static Point3d ConvertPoint2DToPoint3D(Point2d point2D)
         {
             return new Point3d(point2D.X, point2D.Y, 0.0);
         }
-        /// <summary>
-        /// Конвертирование 3Д точки в 2Д точку
-        /// </summary>
+        /// <summary>Конвертирование 3Д точки в 2Д точку</summary>
         /// <param name="point3d">Исходная 3Д точка</param>
         /// <returns>Результирующая 2Д точка</returns>
         public static Point2d ConvertPoint3dToPoint2d(Point3d point3d)

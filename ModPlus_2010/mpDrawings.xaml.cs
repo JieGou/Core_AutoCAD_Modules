@@ -5,14 +5,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Internal;
-using mpMsg;
-using mpSettings;
-using ModPlus.App;
+using ModPlusAPI;
 // AutoCad
 #if ac2010
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -22,18 +17,18 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ModPlus
 {
-    public partial class MpDrawings
+    partial class MpDrawings
     {
         // Переменные
-        public DocumentCollection Docs = AcApp.DocumentManager;
-        public string GlobalFileName = string.Empty;
+        DocumentCollection Docs = AcApp.DocumentManager;
+        string GlobalFileName = string.Empty;
 
-        public MpDrawings()
+        internal MpDrawings()
         {
             try
             {
-                Top = double.Parse(MpSettings.GetValue("Settings", "DrawingsCoordinates", "top"));
-                Left = double.Parse(MpSettings.GetValue("Settings", "DrawingsCoordinates", "left"));
+                Top = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "top"));
+                Left = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "left"));
             }
             catch (Exception)
             {
@@ -110,38 +105,12 @@ namespace ModPlus
         // Чертеж закрыт
         void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {
-            //try
-            //{
-            //    foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
-            //        lbi => lbi.ToolTip.ToString() == e.FileName))
-            //    {
-            //        Drawings.Items.Remove(lbi);
-            //        break;
-            //    }
-            //}
-            //catch
-            //{
-            //    // ignored
-            //}
             GetDocuments();
             CheckUnused();
         }
         // Документ создан/открыт
         void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
         {
-            //try
-            //{
-            //    var lbi = new ListBoxItem();
-            //    var filename = Path.GetFileName(e.Document.Name);
-            //    lbi.Content = filename;
-            //    lbi.ToolTip = e.Document.Name;
-            //    Drawings.Items.Add(lbi);
-            //    Drawings.SelectedItem = lbi;
-            //}
-            //catch
-            //{
-            //    // ignored
-            //}
             GetDocuments();
             CheckUnused();
         }
@@ -154,8 +123,8 @@ namespace ModPlus
                 TbHeader.Visibility = Visibility.Visible;
                 ExpOpenDrawings.Visibility = Visibility.Visible;
 
-                if (MpVars.MpChkDrwsOnMnu)
-                {
+                //if (ModPlusAPI.Variables.MpChkDrwsOnMnu)
+                //{
                     ExpOpenDrawings.Visibility = Visibility.Visible;
                     //////////////////////////////////
                     if (Docs.Count != Drawings.Items.Count)
@@ -206,7 +175,7 @@ namespace ModPlus
                     {
                         // ignored
                     }
-                }
+                //}
                 //////////////////////////////////
                 Focus();
             }
@@ -219,7 +188,7 @@ namespace ModPlus
         }
         private void OnMouseLeaving()
         {
-            if (MpVars.DrawingsCollapseTo.Equals(0)) //icon
+            if (ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo.Equals(0)) //icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
@@ -291,7 +260,7 @@ namespace ModPlus
         }
 
     }
-    public static class MpDrawingsFunction
+    internal static class MpDrawingsFunction
     {
         public static MpDrawings MpDrawingsWin;
         /// <summary>
@@ -299,7 +268,7 @@ namespace ModPlus
         /// </summary>
         public static void LoadMainMenu()
         {
-            if (MpVars.DrawingsAlone)
+            if (ModPlusAPI.Variables.DrawingsFloatMenu)
             {
                 if (MpDrawingsWin == null)
                 {
@@ -319,8 +288,8 @@ namespace ModPlus
 
         static void MpDrawingsWinClosed(object sender, EventArgs e)
         {
-            MpSettings.SetValue("Settings", "DrawingsCoordinates", "top", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture), true);
-            MpSettings.SetValue("Settings", "DrawingsCoordinates", "left", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture), true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "top", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture), true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "left", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture), true);
             MpDrawingsWin = null;
         }
     }

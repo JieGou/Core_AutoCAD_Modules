@@ -14,12 +14,12 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
-using mpPInterface;
+using ModPlusAPI.Interfaces;
 
 namespace ModPlus.Helpers
 {
     // Вспомогательные методы для загрузки функций
-    public static class LoadFunctionsHelper
+    internal static class LoadFunctionsHelper
     {
         /// <summary>
         /// Список загруженных файлов в виде специального класса для последующего использования при построения ленты и меню
@@ -35,37 +35,7 @@ namespace ModPlus.Helpers
             var types = GetLoadableTypes(loadedFuncAssembly);
             foreach (var type in types)
             {
-                var interf = type.GetInterface(typeof(IPluginInterface).Name);
-                if (interf != null)
-                {
-                    var function = Activator.CreateInstance(type) as IPluginInterface;
-                    if (function != null)
-                    {
-                        var lf = new LoadedFunction
-                        {
-                            Name = function.Name,
-                            LName = function.LName,
-                            Description = function.Description,
-                            SmallIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                           ";component/Resources/" + function.Name +
-                                           "_16x16.png",
-                            BigIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                           ";component/Resources/" + function.Name +
-                                           "_32x32.png",
-                            AvailProductExternalVersion = MpVersionData.CurCadVers,
-                            ToolTipHelpImage = string.Empty,
-                            FullDescription = string.Empty,
-                            SubFunctionsNames = new List<string>(),
-                            SubFunctionsLNames = new List<string>(),
-                            SubBigIconsUrl = new List<string>(),
-                            SubSmallIconsUrl = new List<string>(),
-                            SubHelpImages = new List<string>()
-                        };
-                        LoadedFunctions.Add(lf);
-                    }
-                    break;
-                }
-                interf = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
+                var interf = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
                 if (interf != null)
                 {
                     var function = Activator.CreateInstance(type) as IModPlusFunctionInterface;
@@ -317,7 +287,7 @@ namespace ModPlus.Helpers
         }
     }
 
-    public class LoadedFunction 
+    internal class LoadedFunction 
     {
         public string Name { get; set; }
         public string LName { get; set; }
@@ -337,7 +307,7 @@ namespace ModPlus.Helpers
         public List<string> SubBigIconsUrl { get; set; }
     }
 
-    public static class WPFMenuesHelper
+    internal static class WPFMenuesHelper
     {
         public static Button AddButton(FrameworkElement sourceWindow, string name, string lname, string img32, string description, string fullDescription, string helpImage)
         {

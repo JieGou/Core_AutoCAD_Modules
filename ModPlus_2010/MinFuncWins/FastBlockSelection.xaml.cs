@@ -1,43 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using mpMsg;
-using mpSettings;
+using ModPlusAPI.Windows;
 
 namespace ModPlus.MinFuncWins
 {
-    /// <summary>
-    /// Логика взаимодействия для FastBlockSelection.xaml
-    /// </summary>
-    public partial class FastBlockSelection
+    partial class FastBlockSelection
     {
-        public List<string> ValidateNames;
+        private readonly List<string> ValidateNames;
 
-        public FastBlockSelection()
+        internal FastBlockSelection(List<string> validateNames)
         {
+            ValidateNames = validateNames;
             InitializeComponent();
-            MpWindowHelpers.OnWindowStartUp(
-                this,
-                MpSettings.GetValue("Settings", "MainSet", "Theme"),
-                MpSettings.GetValue("Settings", "MainSet", "AccentColor"),
-                MpSettings.GetValue("Settings", "MainSet", "BordersType")
-                );
+            this.OnWindowStartUp();
         }
 
         private void BtOk_OnClick(object sender, RoutedEventArgs e)
         {
             if (ValidateNames.Contains(TbBlockName.Text))
             {
-                MpMsgWin.Show("Такое имя уже используется! Придумайте другое");
+                ModPlusAPI.Windows.MessageBox.Show("Такое имя уже используется! Придумайте другое");
                 return;
             }
             if (string.IsNullOrEmpty(TbBlockName.Text))
             {
-                MpMsgWin.Show("Нужно указать отображаемое имя блока!");
+                ModPlusAPI.Windows.MessageBox.Show("Нужно указать отображаемое имя блока!");
                 return;
             }
             if (LbBlocks.SelectedIndex == -1)
             {
-                MpMsgWin.Show("Нужно выбрать блок в списке!");
+                ModPlusAPI.Windows.MessageBox.Show("Нужно выбрать блок в списке!");
                 return;
             }
             DialogResult = true;

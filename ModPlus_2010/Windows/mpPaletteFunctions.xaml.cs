@@ -10,10 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
-using mpMsg;
-using mpSettings;
 using ModPlus.Helpers;
-using mpPInterface;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 
 namespace ModPlus.Windows
 {
@@ -40,20 +39,20 @@ namespace ModPlus.Windows
             try
             {
                 // Расположение файла конфигурации
-                var confF = MpSettings.FullFileName;
+                var confF = UserConfigFile.FullFileName;
                 // Грузим
                 var configFile = XElement.Load(confF);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -67,7 +66,7 @@ namespace ModPlus.Windows
                         IsExpanded = false,
                         Margin = new Thickness(1)
                     };
-                    var expStck = new StackPanel { Orientation = Orientation.Vertical };
+                    var expStck = new StackPanel {Orientation = Orientation.Vertical};
 
                     // Проходим по функциям группы
                     foreach (var func in group.Elements("Function"))
@@ -75,7 +74,8 @@ namespace ModPlus.Windows
                         var funcNameAttr = func.Attribute("Name")?.Value;
                         if (string.IsNullOrEmpty(funcNameAttr)) continue;
 
-                        var loadedFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
+                        var loadedFunction =
+                            LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
                         if (loadedFunction == null) continue;
 
                         expStck.Children.Add(
@@ -99,13 +99,14 @@ namespace ModPlus.Windows
                         {
                             var subFuncNameAttr = subFunc.Attribute("Name")?.Value;
                             if (string.IsNullOrEmpty(subFuncNameAttr)) continue;
-                            var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
+                            var loadedSubFunction =
+                                LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
                             if (loadedSubFunction == null) continue;
 
                             expStck.Children.Add(
-                            WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
-                            loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
-                            loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage)
+                                WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
+                                    loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
+                                    loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage)
                             );
 
                         }
@@ -117,7 +118,10 @@ namespace ModPlus.Windows
                         FunctionsPanel.Children.Add(exp);
                 }
             }
-            catch (Exception exception) { MpExWin.Show(exception); }
+            catch (Exception exception)
+            {
+                ExceptionBox.ShowForConfigurator(exception);
+            }
         }
         
         private void FillFieldsFunction()
@@ -226,7 +230,7 @@ namespace ModPlus.Windows
         //                FunctionsPanel.Children.Add(exp);
         //        }
         //    }
-        //    catch (Exception exception) { MpExWin.Show(exception); }
+        //    catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
         //}
 
         //private Button AddButton(string name, string lname, string img32, string description)

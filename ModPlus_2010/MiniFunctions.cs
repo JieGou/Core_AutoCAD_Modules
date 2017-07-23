@@ -1,45 +1,42 @@
-﻿
+﻿#if ac2010
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
+#elif ac2013
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+#endif
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
-using mpMsg;
-using mpSettings;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 
 namespace ModPlus
 {
-    public class MiniFunctions
+    internal class MiniFunctions
     {
         public static void LoadUnloadContextMenues()
         {
             // ent by block
             bool b;
             // ent by block
-            var entByBlockObjContMen = !bool.TryParse(MpSettings.GetValue("Settings", "EntByBlockOCM"), out b) || b;
+            var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out b) || b;
             if (entByBlockObjContMen)
                 ContextMenues.EntByBlockObjectContextMenu.Attach();
             else ContextMenues.EntByBlockObjectContextMenu.Detach();
             // Fast block
-            var fastBlocksContextMenu = !bool.TryParse(MpSettings.GetValue("Settings", "FastBlocksCM"), out b) || b;
+            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
                 ContextMenues.FastBlockContextMenu.Attach();
             else ContextMenues.FastBlockContextMenu.Detach();
             // VP to MS
-            var VPtoMSObjConMen = !bool.TryParse(MpSettings.GetValue("Settings", "VPtoMS"), out b) || b;
+            var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
                 ContextMenues.VPtoMSobjectContextMenu.Attach();
             else ContextMenues.VPtoMSobjectContextMenu.Detach();
@@ -85,7 +82,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
 
@@ -198,7 +195,7 @@ namespace ModPlus
                         }
                         else
                         {
-                            MpMsgWin.Show("Указанный объект не является объектом подрезки видового экрана");
+                            MessageBox.Show("Указанный объект не является объектом подрезки видового экрана", MessageBoxIcon.Alert);
                             return;
                         }
                     }
@@ -246,7 +243,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
         private Point3dCollection VPcontuorPoints(Viewport viewport, Transaction tr)
@@ -304,7 +301,7 @@ namespace ModPlus
                     }
                     else
                     {
-                        MpMsgWin.Show("Видовой экран подрезан необрабатываемым объектом!"
+                        MessageBox.Show("Видовой экран подрезан необрабатываемым объектом!"
                             + $"\nВидовой экран №{viewport.Number}, объект подрезки: {ent}\n");
                     }
                 }
@@ -380,9 +377,9 @@ namespace ModPlus
                 {
                     if (ContextMenu == null)
                     {
-                        if (File.Exists(MpSettings.FullFileName))
+                        if (File.Exists(UserConfigFile.FullFileName))
                         {
-                            var configXml = MpSettings.XmlMpSettingsFile;
+                            var configXml = UserConfigFile.ConfigFileXml;
                             var settingsXml = configXml?.Element("Settings");
                             var fastBlocksXml = settingsXml?.Element("mpFastBlocks");
                             if (fastBlocksXml != null)
@@ -403,7 +400,7 @@ namespace ModPlus
                         }
                         else
                         {
-                            MpMsgWin.Show("Не найден файл настроек!");
+                            MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
                         }
                     }
                 }
@@ -424,9 +421,9 @@ namespace ModPlus
                         var mi = sender as MenuItem;
                         if (mi != null)
                         {
-                            if (File.Exists(MpSettings.FullFileName))
+                            if (File.Exists(UserConfigFile.FullFileName))
                             {
-                                var configXml = MpSettings.XmlMpSettingsFile;
+                                var configXml = UserConfigFile.ConfigFileXml;
                                 var settingsXml = configXml?.Element("Settings");
                                 var fastBlocksXml = settingsXml?.Element("mpFastBlocks");
                                 if (fastBlocksXml != null)
@@ -449,13 +446,13 @@ namespace ModPlus
                             }
                             else
                             {
-                                MpMsgWin.Show("Не найден файл настроек!");
+                                MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
                             }
                         }
                     }
                     catch (System.Exception exception)
                     {
-                        MpExWin.Show(exception);
+                        ExceptionBox.ShowForConfigurator(exception);
                     }
                 }
                 private static void InsertBlock(string file, string blockName)

@@ -5,16 +5,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Internal;
-using mpMsg;
-using mpPInterface;
-using mpSettings;
 using ModPlus.App;
 using ModPlus.Helpers;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 // AutoCad
 #if ac2010
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -24,18 +21,18 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace ModPlus
 {
-    public partial class MpFloatMenu
+    partial class MpFloatMenu
     {
         // Переменные
-        public DocumentCollection Docs = AcApp.DocumentManager;
-        public string GlobalFileName = string.Empty;
+        DocumentCollection Docs = AcApp.DocumentManager;
+        string GlobalFileName = string.Empty;
 
         public MpFloatMenu()
         {
             try
             {
-                Top = double.Parse(MpSettings.GetValue("Settings", "MainMenuCoordinates", "top"));
-                Left = double.Parse(MpSettings.GetValue("Settings", "MainMenuCoordinates", "left"));
+                Top = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainMenuCoordinates", "top"));
+                Left = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainMenuCoordinates", "left"));
             }
             catch (Exception)
             {
@@ -52,7 +49,7 @@ namespace ModPlus
             FillFunctions();
 
             ////////////////////////////////////////////////////////
-            if (MpVars.MpChkDrwsOnMnu)
+            if (ModPlusAPI.Variables.DrawingsInFloatMenu)
             {
                 // Подключение обработчиков событий для создания и закрытия чертежей
                 AcApp.DocumentManager.DocumentCreated +=
@@ -100,20 +97,20 @@ namespace ModPlus
             try
             {
                 // Расположение файла конфигурации
-                var confF = MpSettings.FullFileName;
+                var confF = UserConfigFile.FullFileName;
                 // Грузим
                 var configFile = XElement.Load(confF);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню", MessageBoxIcon.Alert);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню", MessageBoxIcon.Alert);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -174,7 +171,7 @@ namespace ModPlus
                         FunctionsPanel.Children.Add(exp);
                 }
             }
-            catch (Exception exception) { MpExWin.Show(exception); }
+            catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
         }
         
         // Чертеж закрыт
@@ -220,7 +217,7 @@ namespace ModPlus
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
                 BtMpSettings.Visibility = Visibility.Visible;
-                if (MpVars.MpChkDrwsOnMnu)
+                if (ModPlusAPI.Variables.DrawingsInFloatMenu)
                 {
                     ExpOpenDrawings.Visibility = Visibility.Visible;
                     //////////////////////////////////
@@ -286,7 +283,7 @@ namespace ModPlus
         }
         private void OnMouseLeaving()
         {
-            if (MpVars.FloatMenuCollapseTo.Equals(0)) //icon
+            if (ModPlusAPI.Variables.FloatMenuCollapseTo.Equals(0)) //icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
@@ -384,7 +381,7 @@ namespace ModPlus
         /// </summary>
         public static void LoadMainMenu()
         {
-            if (MpVars.MpFloatMenu)
+            if (ModPlusAPI.Variables.FloatMenu)
             {
                 if (MpMainMenuWin == null)
                 {
@@ -405,8 +402,8 @@ namespace ModPlus
 
         static void mpMainMenuWin_Closed(object sender, EventArgs e)
         {
-            MpSettings.SetValue("Settings", "MainMenuCoordinates", "top", MpMainMenuWin.Top.ToString(CultureInfo.InvariantCulture), true);
-            MpSettings.SetValue("Settings", "MainMenuCoordinates", "left", MpMainMenuWin.Left.ToString(CultureInfo.InvariantCulture), true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainMenuCoordinates", "top", MpMainMenuWin.Top.ToString(CultureInfo.InvariantCulture), true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainMenuCoordinates", "left", MpMainMenuWin.Left.ToString(CultureInfo.InvariantCulture), true);
             MpMainMenuWin = null;
         }
     }

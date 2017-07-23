@@ -16,17 +16,18 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\ModPlus\ExtDlls\</OutputPath>
+    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DocumentationFile>..\..\..\..\..\ModPlus\ExtDlls\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\..\..\ModPlus\ExtDlls\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -50,37 +51,11 @@
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ExtDlls\MahApps.Metro.dll</HintPath>
+      <HintPath>..\..\..\..\..\ModPlus\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="mpCustomThemes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\ModPlus_builded\mpCustomThemes.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpMsg, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpMsg.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpPInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpPInterface.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpRegistry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpRegistry.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpSettings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpSettings.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpSite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpSite.dll</HintPath>
+    <Reference Include="ModPlusAPI">
+      <HintPath>..\..\..\..\..\ModPlus\ModPlusAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -97,17 +72,14 @@
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\WindowsBase.dll</HintPath>
     </Reference>
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="Xceed.Wpf.Toolkit, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\ModPlus_builded\Xceed.Wpf.Toolkit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App\mpMainSettings.xaml.cs">
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="App\RibbonBuilder.cs" />
+    <Compile Include="Helpers\AutocadHelpers.cs" />
+    <Compile Include="Helpers\InsertToAutoCAD.cs" />
     <Compile Include="Helpers\LoadFunctionsHelper.cs" />
     <Compile Include="Helpers\RibbonHelpers.cs" />
     <Compile Include="MinFuncWins\FastBlockSelection.xaml.cs">
@@ -138,22 +110,8 @@
     <Compile Include="Windows\mpPaletteFunctions.xaml.cs">
       <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\NewFunctionsShow.xaml.cs">
-      <DependentUpon>NewFunctionsShow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Windows\OpenVideo.xaml.cs">
-      <DependentUpon>OpenVideo.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Windows\Reclame.xaml.cs">
-      <DependentUpon>Reclame.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\SelectNumberWin.xaml.cs">
       <DependentUpon>SelectNumberWin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\SetPrefixSuffixWin.xaml.cs">
-      <DependentUpon>SetPrefixSuffixWin.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -185,23 +143,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\NewFunctionsShow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\OpenVideo.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Reclame.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\SelectNumberWin.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\SetPrefixSuffixWin.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -212,12 +154,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Reclame.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icon.png" />

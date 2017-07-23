@@ -4,17 +4,12 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using Autodesk.Windows;
-using Autodesk.AutoCAD.ApplicationServices;
-using mpSettings;
 using System.Windows.Controls;
 
 namespace ModPlus.Helpers
 {
-    public static class RibbonHelpers
+    internal static class RibbonHelpers
     {
         /// <summary>
         /// Создание маленькой кнопки

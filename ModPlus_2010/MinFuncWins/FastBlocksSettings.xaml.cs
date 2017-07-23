@@ -7,8 +7,8 @@ using System.Windows.Controls;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Windows;
-using mpMsg;
-using mpSettings;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 using Visibility = System.Windows.Visibility;
 
 namespace ModPlus.MinFuncWins
@@ -30,12 +30,7 @@ namespace ModPlus.MinFuncWins
         public FastBlocksSettings()
         {
             InitializeComponent();
-            MpWindowHelpers.OnWindowStartUp(
-                this,
-                MpSettings.GetValue("Settings", "MainSet", "Theme"),
-                MpSettings.GetValue("Settings", "MainSet", "AccentColor"),
-                MpSettings.GetValue("Settings", "MainSet", "BordersType")
-                );
+            this.OnWindowStartUp();
             Loaded += FastBlocksSettings_Loaded;
             Closed += FastBlocksSettings_Closed;
         }
@@ -44,7 +39,7 @@ namespace ModPlus.MinFuncWins
         {
             // off/on menu
             bool b;
-            var fastBlocksContextMenu = !bool.TryParse(MpSettings.GetValue("Settings", "FastBlocksCM"), out b) || b;
+            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
             {
                 MiniFunctions.ContextMenues.FastBlockContextMenu.Detach();
@@ -61,9 +56,9 @@ namespace ModPlus.MinFuncWins
         // save to settings file
         private  void SaveToSettingsFile()
         {
-            if (File.Exists(MpSettings.FullFileName))
+            if (File.Exists(UserConfigFile.FullFileName))
             {
-                var configXml = MpSettings.XmlMpSettingsFile;
+                var configXml = UserConfigFile.ConfigFileXml;
                 if (configXml != null)
                 {
                     var settingsXml = configXml.Element("Settings");
@@ -87,20 +82,20 @@ namespace ModPlus.MinFuncWins
                         }
                     }
                     // Save
-                    configXml.Save(MpSettings.FullFileName);
+                    configXml.Save(UserConfigFile.FullFileName);
                 }
             }
             else
             {
-                MpMsgWin.Show("Не найден файл настроек!");
+                ModPlusAPI.Windows.MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
             }
         }
         // load from settings file
         private void LoadFromSettingsFile()
         {
-            if (File.Exists(MpSettings.FullFileName))
+            if (File.Exists(UserConfigFile.FullFileName))
             {
-                var configXml = MpSettings.XmlMpSettingsFile;
+                var configXml = UserConfigFile.ConfigFileXml;
                 var settingsXml = configXml?.Element("Settings");
                 var fastBlocksXml = settingsXml?.Element("mpFastBlocks");
                 if (fastBlocksXml != null)
@@ -120,7 +115,7 @@ namespace ModPlus.MinFuncWins
             }
             else
             {
-                MpMsgWin.Show("Не найден файл настроек!");
+                ModPlusAPI.Windows.MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
             }
         }
         private void LwFastBlocks_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -133,7 +128,7 @@ namespace ModPlus.MinFuncWins
         {
             if (LwFastBlocks.SelectedIndex != -1)
             {
-                if (MpQstWin.Show("Вы уверены, что хотите удалить данный блок из списка?"))
+                if (ModPlusAPI.Windows.MessageBox.ShowYesNo("Вы уверены, что хотите удалить данный блок из списка?", MessageBoxIcon.Question))
                 {
                     var selectedItem = LwFastBlocks.SelectedItem as FastBlock;
                     _fastBlocks.Remove(selectedItem);
@@ -170,10 +165,9 @@ namespace ModPlus.MinFuncWins
                                             select btRecord.Name);
                         }
                         var validateNames = _fastBlocks.Select(fastBlock => fastBlock.Name).ToList();
-                        var fbs = new FastBlockSelection
+                        var fbs = new FastBlockSelection(validateNames)
                         {
-                            LbBlocks = {ItemsSource = blocks},
-                            ValidateNames = validateNames
+                            LbBlocks = {ItemsSource = blocks}
                         };
                         if (fbs.ShowDialog() == true)
                         {
@@ -195,12 +189,12 @@ namespace ModPlus.MinFuncWins
                 }
                 else
                 {
-                    MpMsgWin.Show("Максимально допустимое количество блоков: 10");
+                    ModPlusAPI.Windows.MessageBox.Show("Максимально допустимое количество блоков: 10", MessageBoxIcon.Alert);
                 }
             }
             catch (Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
     }

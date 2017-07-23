@@ -8,15 +8,14 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Autodesk.AutoCAD.Internal;
 using Autodesk.AutoCAD.Runtime;
-using mpMsg;
-using mpSettings;
 using MahApps.Metro;
 using ModPlus.MinFuncWins;
-using Exception = System.Exception;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 
 namespace ModPlus.App
 {
-    public partial class MpMainSettings
+    partial class MpMainSettings
     {
         private string _curUserEmail = string.Empty;
         private string _curTheme = string.Empty;
@@ -33,7 +32,7 @@ namespace ModPlus.App
         private string _curBordersType = string.Empty;
         public List<AccentColorMenuData> AccentColors { get; set; }
         public List<AppThemeMenuData> AppThemes { get; set; }
-        public MpMainSettings()
+        internal MpMainSettings()
         {
             InitializeComponent();
 
@@ -48,7 +47,7 @@ namespace ModPlus.App
         
         private void FillThemesAndColors()
         {
-            ThemeManager.AddAppTheme("DarkBlue", new Uri("pack://application:,,,/mpCustomThemes;component/DarkBlue.xaml"));
+            ThemeManager.AddAppTheme("DarkBlue", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Themes/DarkBlue.xaml"));
             // create accent color menu items for the demo
             AccentColors = ThemeManager.Accents
                                             .Select(a => new AccentColorMenuData() { Name = a.Name, ColorBrush = a.Resources["AccentColorBrush"] as Brush })
@@ -65,13 +64,13 @@ namespace ModPlus.App
             // Устанавливаем текущие. На всякий случай "без ошибок"
             try
             {
-                _curTheme = MpSettings.GetValue("Settings", "MainSet", "Theme");
+                _curTheme = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme");
                 foreach (var item in MiTheme.Items.Cast<AppThemeMenuData>().Where(item => item.Name.Equals(_curTheme)))
                 {
                     MiTheme.SelectedIndex = MiTheme.Items.IndexOf(item);
                 }
 
-                _curColor = MpSettings.GetValue("Settings", "MainSet", "AccentColor");
+                _curColor = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor");
                 foreach (
                     var item in MiColor.Items.Cast<AccentColorMenuData>().Where(item => item.Name.Equals(_curColor)))
                 {
@@ -87,7 +86,7 @@ namespace ModPlus.App
         private void SetAppRegistryKeyForCurrentUser()
         {
             // Ключ берем из глобальных настроек
-            var key = MpVars.RegistryKey;
+            var key = ModPlusAPI.Variables.RegistryKey;
             if (string.IsNullOrEmpty(key))
             {
                 TbAboutRegKey.Visibility = Visibility.Collapsed;
@@ -96,14 +95,14 @@ namespace ModPlus.App
             else
             {
                 TbRegistryKey.Text = key;
-                var regVariant = MpSettings.GetValue("User", "RegestryVariant");
+                var regVariant = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "RegestryVariant");
                 if (!string.IsNullOrEmpty(regVariant))
                 {
                     TbAboutRegKey.Visibility = Visibility.Visible;
                     if (regVariant.Equals("0"))
-                        TbAboutRegKey.Text = "Ключ привязан к физическому диску " + MpSettings.GetValue("User", "HDmodel");
+                        TbAboutRegKey.Text = "Ключ привязан к физическому диску " + UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "HDmodel");
                     else if (regVariant.Equals("1"))
-                        TbAboutRegKey.Text = "Ключ привязан к аккаунту Google: " + MpSettings.GetValue("User", "gName");
+                        TbAboutRegKey.Text = "Ключ привязан к аккаунту Google: " + UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "gName");
                 }
             }
         }
@@ -115,10 +114,10 @@ namespace ModPlus.App
             {
                 ThemeManager.ChangeAppStyle(this,
                     ThemeManager.Accents.First(
-                        x => x.Name.Equals(MpSettings.GetValue("Settings", "MainSet", "AccentColor"))
+                        x => x.Name.Equals(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor"))
                         ),
                     ThemeManager.AppThemes.First(
-                        x => x.Name.Equals(MpSettings.GetValue("Settings", "MainSet", "Theme")))
+                        x => x.Name.Equals(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme")))
                     );
 
             }
@@ -132,16 +131,16 @@ namespace ModPlus.App
         private void GetDataFromConfigFile()
         {
             // Separator
-            var separator = MpSettings.GetValue("Settings", "MainSet", "Separator");
+            var separator = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Separator");
             CbSeparatorSettings.SelectedIndex = string.IsNullOrEmpty(separator) ? 0 : int.Parse(separator);
             // Check updates and new
             bool b;
-            ChkEntByBlock.IsChecked = !bool.TryParse(MpSettings.GetValue("Settings", "EntByBlockOCM"), out b) || b; //true
-            ChkFastBlocks.IsChecked = !bool.TryParse(MpSettings.GetValue("Settings", "FastBlocksCM"), out b) || b; //true
-            ChkVPtoMS.IsChecked = !bool.TryParse(MpSettings.GetValue("Settings", "VPtoMS"), out b) || b; //true
+            ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out b) || b; //true
+            ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
+            ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
             
             // Виды границ окна
-            var border = MpSettings.GetValue("Settings", "MainSet", "BordersType");
+            var border = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType");
             foreach (ComboBoxItem item in CbWindowsBorders.Items)
             {
                 if (item.Tag.Equals(border))
@@ -160,16 +159,16 @@ namespace ModPlus.App
             try
             {
                 // Адаптация
-                ChkMpFloatMenu.IsChecked = _curFloatMenu = MpVars.MpFloatMenu;
-                ChkMpPalette.IsChecked = _curPalette = MpVars.MpPalette;
-                ChkMpPaletteFunctions.IsChecked = _curPaletteFunctions = MpVars.MpPaletteFunctions;
-                ChkMpPaletteDrawings.IsChecked = _curPaletteDrawings = MpVars.MpPaletteDrawings;
-                ChkMpRibbon.IsChecked = _curRibbon = MpVars.MpRibbon;
-                ChkMpChkDrwsOnMnu.IsChecked = _curDrwsOnMnu = MpVars.MpChkDrwsOnMnu;
-                ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = MpVars.DrawingsAlone;
+                ChkMpFloatMenu.IsChecked = _curFloatMenu = ModPlusAPI.Variables.FloatMenu;
+                ChkMpPalette.IsChecked = _curPalette = ModPlusAPI.Variables.Palette;
+                ChkMpPaletteFunctions.IsChecked = _curPaletteFunctions = ModPlusAPI.Variables.FunctionsInPalette;
+                ChkMpPaletteDrawings.IsChecked = _curPaletteDrawings = ModPlusAPI.Variables.DrawingsInPalette;
+                ChkMpRibbon.IsChecked = _curRibbon = ModPlusAPI.Variables.Ribbon;
+                ChkMpChkDrwsOnMnu.IsChecked = _curDrwsOnMnu = ModPlusAPI.Variables.DrawingsInFloatMenu;
+                ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = ModPlusAPI.Variables.DrawingsFloatMenu;
                 // Выбор в выпадающих списках (сворачивать в)
-                CbFloatMenuCollapseTo.SelectedIndex = _curFloatMenuCollapseTo = MpVars.FloatMenuCollapseTo;
-                CbDrawingsCollapseTo.SelectedIndex = _curDrawingsCollapseTo = MpVars.DrawingsCollapseTo;
+                CbFloatMenuCollapseTo.SelectedIndex = _curFloatMenuCollapseTo = ModPlusAPI.Variables.FloatMenuCollapseTo;
+                CbDrawingsCollapseTo.SelectedIndex = _curDrawingsCollapseTo = ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo;
                 // Видимость в зависимости от галочек
                 ChkMpChkDrwsOnMnu.Visibility =
                     CbFloatMenuCollapseTo.Visibility =
@@ -179,31 +178,31 @@ namespace ModPlus.App
                 ChkMpPaletteDrawings.Visibility =
                     ChkMpPaletteFunctions.Visibility = _curPalette ? Visibility.Visible : Visibility.Collapsed;
                 // Тихая загрузка
-                ChkQuietLoading.IsChecked = MpVars.QuietLoading;
+                ChkQuietLoading.IsChecked = ModPlusAPI.Variables.QuietLoading;
                 // email
-                TbEmailAdress.Text = _curUserEmail = MpVars.UserEmail;
+                TbEmailAdress.Text = _curUserEmail = ModPlusAPI.Variables.UserEmail;
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
         // Выбор разделителя целой и дробной части для чисел
         private void CbSeparatorSettings_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MpSettings.SetValue("Settings", "MainSet", "Separator",
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Separator",
                 ((ComboBox)sender).SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
         }
         // Выбор темы
         private void MiTheme_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MpSettings.SetValue("Settings", "MainSet", "Theme", ((AppThemeMenuData)e.AddedItems[0]).Name, true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme", ((AppThemeMenuData)e.AddedItems[0]).Name, true);
             ChangeWindowTheme();
         }
         // Выбор цвета
         private void MiColor_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MpSettings.SetValue("Settings", "MainSet", "AccentColor", ((AccentColorMenuData)e.AddedItems[0]).Name, true);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor", ((AccentColorMenuData)e.AddedItems[0]).Name, true);
             ChangeWindowTheme();
         }
         // windows borders select
@@ -212,8 +211,8 @@ namespace ModPlus.App
             var cb = sender as ComboBox;
             var cbi = cb?.SelectedItem as ComboBoxItem;
             if (cbi == null) return;
-            MpWindowHelpers.ChangeWindowBordes(cbi.Tag.ToString(), this);
-            MpSettings.SetValue("Settings", "MainSet", "BordersType", cbi.Tag.ToString(), true);
+            this.ChangeWindowBordes(cbi.Tag.ToString());
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType", cbi.Tag.ToString(), true);
         }
 
 
@@ -226,8 +225,10 @@ namespace ModPlus.App
                 else
                 {
                     TbEmailAdress.BorderBrush = Brushes.Red;
-                    MpMsgWin.Show("Указанный адрес почты не прошел проверку!" + Environment.NewLine +
-                                  "Или вы ошиблись в указании адреса почты или у вас оооочень уникальный хостер почты =)");
+                    ModPlusAPI.Windows.MessageBox.ShowForConfigurator(
+                        "Указанный адрес почты не прошел проверку!" + Environment.NewLine +
+                        "Или вы ошиблись в указании адреса почты или у вас оооочень уникальный хостер почты =)", 
+                        MessageBoxIcon.Alert);
                     TbEmailAdress.Focus();
                     e.Cancel = true;
                 }
@@ -239,25 +240,25 @@ namespace ModPlus.App
             try
             {
                 // Так как эти значения хранятся в переменных, то их нужно перезаписать
-                MpVars.MpChkDrwsOnMnu = ChkMpChkDrwsOnMnu.IsChecked.Value;
-                MpVars.MpFloatMenu = ChkMpFloatMenu.IsChecked.Value;
-                MpVars.MpPalette = ChkMpPalette.IsChecked.Value;
-                MpVars.MpPaletteDrawings = ChkMpPaletteDrawings.IsChecked.Value;
-                MpVars.MpPaletteFunctions = ChkMpPaletteFunctions.IsChecked.Value;
-                MpVars.MpRibbon = ChkMpRibbon.IsChecked.Value;
-                MpVars.MpSeparator = CbSeparatorSettings.SelectedIndex.ToString(CultureInfo.InvariantCulture);
-                MpVars.QuietLoading = ChkQuietLoading.IsChecked.Value;
-                MpVars.FloatMenuCollapseTo = CbFloatMenuCollapseTo.SelectedIndex;
-                MpVars.DrawingsCollapseTo = CbDrawingsCollapseTo.SelectedIndex;
-                MpVars.DrawingsAlone = ChkMpDrawingsAlone.IsChecked.Value;
-                // Сохраняем в реестр почту, если изменилась
-                MpVars.UserEmail = TbEmailAdress.Text;
-                if (!TbEmailAdress.Text.Equals(_curUserEmail))
-                {
-                    var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("ModPlus");
-                    using (key)
-                        key?.SetValue("email", TbEmailAdress.Text);
-                }
+                //MpVars.MpChkDrwsOnMnu = ChkMpChkDrwsOnMnu.IsChecked.Value;
+                //MpVars.MpFloatMenu = ChkMpFloatMenu.IsChecked.Value;
+                //MpVars.MpPalette = ChkMpPalette.IsChecked.Value;
+                //MpVars.MpPaletteDrawings = ChkMpPaletteDrawings.IsChecked.Value;
+                //MpVars.MpPaletteFunctions = ChkMpPaletteFunctions.IsChecked.Value;
+                //MpVars.MpRibbon = ChkMpRibbon.IsChecked.Value;
+                //MpVars.MpSeparator = CbSeparatorSettings.SelectedIndex.ToString(CultureInfo.InvariantCulture);
+                //MpVars.QuietLoading = ChkQuietLoading.IsChecked.Value;
+                //MpVars.FloatMenuCollapseTo = CbFloatMenuCollapseTo.SelectedIndex;
+                //MpVars.DrawingsCollapseTo = CbDrawingsCollapseTo.SelectedIndex;
+                //MpVars.DrawingsAlone = ChkMpDrawingsAlone.IsChecked.Value;
+                //// Сохраняем в реестр почту, если изменилась
+                //MpVars.UserEmail = TbEmailAdress.Text;
+                //if (!TbEmailAdress.Text.Equals(_curUserEmail))
+                //{
+                //    var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("ModPlus");
+                //    using (key)
+                //        key?.SetValue("email", TbEmailAdress.Text);
+                //}
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
@@ -276,10 +277,10 @@ namespace ModPlus.App
                             !string.IsNullOrEmpty(_curBordersType) &
                             !string.IsNullOrEmpty(_curFloatMenuCollapseTo.ToString()))
                         {
-                            if (!MpSettings.GetValue("Settings", "MainSet", "Theme").Equals(_curTheme) |
-                                !MpSettings.GetValue("Settings", "MainSet", "AccentColor").Equals(_curColor) |
-                                !MpSettings.GetValue("Settings", "MainSet", "BordersType").Equals(_curBordersType) |
-                                !MpSettings.GetValue("Settings", "MainSet", "FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) |
+                            if (!UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme").Equals(_curTheme) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor").Equals(_curColor) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType").Equals(_curBordersType) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) |
                                 !ChkMpChkDrwsOnMnu.IsChecked.Value.Equals(_curDrwsOnMnu))
                             {
                                 MpMenuFunction.MpMainMenuWin.Close();
@@ -315,10 +316,10 @@ namespace ModPlus.App
                             !string.IsNullOrEmpty(_curBordersType) &
                             !string.IsNullOrEmpty(_curDrawingsCollapseTo.ToString()))
                         {
-                            if (!MpSettings.GetValue("Settings", "MainSet", "Theme").Equals(_curTheme) |
-                                !MpSettings.GetValue("Settings", "MainSet", "AccentColor").Equals(_curColor) |
-                                !MpSettings.GetValue("Settings", "MainSet", "BordersType").Equals(_curBordersType) |
-                                !MpSettings.GetValue("Settings", "MainSet", "DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) |
+                            if (!UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme").Equals(_curTheme) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor").Equals(_curColor) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType").Equals(_curBordersType) |
+                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) |
                                 !ChkMpDrawingsAlone.IsChecked.Value.Equals(_curDrawingsAlone))
                             {
                                 MpDrawingsFunction.MpDrawingsWin.Close();
@@ -339,9 +340,9 @@ namespace ModPlus.App
                 // перевод фокуса на автокад
                 Utils.SetFocusToDwgView();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                MpExWin.Show(ex);
+                ExceptionBox.ShowForConfigurator(ex);
             }
 
         }
@@ -352,7 +353,7 @@ namespace ModPlus.App
             var chkBox = sender as CheckBox;
             if (chkBox == null) return;
             var name = chkBox.Name;
-            MpSettings.SetValue("Settings", "MainSet",
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet",
                 name.Substring(5),
                 chkBox.IsChecked?.ToString(),
                 true
@@ -376,8 +377,8 @@ namespace ModPlus.App
         // Тихая загрузка
         private void ChkQuietLoading_OnChecked_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            MpSettings.SetValue("Settings", "MainSet", "ChkQuietLoading", (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value).ToString(), true);
-            MpVars.QuietLoading = (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value);
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "ChkQuietLoading", (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value).ToString(), true);
+            ModPlusAPI.Variables.QuietLoading = (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value);
         }
         // Сворачивать в - для плавающего меню
         private void CbFloatMenuCollapseTo_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -385,9 +386,9 @@ namespace ModPlus.App
             var cb = sender as ComboBox;
             if (cb != null)
             {
-                MpSettings.SetValue("Settings", "MainSet", "FloatMenuCollapseTo",
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "FloatMenuCollapseTo",
                     cb.SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
-                MpVars.FloatMenuCollapseTo = cb.SelectedIndex;
+                ModPlusAPI.Variables.FloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
 
@@ -396,9 +397,9 @@ namespace ModPlus.App
             var cb = sender as ComboBox;
             if (cb != null)
             {
-                MpSettings.SetValue("Settings", "MainSet", "DrawingsCollapseTo",
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "DrawingsCollapseTo",
                     cb.SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
-                MpVars.DrawingsCollapseTo = cb.SelectedIndex;
+                ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
         #region Контекстные меню
@@ -408,7 +409,7 @@ namespace ModPlus.App
             var chk = sender as CheckBox;
             if (chk != null)
             {
-                MpSettings.SetValue("Settings", "EntByBlockOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.ContextMenues.EntByBlockObjectContextMenu.Attach();
                 else MiniFunctions.ContextMenues.EntByBlockObjectContextMenu.Detach();
@@ -420,7 +421,7 @@ namespace ModPlus.App
             var chk = sender as CheckBox;
             if (chk != null)
             {
-                MpSettings.SetValue("Settings", "FastBlocksCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.ContextMenues.FastBlockContextMenu.Attach();
                 else MiniFunctions.ContextMenues.FastBlockContextMenu.Detach();
@@ -437,7 +438,7 @@ namespace ModPlus.App
             var chk = sender as CheckBox;
             if (chk != null)
             {
-                MpSettings.SetValue("Settings", "VPtoMS", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.ContextMenues.VPtoMSobjectContextMenu.Attach();
                 else MiniFunctions.ContextMenues.VPtoMSobjectContextMenu.Detach();
@@ -485,8 +486,15 @@ namespace ModPlus.App
         [CommandMethod("ModPlus", "mpSettings", CommandFlags.Modal)]
         public void Main()
         {
-            var win = new MpMainSettings();
-            win.ShowDialog();
+            try
+            {
+                var win = new MpMainSettings();
+                win.ShowDialog();
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow x:Class="ModPlus.App.MpMainSettings"
+﻿<controls:MetroWindow x:Class="ModPlus.App.MpMainSettings" x:ClassModifier="internal"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
@@ -204,8 +204,10 @@
                                 <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
                                                 Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                                     <StackPanel Orientation="Vertical" Margin="10">
-                                        <TextBlock FontSize="14">Для работы с сервером modplus.org укажите адрес вашей почты</TextBlock>
-                                        <TextBlock FontSize="14">Адрес почты требуется для идентификации Вас на сервере</TextBlock>
+                                        <TextBlock FontSize="14">Укажите адрес вашей почты.</TextBlock>
+                                        <TextBlock FontSize="14">Адрес почты понадобится, если Вы будете отправлять</TextBlock>
+                                        <TextBlock FontSize="14">свои данные (файл конфигурации и ключи) на сервер.</TextBlock>
+                                        <TextBlock FontSize="14">Адрес почты требуется для идентификации Вас на сервере.</TextBlock>
                                         <TextBlock FontSize="14">Рекомендуется использовать адрес почты указанный</TextBlock>
                                         <TextBlock FontSize="14">при регистрации на сайте modplus.org</TextBlock>
                                     </StackPanel>

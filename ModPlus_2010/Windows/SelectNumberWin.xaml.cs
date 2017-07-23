@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using mpSettings;
+using ModPlusAPI.Windows;
 
 namespace ModPlus.Windows
 {
@@ -19,12 +19,7 @@ namespace ModPlus.Windows
         public SelectNumberWin()
         {
             InitializeComponent();
-            MpWindowHelpers.OnWindowStartUp(
-                this,
-                MpSettings.GetValue("Settings", "MainSet", "Theme"),
-                MpSettings.GetValue("Settings", "MainSet", "AccentColor"),
-                MpSettings.GetValue("Settings", "MainSet", "BordersType")
-                );
+            this.OnWindowStartUp();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

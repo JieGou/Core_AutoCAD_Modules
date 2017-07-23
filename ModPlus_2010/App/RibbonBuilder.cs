@@ -8,15 +8,15 @@ using System.Linq;
 using System.Xml.Linq;
 using Autodesk.Windows;
 using Autodesk.AutoCAD.ApplicationServices;
-using mpSettings;
 using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
 using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
 using RibbonSplitButton = Autodesk.Windows.RibbonSplitButton;
 using RibbonSplitButtonListStyle = Autodesk.Windows.RibbonSplitButtonListStyle;
 
 // ModPlus
-using mpMsg;
 using ModPlus.Helpers;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
 using Orientation = System.Windows.Controls.Orientation;
 
 namespace ModPlus.App
@@ -61,7 +61,7 @@ namespace ModPlus.App
             }
             catch (Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
         static void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
@@ -85,7 +85,7 @@ namespace ModPlus.App
             }
             catch (Exception exception)
             {
-                MpExWin.Show(exception);
+                ExceptionBox.ShowForConfigurator(exception);
             }
         }
 
@@ -94,20 +94,20 @@ namespace ModPlus.App
             try
             {
                 // Расположение файла конфигурации
-                var confF = MpSettings.FullFileName;
+                var confF = UserConfigFile.FullFileName;
                 // Грузим
                 var configFile = XElement.Load(confF);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно построить ленту");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Functions
                 if (element?.Element("Functions") == null)
                 {
-                    MpMsgWin.Show("Файл конфигурации поврежден! Невозможно построить ленту");
+                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -352,7 +352,7 @@ namespace ModPlus.App
                             ribTab.Panels.Remove(ribPanel);
                     }
             }
-            catch (Exception exception) { MpExWin.Show(exception); }
+            catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
         }
 
         private static void AddHelpPanel(RibbonTab ribTab)
