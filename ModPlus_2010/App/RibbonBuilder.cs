@@ -21,14 +21,14 @@ using Orientation = System.Windows.Controls.Orientation;
 
 namespace ModPlus.App
 {
-    public static class RibbonBuilder
+    internal static class RibbonBuilder
     {
         public static void BuildRibbon()
         {
             if (!IsLoaded())
             {
                 CreateRibbon();
-                AcApp.SystemVariableChanged += acadApp_SystemVariableChanged;
+                AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
             }
         }
         private static bool IsLoaded()
@@ -54,7 +54,7 @@ namespace ModPlus.App
                         tab => tab.Id.Equals("ModPlus_ID") & tab.Title.Equals("ModPlus")))
                     {
                         ribCntrl.Tabs.Remove(tab);
-                        AcApp.SystemVariableChanged -= acadApp_SystemVariableChanged;
+                        AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                         break;
                     }
                 }
@@ -64,7 +64,7 @@ namespace ModPlus.App
                 ExceptionBox.ShowForConfigurator(exception);
             }
         }
-        static void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
+        private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
         {
             if (e.Name.Equals("WSCURRENT")) BuildRibbon();
         }
@@ -100,14 +100,14 @@ namespace ModPlus.App
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
+                    MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Functions
                 if (element?.Element("Functions") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
+                    MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,8 +15,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using ModPlus.App;
@@ -32,7 +29,7 @@ namespace ModPlus
 {
     public class ModPlus : IExtensionApplication
     {
-        private static bool _quiteLoad = false;
+        private static bool _quiteLoad;
         // Инициализация плагина
         public void Initialize()
         {
@@ -56,6 +53,7 @@ namespace ModPlus
                     ed.WriteMessage("\n***************************");
                     return;
                 }
+                ModPlusAPI.Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
                 ed.WriteMessage("\n***************************");
                 ed.WriteMessage("\nЗагрузка плагина ModPlus...");
                 if (!_quiteLoad) ed.WriteMessage("\nЗагрузка рабочих компонентов...");
@@ -287,7 +285,6 @@ namespace ModPlus
         //    }
         //}
         // Загрузка функций
-
         private static void LoadFunctions(Editor ed)
         {
             try
@@ -372,7 +369,7 @@ namespace ModPlus
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
+        private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
             //now one Ribbon item is initialized, but the Ribbon control
             //may not be available yet, so check if before
@@ -393,7 +390,7 @@ namespace ModPlus
         {
             try
             {
-                var  loadWithWindows =!bool.TryParse(ModPlusAPI.Regestry.GetValue("AutoUpdater","LoadWithWindows"), out bool b) || b;
+                var  loadWithWindows =!bool.TryParse(Regestry.GetValue("AutoUpdater","LoadWithWindows"), out bool b) || b;
                 if (loadWithWindows)
                 {
                     // Если "грузить с виндой", то проверяем, что модуль запущен
@@ -420,442 +417,7 @@ namespace ModPlus
             }
         }
     }
-    public class MpCadHelpers
-    {
-        /// <summary>
-        /// Функции получения данных из автокада
-        /// </summary>
-        public class GetFromAutoCad
-        {
-            /// <summary>
-            /// Получает расстояние между двумя указанными точками в виде строки
-            /// </summary>
-            /// <returns>Строкове представление расстояния</returns>
-            public static string GetLenByTwoPoint()
-            {
-                try
-                {
-                    using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
-                    {
-                        var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
-                        var pdo = new PromptDistanceOptions("\nПервая точка: ");
-                        var pdr = ed.GetDistance(pdo);
-                        return pdr.Status != PromptStatus.OK ? string.Empty : pdr.Value.ToString(CultureInfo.InvariantCulture);
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    ExceptionBox.ShowForConfigurator(ex);
-                    return string.Empty;
-                }
-
-            }
-
-            /// <summary>
-            /// Получение суммы длин выбранных примитивов
-            /// </summary>
-            /// <param name="sumLen">Сумма длин всех примитивов</param>
-            /// <param name="entities">Поддерживаемые примитивы</param>
-            /// <param name="count">Количество примитивов</param>
-            /// <param name="lens">Сумма длин для каждого примитива</param>
-            /// <param name="objectIds">Список ObjectId выбранных примитивов</param>
-            public static void GetLenFromEntities(out double sumLen, out List<string> entities, out List<int> count, out List<double> lens, out List<List<ObjectId>> objectIds)
-            {
-                // Поддерживаемые примитивы
-                entities = new List<string> { "Line", "Circle", "Polyline", "Arc", "Spline", "Ellipse" };
-                // Выбранное количество
-                count = new List<int> { 0, 0, 0, 0, 0, 0 };
-                // Сумма длин
-                sumLen = 0.0;
-                lens = new List<double> { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-                // Список ObjectId
-                objectIds = new List<List<ObjectId>>
-                {
-                    new List<ObjectId>(),
-                    new List<ObjectId>(),
-                    new List<ObjectId>(),
-                    new List<ObjectId>(),
-                    new List<ObjectId>(),
-                    new List<ObjectId>()
-                };
-
-                var doc = AcApp.DocumentManager.MdiActiveDocument;
-                var ed = doc.Editor;
-                try
-                {
-                    var selRes = ed.SelectImplied();
-                    // Если сначала ничего не выбрано, просим выбрать:
-                    if (selRes.Status == PromptStatus.Error)
-                    {
-                        var selOpts = new PromptSelectionOptions
-                        {
-                            MessageForAdding =
-                                "\n" + "Выберите отрезки, полилинии, окружности, дуги, эллипсы или сплайны: "
-                        };
-                        TypedValue[] values =
-                            {
-                                new TypedValue((int) DxfCode.Operator, "<OR"),
-                                new TypedValue((int) DxfCode.Start, "LINE"),
-                                new TypedValue((int) DxfCode.Start, "POLYLINE"),
-                                new TypedValue((int) DxfCode.Start, "LWPOLYLINE"),
-                                new TypedValue((int) DxfCode.Start, "CIRCLE"),
-                                new TypedValue((int) DxfCode.Start, "ARC"),
-                                new TypedValue((int) DxfCode.Start, "SPLINE"),
-                                new TypedValue((int) DxfCode.Start, "ELLIPSE"),
-                                new TypedValue((int) DxfCode.Operator, "OR>")
-                            };
-                        var sfilter = new SelectionFilter(values);
-                        selRes = ed.GetSelection(selOpts, sfilter);
-                    }
-                    else ed.SetImpliedSelection(new ObjectId[0]);
-
-                    if (selRes.Status == PromptStatus.OK)// Если выбраны объекты, тогда дальше
-                    {
-                        using (var tr = doc.TransactionManager.StartTransaction())
-                        {
-                            try
-                            {
-                                var objIds = selRes.Value.GetObjectIds();
-                                foreach (var objId in objIds)
-                                {
-                                    var ent = (Entity)tr.GetObject(objId, OpenMode.ForRead);
-                                    switch (ent.GetType().Name)
-                                    {
-                                        case "Line":
-                                            count[0]++;
-                                            objectIds[0].Add(objId);
-                                            lens[0] += ((Line)ent).Length;
-                                            break;
-                                        case "Circle":
-                                            count[1]++;
-                                            objectIds[1].Add(objId);
-                                            lens[1] += ((Circle)ent).Circumference;
-                                            break;
-                                        case "Polyline":
-                                            count[2]++;
-                                            objectIds[2].Add(objId);
-                                            lens[2] += ((Autodesk.AutoCAD.DatabaseServices.Polyline)ent).Length;
-                                            break;
-                                        case "Arc":
-                                            count[3]++;
-                                            objectIds[3].Add(objId);
-                                            lens[3] += ((Arc)ent).Length;
-                                            break;
-                                        case "Spline":
-                                            count[4]++;
-                                            objectIds[4].Add(objId);
-                                            lens[4] +=
-                                                      (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                                       ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
-                                            break;
-                                        case "Ellipse":
-                                            count[5]++;
-                                            objectIds[5].Add(objId);
-                                            lens[5] +=
-                                                       (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
-                                            break;
-                                    }
-                                    ent.Dispose();
-                                }
-                                // Общая сумма длин
-                                sumLen += lens.Sum();
-                                tr.Commit();
-                            }
-                            catch (System.Exception ex)
-                            {
-                                ExceptionBox.ShowForConfigurator(ex);
-                                tr.Commit();
-                            }
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    ExceptionBox.ShowForConfigurator(ex);
-                }
-            }
-            /// <summary>
-            /// Получение суммы длин выбранных примитивов
-            /// </summary>
-            /// <param name="sumLen">Сумма длин всех примитивов</param>
-            public static void GetLenFromEntities(out double sumLen)
-            {
-                // Сумма длин
-                sumLen = 0.0;
-                var lens = new List<double> { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-                var doc = AcApp.DocumentManager.MdiActiveDocument;
-                var ed = doc.Editor;
-                try
-                {
-                    var selRes = ed.SelectImplied();
-                    // Если сначала ничего не выбрано, просим выбрать:
-                    if (selRes.Status == PromptStatus.Error)
-                    {
-                        var selOpts = new PromptSelectionOptions
-                        {
-                            MessageForAdding =
-                                "\n" + "Выберите отрезки, полилинии, окружности, дуги, эллипсы или сплайны: "
-                        };
-                        TypedValue[] values =
-                            {
-                                new TypedValue((int) DxfCode.Operator, "<OR"),
-                                new TypedValue((int) DxfCode.Start, "LINE"),
-                                new TypedValue((int) DxfCode.Start, "POLYLINE"),
-                                new TypedValue((int) DxfCode.Start, "LWPOLYLINE"),
-                                new TypedValue((int) DxfCode.Start, "CIRCLE"),
-                                new TypedValue((int) DxfCode.Start, "ARC"),
-                                new TypedValue((int) DxfCode.Start, "SPLINE"),
-                                new TypedValue((int) DxfCode.Start, "ELLIPSE"),
-                                new TypedValue((int) DxfCode.Operator, "OR>")
-                            };
-                        var sfilter = new SelectionFilter(values);
-                        selRes = ed.GetSelection(selOpts, sfilter);
-                    }
-                    else ed.SetImpliedSelection(new ObjectId[0]);
-
-                    if (selRes.Status == PromptStatus.OK)// Если выбраны объекты, тогда дальше
-                    {
-                        using (var tr = doc.TransactionManager.StartTransaction())
-                        {
-                            try
-                            {
-                                var objIds = selRes.Value.GetObjectIds();
-                                foreach (var objId in objIds)
-                                {
-                                    var ent = (Entity)tr.GetObject(objId, OpenMode.ForRead);
-                                    switch (ent.GetType().Name)
-                                    {
-                                        case "Line":
-                                            lens[0] += ((Line)ent).Length;
-                                            break;
-                                        case "Circle":
-                                            lens[1] += ((Circle)ent).Circumference;
-                                            break;
-                                        case "Polyline":
-                                            lens[2] += ((Autodesk.AutoCAD.DatabaseServices.Polyline)ent).Length;
-                                            break;
-                                        case "Arc":
-                                            lens[3] += ((Arc)ent).Length;
-                                            break;
-                                        case "Spline":
-                                            lens[4] +=
-                                                      (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                                       ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
-                                            break;
-                                        case "Ellipse":
-                                            lens[5] +=
-                                                       (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
-                                            break;
-                                    }
-                                    ent.Dispose();
-                                }
-                                // Общая сумма длин
-                                sumLen += lens.Sum();
-                                tr.Commit();
-                            }
-                            catch (System.Exception ex)
-                            {
-                                ExceptionBox.ShowForConfigurator(ex);
-                                tr.Commit();
-                            }
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    ExceptionBox.ShowForConfigurator(ex);
-                }
-            }
-        }
-        /// <summary>
-        /// Добавление 
-        /// </summary>
-        /// <param name="regAppName"></param>
-        public static void AddRegAppTableRecord(string regAppName)
-        {
-            var doc = AcApp.DocumentManager.MdiActiveDocument;
-            var db = doc.Database;
-            var tr = doc.TransactionManager.StartTransaction();
-            using (tr)
-            {
-                var rat =
-                  (RegAppTable)tr.GetObject(
-                    db.RegAppTableId,
-                    OpenMode.ForRead,
-                    false
-                  );
-                if (!rat.Has(regAppName))
-                {
-                    rat.UpgradeOpen();
-                    var ratr =
-                      new RegAppTableRecord { Name = regAppName };
-                    rat.Add(ratr);
-                    tr.AddNewlyCreatedDBObject(ratr, true);
-                }
-                tr.Commit();
-            }
-        }
-        /// <summary>
-        /// Добавление текстовых расширенных данных в словарь
-        /// </summary>
-        /// <param name="dictionaryName">Словарь</param>
-        /// <param name="value">Добавляемое значение</param>
-        public static void SetStringXData(string dictionaryName, string value)
-        {
-            var doc = AcApp.DocumentManager.MdiActiveDocument;
-            if (doc != null)
-            {
-                var db = doc.Database;
-                try
-                {
-                    using (doc.LockDocument())
-                    {
-                        using (var tr = db.TransactionManager.StartTransaction())
-                        {
-                            var rec = new Xrecord
-                            {
-                                Data = new ResultBuffer(
-                                    new TypedValue(Convert.ToInt32(DxfCode.Text), value))
-                            };
-
-                            var dict =
-                                (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, false);
-                            dict.SetAt(dictionaryName, rec);
-                            tr.AddNewlyCreatedDBObject(rec, true);
-                            tr.Commit();
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    ExceptionBox.ShowForConfigurator(ex);
-                }
-            }
-        }
-        /// <summary>
-        /// Получение текстовых расширенных данных из указанного словаря
-        /// </summary>
-        /// <param name="dictionaryName">Словарь</param>
-        /// <returns>Значение</returns>
-        public static string GetStringXData(string dictionaryName)
-        {
-            var doc = AcApp.DocumentManager.MdiActiveDocument;
-            if (doc != null)
-            {
-                var db = doc.Database;
-                try
-                {
-                    using (doc.LockDocument())
-                    {
-                        using (var tr = db.TransactionManager.StartTransaction())
-                        {
-                            var dict =
-                                (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, true);
-                            var id = dict.GetAt(dictionaryName);
-                            var rec = tr.GetObject(id, OpenMode.ForWrite, true) as Xrecord;
-                            var value = string.Empty;
-                            if (rec != null)
-                                foreach (var rb in rec.Data.AsArray())
-                                {
-                                    value = rb.Value.ToString();
-                                }
-
-                            tr.Commit();
-                            return value;
-                        }
-                    }
-                } // try
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-            return string.Empty;
-        }
-        /// <summary>
-        /// Проверка наличия словаря расширенных данных
-        /// </summary>
-        /// <param name="dictionaryName">Словарь</param>
-        /// <returns>True - словарь существует, False - словарь отсутствует</returns>
-        public static bool HasXDataDictionary(string dictionaryName)
-        {
-            var doc = AcApp.DocumentManager.MdiActiveDocument;
-            if (doc != null)
-            {
-                var db = doc.Database;
-                try
-                {
-                    using (var tr = db.TransactionManager.StartTransaction())
-                    {
-                        using (doc.LockDocument())
-                        {
-                            var dict =
-                                (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, true);
-                            if (dict.Contains(dictionaryName))
-                            {
-                                tr.Commit();
-                                return true;
-                            }
-                            tr.Commit();
-                            return false;
-                        }
-                    }
-                } // try
-                catch (System.Exception ex)
-                {
-                    ExceptionBox.ShowForConfigurator(ex);
-                    return false;
-                }
-            }
-            return false;
-        }
-        /// <summary>
-        /// Удаление 
-        /// </summary>
-        /// <param name="value"></param>
-        public static void DeleteStringXData(string value)
-        {
-            var database = AcApp.DocumentManager.MdiActiveDocument.Database;
-            try
-            {
-                using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
-                {
-                    using (var tr = database.TransactionManager.StartTransaction())
-                    {
-                        var newValue = new Xrecord();
-                        var values = new[] { new TypedValue(Convert.ToInt32(DxfCode.XRefPath), value) };
-                        newValue.Data = new ResultBuffer(values);
-                        var dictionary = ((DBDictionary)tr.GetObject(database.NamedObjectsDictionaryId, OpenMode.ForWrite, false));
-                        foreach (var obj in dictionary)
-                        {
-                            if (obj.Value.GetObject(OpenMode.ForRead) is Xrecord)
-                            {
-                                var rec = obj.Value.GetObject(OpenMode.ForRead) as Xrecord;
-                                var rb = rec?.Data;
-                                var tv = rb?.AsArray();
-                                var rb2 = newValue.Data;
-                                var tv2 = rb2.AsArray();
-                                if (((TypedValue)tv.GetValue(0)).Value.Equals(
-                                    ((TypedValue)tv2.GetValue(0)).Value))
-                                {
-                                    dictionary.Remove(obj.Key);
-                                    break;
-                                }
-                            }
-                        }
-                        tr.Commit();
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                ExceptionBox.ShowForConfigurator(ex);
-            }
-        }
-    }
+    /// <summary>Вспомгательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
     public static class XDataHelpersForProducts
     {
         private const string AppName = "ModPlusProduct";
@@ -956,8 +518,8 @@ namespace ModPlus
             }
         }
     }
-    // Работа с палитрой
-    public static class MpPalette
+    /// <summary>Методы создания и работы с палитрой ModPlus</summary>
+    internal static class MpPalette
     {
         public static PaletteSet MpPaletteSet;
         [CommandMethod("mpPalette")]
@@ -967,7 +529,7 @@ namespace ModPlus
             {
                 if (MpPaletteSet == null)
                 {
-                    MpPaletteSet = new PaletteSet("mpPalette", "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB74"));
+                    MpPaletteSet = new PaletteSet("Палитра ModPlus", "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB75"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
                     AddRemovePaletts();
@@ -976,7 +538,7 @@ namespace ModPlus
                         PaletteSetStyles.ShowPropertiesMenu |
                         PaletteSetStyles.ShowAutoHideButton |
                         PaletteSetStyles.ShowCloseButton;
-                    MpPaletteSet.MinimumSize = new System.Drawing.Size(100, 300);
+                    MpPaletteSet.MinimumSize = new Size(100, 300);
                     MpPaletteSet.DockEnabled = DockSides.Left | DockSides.Right;
                     MpPaletteSet.RecalculateDockSiteLayout();
                     MpPaletteSet.Visible = true;
@@ -1058,6 +620,7 @@ namespace ModPlus
 
         private static void _mpPaletteSet_Save(object sender, PalettePersistEventArgs e)
         {
+            // ReSharper disable once UnusedVariable
             var a = (double)e.ConfigurationSection.ReadProperty("ModPlusPalette", 22.3);
         }
 

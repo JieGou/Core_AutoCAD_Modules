@@ -1,25 +1,19 @@
-﻿<UserControl x:Class="ModPlus.Windows.mpPaletteFunctions"
+﻿<UserControl x:Class="ModPlus.Windows.mpPaletteFunctions" x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-             xmlns:local="clr-namespace:ModPlus.Windows"
              mc:Ignorable="d" Background="White">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Padding" Value="2"></Setter>
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -38,11 +32,11 @@
         </Grid.Resources>
         <Button Grid.Row="0" Grid.Column="0" Margin="2" Name="BtFields" 
                 Width="24" Height="24" Padding="0"
-                Style="{StaticResource BtStyle}" ToolTip="Вызов функции Поля"
+                 ToolTip="Вызов функции Поля"
                 HorizontalAlignment="Right" Click="BtFields_OnClick"></Button>
         <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="BtSettings"
                 Padding="0" Width="24" Height="24"
-                Style="{StaticResource BtStyle}" Click="BtSettings_OnClick"
+                 Click="BtSettings_OnClick"
                 ToolTip="Настройки ModPlus" HorizontalAlignment="Right">
             <Rectangle Width="18" Height="18" Fill="DimGray">
                 <Rectangle.OpacityMask>
@@ -58,22 +52,5 @@
 
                 </StackPanel>
             </ScrollViewer>
-        <!--<TabControl Grid.Column="0" Grid.Row="1" Name="ExpMpFunctions" 
-                    Grid.ColumnSpan="2" Padding="2">
-            <TabItem Header="Функции" controls:ControlsHelper.HeaderFontSize="12">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel CanVerticallyScroll="True" Name="FunctionsPanel">
-
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-            <TabItem Header="ЕСКД" controls:ControlsHelper.HeaderFontSize="12" Name="TabItemESKDfunctions">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel CanVerticallyScroll="True" Name="ESKDFunctionsPanel">
-
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-        </TabControl>-->
     </Grid>
 </UserControl>

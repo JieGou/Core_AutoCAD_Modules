@@ -13,9 +13,6 @@ using Visibility = System.Windows.Visibility;
 
 namespace ModPlus.MinFuncWins
 {
-    /// <summary>
-    /// Логика взаимодействия для FastBlocksSettings.xaml
-    /// </summary>
     public partial class FastBlocksSettings
     {
         class FastBlock
@@ -27,6 +24,7 @@ namespace ModPlus.MinFuncWins
         }
 
         private List<FastBlock> _fastBlocks;
+
         public FastBlocksSettings()
         {
             InitializeComponent();

@@ -173,5 +173,24 @@ namespace ModPlus.Helpers
             }
             return btr?.Name;
         }
+        /// <summary>Получение аннотативного масштаба по имени из текущей базы данных (HostApplicationServices.WorkingDatabase)</summary>
+        /// <param name="name">Имя масштаба</param>
+        /// <returns>Аннотативный масштаб с таким именем или текущий масштаб в БД</returns>
+        public static AnnotationScale GetAnnotationScaleByName(string name)
+        {
+            var db = HostApplicationServices.WorkingDatabase;
+            var ocm = db.ObjectContextManager;
+            if (ocm != null)
+            {
+                var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
+                if (occ != null)
+                    foreach (var objectContext in occ)
+                    {
+                        var asc = objectContext as AnnotationScale;
+                        if (asc?.Name == name) return asc;
+                    }
+            }
+            return db.Cannoscale;
+        }
     }
 }

@@ -3,33 +3,23 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 #elif ac2013
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.AutoCAD.ApplicationServices;
 using Path = System.IO.Path;
 
 namespace ModPlus.Windows
 {
-    public partial class mpPaletteDrawings 
+    internal partial class mpPaletteDrawings 
     {
         // Переменные
-        public DocumentCollection Docs = AcApp.DocumentManager;
-        public string GlobalFileName = string.Empty;
-
-        public mpPaletteDrawings()
+        private readonly DocumentCollection Docs = AcApp.DocumentManager;
+        
+        internal mpPaletteDrawings()
         {
             InitializeComponent();
+            ModPlusAPI.Windows.Helpers.ChangeThemeForResutceDictionary(this.Resources, true);
             Loaded += MpPaletteDrawings_Loaded;
         }
 

@@ -353,8 +353,7 @@ namespace ModPlus.Helpers
                 Content = stck,
                 ToolTip = AddTooltip(description, fullDescription, helpImage),
                 Margin = new Thickness(1),
-                Padding = new Thickness(1),
-                Style = sourceWindow.FindResource("BtStyle") as Style
+                Padding = new Thickness(1)
             };
             btn.Click += CommandButtonClick;
 

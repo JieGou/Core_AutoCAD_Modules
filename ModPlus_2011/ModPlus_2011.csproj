@@ -9,25 +9,30 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModPlus</RootNamespace>
     <AssemblyName>ModPlus_2011</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\ModPlus_builded\</OutputPath>
+    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>..\..\..\..\..\ModPlus\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
+    <DefineConstants>TRACE;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>..\..\..\..\..\ModPlus\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
@@ -48,37 +53,12 @@
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\ModPlus_builded\MahApps.Metro.dll</HintPath>
+      <HintPath>..\..\..\..\..\ModPlus\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="mpCustomThemes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\ModPlus_builded\mpCustomThemes.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpMsg, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpMsg.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpPInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpPInterface.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpRegistry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpRegistry.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpSettings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpSettings.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mpSite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ModPlus_builded\mpSite.dll</HintPath>
+      <HintPath>..\..\..\..\..\ModPlus\ModPlusAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -140,26 +120,6 @@
       <Link>Windows\mpPaletteFunctions.xaml.cs</Link>
       <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\NewFunctionsShow.xaml.cs">
-      <Link>Windows\NewFunctionsShow.xaml.cs</Link>
-      <DependentUpon>NewFunctionsShow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\OpenVideo.xaml.cs">
-      <Link>Windows\OpenVideo.xaml.cs</Link>
-      <DependentUpon>OpenVideo.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\Reclame.xaml.cs">
-      <Link>Windows\Reclame.xaml.cs</Link>
-      <DependentUpon>Reclame.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\SelectNumberWin.xaml.cs">
-      <Link>Windows\SelectNumberWin.xaml.cs</Link>
-      <DependentUpon>SelectNumberWin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\SetPrefixSuffixWin.xaml.cs">
-      <Link>Windows\SetPrefixSuffixWin.xaml.cs</Link>
-      <DependentUpon>SetPrefixSuffixWin.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -178,13 +138,7 @@
     <Resource Include="Resources\icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\HelpBt.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Reclame.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="..\ModPlus_2010\App\mpMainSettings.xaml">
@@ -219,31 +173,6 @@
     </Page>
     <Page Include="..\ModPlus_2010\Windows\mpPaletteFunctions.xaml">
       <Link>Windows\mpPaletteFunctions.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\NewFunctionsShow.xaml">
-      <Link>Windows\NewFunctionsShow.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\OpenVideo.xaml">
-      <Link>Windows\OpenVideo.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\Reclame.xaml">
-      <Link>Windows\Reclame.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\SelectNumberWin.xaml">
-      <Link>Windows\SelectNumberWin.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\SetPrefixSuffixWin.xaml">
-      <Link>Windows\SetPrefixSuffixWin.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

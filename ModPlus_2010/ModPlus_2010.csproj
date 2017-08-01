@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModPlus</RootNamespace>
     <AssemblyName>ModPlus_2010</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,14 +24,17 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\ModPlus\ExtDlls\ModPlus.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\ModPlus\ExtDlls\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
+    <DefineConstants>TRACE;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>..\..\..\..\..\ModPlus\ExtDlls\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
@@ -62,15 +66,12 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\WindowsBase.dll</HintPath>
-    </Reference>
+    <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
@@ -79,9 +80,11 @@
     </Compile>
     <Compile Include="App\RibbonBuilder.cs" />
     <Compile Include="Helpers\AutocadHelpers.cs" />
+    <Compile Include="Helpers\GetFromAutoCAD.cs" />
     <Compile Include="Helpers\InsertToAutoCAD.cs" />
     <Compile Include="Helpers\LoadFunctionsHelper.cs" />
     <Compile Include="Helpers\RibbonHelpers.cs" />
+    <Compile Include="Helpers\XDataHelpers.cs" />
     <Compile Include="MinFuncWins\FastBlockSelection.xaml.cs">
       <DependentUpon>FastBlockSelection.xaml</DependentUpon>
     </Compile>
@@ -109,9 +112,6 @@
     </Compile>
     <Compile Include="Windows\mpPaletteFunctions.xaml.cs">
       <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\SelectNumberWin.xaml.cs">
-      <DependentUpon>SelectNumberWin.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -142,10 +142,6 @@
     <Page Include="Windows\mpPaletteFunctions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\SelectNumberWin.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -11,16 +11,13 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
-                <Setter Property="BorderThickness" Value="1" />
-            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="5">
@@ -77,7 +74,7 @@
             </ListView.ItemTemplate>
         </ListView>
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
-            <Button Name="BtAddNewBlock" Style="{StaticResource BtStyle}"
+            <Button Name="BtAddNewBlock" 
                     Click="BtAddNewBlock_OnClick"
                     Padding="2" Margin="2">
                 <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
@@ -87,7 +84,7 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>
-            <Button Name="BtRemoveBlock" Style="{StaticResource BtStyle}"
+            <Button Name="BtRemoveBlock" 
                     Padding="2" Margin="2" IsEnabled="False" Click="BtRemoveBlock_OnClick">
                 <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>

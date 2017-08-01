@@ -11,16 +11,13 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
-                <Setter Property="BorderThickness" Value="1" />
-            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="5">
@@ -46,10 +43,10 @@
                      controls:TextBoxHelper.Watermark="Отображаемое имя блока"
                      MaxWidth="200" MaxLength="20" Name="TbBlockName"></TextBox>
             <Button Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    Margin="2" Style="{StaticResource BtStyle}"
+                    Margin="2" 
                     Name="BtOk" Click="BtOk_OnClick">Принять</Button>
             <Button Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    Margin="2" Style="{StaticResource BtStyle}"
+                    Margin="2" 
                     Name="BtCancel" Click="BtCancel_OnClick">Отмена</Button>
         </Grid>
     </Grid>

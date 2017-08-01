@@ -16,14 +16,12 @@ using ModPlusAPI.Windows;
 
 namespace ModPlus.Windows
 {
-    /// <summary>
-    /// Логика взаимодействия для mpPaletteFunctions.xaml
-    /// </summary>
-    public partial class mpPaletteFunctions
+    internal partial class mpPaletteFunctions
     {
-        public mpPaletteFunctions()
+        internal mpPaletteFunctions()
         {
             InitializeComponent();
+            ModPlusAPI.Windows.Helpers.ChangeThemeForResutceDictionary(this.Resources, true);
             Loaded += MpPaletteFunctions_Loaded;
         }
 
@@ -297,7 +295,7 @@ namespace ModPlus.Windows
             if (AcApp.DocumentManager.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSETTINGS ", false, false, false);
         }
-        // start fieds function
+        // start fields function
         private void BtFields_OnClick(object sender, RoutedEventArgs e)
         {
             if (AcApp.DocumentManager.Count > 0)

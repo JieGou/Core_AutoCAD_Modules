@@ -1,24 +1,19 @@
-﻿<UserControl x:Class="ModPlus.Windows.mpPaletteDrawings"
+﻿<UserControl x:Class="ModPlus.Windows.mpPaletteDrawings" x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ModPlus.Windows"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Padding" Value="2"></Setter>
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -43,7 +38,7 @@
             </Canvas>
         </Grid.Resources>
         <Button Grid.Column="0" Margin="2" Name="BtAddDrawing" Click="BtAddDrawing_OnClick"
-                Style="{StaticResource BtStyle}" ToolTip="Новый чертеж">
+                 ToolTip="Новый чертеж" Padding="2">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
@@ -52,8 +47,8 @@
             </Rectangle>
         </Button>
         <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="BtOpenDrawing"
-                Click="BtOpenDrawing_OnClick"
-                Style="{StaticResource BtStyle}" ToolTip="Открыть чертеж">
+                Click="BtOpenDrawing_OnClick" Padding="2"
+                 ToolTip="Открыть чертеж">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
@@ -61,8 +56,8 @@
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
-        <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource BtStyle}"
-                Name="BtClose" ToolTip="Закрыть текущий чертеж"
+        <Button Grid.Row="0" Grid.Column="2" 
+                Name="BtClose" ToolTip="Закрыть текущий чертеж" Padding="0"
                 Click="BtCloseDwg_Click" Margin="0,2,2,2">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>

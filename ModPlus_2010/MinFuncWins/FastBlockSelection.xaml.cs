@@ -4,7 +4,7 @@ using ModPlusAPI.Windows;
 
 namespace ModPlus.MinFuncWins
 {
-    partial class FastBlockSelection
+    internal partial class FastBlockSelection
     {
         private readonly List<string> ValidateNames;
 

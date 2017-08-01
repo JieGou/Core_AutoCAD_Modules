@@ -9,15 +9,15 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="BtStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
                 <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Margin" Value="2"></Setter>
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -269,7 +269,7 @@
                               VerticalAlignment="Center"
                               Content="Частоиспользуемые блоки"
                               ToolTip="Включение/отключение контекстного меню для мини-функции &quot;Частоиспользуемые блоки&quot;"></CheckBox>
-                    <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource BtStyle}"
+                    <Button Grid.Row="1" Grid.Column="1" 
                             Padding="2" ToolTip="Настроить список частоиспользуемых блоков"
                             Name="BtFastBlocksSettings" Click="BtFastBlocksSettings_OnClick">
                         <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
