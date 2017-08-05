@@ -212,6 +212,7 @@ namespace ModPlus.Helpers
         private static string ConvertLName(string lName)
         {
             if (!lName.Contains(" ")) return lName;
+            if (lName.Length <= 8) return lName;
             if (lName.Count(x => x == ' ') == 1)
             {
                 return lName.Split(' ')[0] + Environment.NewLine + lName.Split(' ')[1];
