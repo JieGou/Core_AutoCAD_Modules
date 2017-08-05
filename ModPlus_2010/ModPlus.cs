@@ -68,7 +68,6 @@ namespace ModPlus
                 // Строим: ленту, меню, плавающее меню
                 // Загрузка ленты
                 Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
-                // Палитра
                 if (ModPlusAPI.Variables.Palette)
                     MpPalette.CreatePalette();
                 // Загрузка основного меню (с проверкой значения из файла настроек)
@@ -433,7 +432,7 @@ namespace ModPlus
         }
     }
     /// <summary>Методы создания и работы с палитрой ModPlus</summary>
-    internal static class MpPalette
+    public static class MpPalette
     {
         public static PaletteSet MpPaletteSet;
         [CommandMethod("mpPalette")]
