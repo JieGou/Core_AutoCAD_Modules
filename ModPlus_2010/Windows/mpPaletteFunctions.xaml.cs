@@ -29,7 +29,7 @@ namespace ModPlus.Windows
         {
             FillFieldsFunction();
             FillFunctions();
-            
+
         }
         // Заполнение списка функций
         private void FillFunctions()
@@ -56,6 +56,7 @@ namespace ModPlus.Windows
                 var confCuiXel = element.Element("CUI");
                 // Проходим по группам
                 if (confCuiXel == null) return;
+
                 foreach (var group in confCuiXel.Elements("Group"))
                 {
                     var exp = new Expander
@@ -64,8 +65,8 @@ namespace ModPlus.Windows
                         IsExpanded = false,
                         Margin = new Thickness(1)
                     };
-                    var expStck = new StackPanel {Orientation = Orientation.Vertical};
-
+                    var grid = new Grid(){HorizontalAlignment = HorizontalAlignment.Stretch};
+                    var index = 0;
                     // Проходим по функциям группы
                     foreach (var func in group.Elements("Function"))
                     {
@@ -76,20 +77,27 @@ namespace ModPlus.Windows
                             LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
                         if (loadedFunction == null) continue;
 
-                        expStck.Children.Add(
-                            WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
-                                loadedFunction.BigIconUrl, loadedFunction.Description,
-                                loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage)
-                        );
+                        var btn = WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
+                            loadedFunction.BigIconUrl, loadedFunction.Description,
+                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage, false);
+                        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                        btn.SetValue(Grid.ColumnProperty, index);
+                        grid.Children.Add(btn);
+                        index++;
+                        
                         if (loadedFunction.SubFunctionsNames.Any())
                         {
                             for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                             {
-                                expStck.Children.Add(WPFMenuesHelper.AddButton(this,
+                                btn = WPFMenuesHelper.AddButton(this,
                                     loadedFunction.SubFunctionsNames[i],
                                     loadedFunction.SubFunctionsLNames[i], loadedFunction.SubBigIconsUrl[i],
                                     loadedFunction.SubDescriptions[i], loadedFunction.SubFullDescriptions[i],
-                                    loadedFunction.SubHelpImages[i]));
+                                    loadedFunction.SubHelpImages[i], false);
+                                grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                                btn.SetValue(Grid.ColumnProperty, index);
+                                grid.Children.Add(btn);
+                                index++;
                             }
                         }
 
@@ -100,19 +108,19 @@ namespace ModPlus.Windows
                             var loadedSubFunction =
                                 LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
                             if (loadedSubFunction == null) continue;
-
-                            expStck.Children.Add(
-                                WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
-                                    loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
-                                    loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage)
-                            );
-
+                            btn = WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
+                                loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
+                                loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage, false);
+                            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                            btn.SetValue(Grid.ColumnProperty, index);
+                            grid.Children.Add(btn);
+                            index++;
                         }
 
                     }
-                    exp.Content = expStck;
+                    exp.Content = grid;
                     // Добавляем группу, если заполнились функции!
-                    if (expStck.Children.Count > 0)
+                    if (grid.Children.Count > 0)
                         FunctionsPanel.Children.Add(exp);
                 }
             }
@@ -121,7 +129,7 @@ namespace ModPlus.Windows
                 ExceptionBox.ShowForConfigurator(exception);
             }
         }
-        
+
         private void FillFieldsFunction()
         {
             if (LoadFunctionsHelper.HasmpStampsFunction(out string icon))

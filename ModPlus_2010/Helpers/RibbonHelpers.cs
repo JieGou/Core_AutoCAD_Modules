@@ -4,6 +4,8 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.Globalization;
+using System.Linq;
 using Autodesk.Windows;
 using System.Windows.Controls;
 
@@ -108,7 +110,7 @@ namespace ModPlus.Helpers
                 {
                     CommandParameter = tt.Command = fName,
                     Name = tt.Title = lName,
-                    Text = lName,
+                    Text = ConvertLName(lName),
                     CommandHandler = new RibbonCommandHandler(),
                     Orientation = orientation,
                     Size = RibbonItemSize.Large,
@@ -159,7 +161,7 @@ namespace ModPlus.Helpers
                 {
                     CommandParameter = tt.Command = fName,
                     Name = tt.Title = lName,
-                    Text = lName,
+                    Text = ConvertLName(lName),
                     CommandHandler = new RibbonCommandHandler(),
                     Orientation = orientation,
                     Size = RibbonItemSize.Large,
@@ -204,6 +206,28 @@ namespace ModPlus.Helpers
                     AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
                         button.CommandParameter + " ", true, false, true);
                 }
+            }
+        }
+
+        private static string ConvertLName(string lName)
+        {
+            if (!lName.Contains(" ")) return lName;
+            if (lName.Count(x => x == ' ') == 1)
+            {
+                return lName.Split(' ')[0] + Environment.NewLine + lName.Split(' ')[1];
+            }
+            else
+            {
+                var lst = lName.Split(' ');
+                var newLName = string.Empty;
+                int center = (int)(lst.Length / 2.0);
+                for (int i = 0; i < lst.Length; i++)
+                {
+                    var s = lst[i];
+                    if (i != center) newLName = newLName + s;
+                    else newLName = newLName + s + Environment.NewLine;
+                }
+                return newLName;
             }
         }
     }

@@ -139,7 +139,7 @@ namespace ModPlus
                         expStck.Children.Add(
                             WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
                                 loadedFunction.BigIconUrl, loadedFunction.Description,
-                                loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage)
+                                loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage,true)
                         );
                         if (loadedFunction.SubFunctionsNames.Any())
                         {
@@ -149,7 +149,7 @@ namespace ModPlus
                                     loadedFunction.SubFunctionsNames[i],
                                     loadedFunction.SubFunctionsLNames[i], loadedFunction.SubBigIconsUrl[i],
                                     loadedFunction.SubDescriptions[i], loadedFunction.SubFullDescriptions[i],
-                                    loadedFunction.SubHelpImages[i]));
+                                    loadedFunction.SubHelpImages[i], true));
                             }
                         }
 
@@ -162,7 +162,7 @@ namespace ModPlus
                             expStck.Children.Add(
                                 WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
                                 loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
-                                loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage)
+                                loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage, true)
                                 );
                         }
                     }

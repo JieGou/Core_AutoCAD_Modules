@@ -22,7 +22,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>..\..\..\..\..\ModPlus\ModPlus.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +33,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>..\..\..\..\..\ModPlus\ModPlus.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
@@ -79,14 +81,26 @@
     <Compile Include="..\ModPlus_2010\App\RibbonBuilder.cs">
       <Link>App\RibbonBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\AutocadHelpers.cs">
+      <Link>Helpers\AutocadHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\ModPlus_2010\Helpers\GeometryHelpers.cs">
       <Link>Helpers\GeometryHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\GetFromAutoCAD.cs">
+      <Link>Helpers\GetFromAutoCAD.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\InsertToAutoCAD.cs">
+      <Link>Helpers\InsertToAutoCAD.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2010\Helpers\LoadFunctionsHelper.cs">
       <Link>Helpers\LoadFunctionsHelper.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2010\Helpers\RibbonHelpers.cs">
       <Link>Helpers\RibbonHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2010\Helpers\XDataHelpers.cs">
+      <Link>Helpers\XDataHelpers.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2010\MinFuncWins\FastBlockSelection.xaml.cs">
       <Link>MinFuncWins\FastBlockSelection.xaml.cs</Link>

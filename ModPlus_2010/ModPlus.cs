@@ -87,7 +87,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         public void Terminate()
@@ -154,7 +154,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         // Загрузка базы данных
@@ -196,95 +196,9 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
-        // пере/Инициализация файла настроек
-        //private static bool InitConfigFile()
-        //{
-        //    try
-        //    {
-        //        UserConfigFile.InitConfigFile();
-        //        // ReSharper disable once AssignNullToNotNullAttribute
-        //        var curDir = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName;
-        //        // ReSharper disable once AssignNullToNotNullAttribute
-        //        var configPath = Path.Combine(curDir, "UserData");
-        //        if (!Directory.Exists(configPath))
-        //            Directory.CreateDirectory(configPath);
-        //        // Сначала проверяем путь, указанный в реестре
-        //        // Если файл есть - грузим, если нет, то создаем по стандартному пути
-        //        var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus");
-        //        if (key != null)
-        //            using (key)
-        //            {
-        //                var cfile = key.GetValue("ConfigFile") as string;
-        //                if (string.IsNullOrEmpty(cfile) | !File.Exists(cfile))
-        //                {
-        //                    MpSettings.LoadFile(Path.Combine(configPath, "mpConfig.mpcf"));
-        //                    return false;
-        //                }
-        //                if (MpSettings.ValidateXml(cfile))
-        //                    MpSettings.LoadFile(cfile);
-        //                else
-        //                {
-        //                    CopySettingsFileFromBackUp(cfile);
-        //                    MpSettings.LoadFile(cfile);
-        //                }
-        //                return true;
-        //            }
-        //        return false;
-        //    }
-        //    catch (System.Exception exception)
-        //    {
-        //        ExceptionBox.ShowForConfigurator(exception);
-        //        return false;
-        //    }
-        //}
-
-        //private static void MakeSettingsFileBackUp()
-        //{
-        //    try
-        //    {
-        //        var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus");
-        //        if (key != null)
-        //            using (key)
-        //            {
-        //                var cfile = key.GetValue("ConfigFile") as string;
-        //                if (cfile != null & File.Exists(cfile))
-        //                {
-        //                    var fi = new FileInfo(cfile);
-        //                    if (fi.DirectoryName != null)
-        //                        File.Copy(cfile, Path.Combine(fi.DirectoryName, "mpConfig.backup"), true);
-        //                }
-        //            }
-        //    }
-        //    catch (System.Exception exception)
-        //    {
-        //        ExceptionBox.ShowForConfigurator(exception);
-        //    }
-        //}
-
-        //private static void CopySettingsFileFromBackUp(string cfile)
-        //{
-        //    try
-        //    {
-        //        if (File.Exists(cfile))
-        //        {
-        //            var fi = new FileInfo(cfile);
-        //            if (fi.DirectoryName != null)
-        //            {
-        //                var bf = Path.Combine(fi.DirectoryName, "mpConfig.backup");
-        //                if (File.Exists(bf))
-        //                    File.Copy(bf, cfile, true);
-        //            }
-        //        }
-        //    }
-        //    catch (System.Exception exception)
-        //    {
-        //        ExceptionBox.ShowForConfigurator(exception);
-        //    }
-        //}
-        // Загрузка функций
         private static void LoadFunctions(Editor ed)
         {
             try
@@ -360,7 +274,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         /// <summary>
@@ -411,9 +325,9 @@ namespace ModPlus
                     }
                 }
             }
-            catch
+            catch (System.Exception exception)
             {
-                // ignored
+                Statistic.SendException(exception);
             }
         }
     }
@@ -549,7 +463,7 @@ namespace ModPlus
                     MpPaletteSet.Visible = true;
                 }
             }
-            catch (System.Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
+            catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
 
         private static void AddRemovePaletts()

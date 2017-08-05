@@ -55,8 +55,9 @@ namespace ModPlus.Helpers
                                          "_32x32.png",
                             AvailProductExternalVersion = MpVersionData.CurCadVers,
                             FullDescription = function.FullDescription,
-                            ToolTipHelpImage = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                               ";component/Resources/Help/" + function.ToolTipHelpImage,
+                            ToolTipHelpImage = !string.IsNullOrEmpty(function.ToolTipHelpImage)
+                            ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName + ";component/Resources/Help/" + function.ToolTipHelpImage
+                            : string.Empty,
                             SubFunctionsNames = function.SubFunctionsNames,
                             SubFunctionsLNames = function.SubFunctionsLames,
                             SubDescriptions = function.SubDescriptions,
@@ -80,8 +81,10 @@ namespace ModPlus.Helpers
                             foreach (var helpImage in function.SubHelpImages)
                             {
                                 lf.SubHelpImages.Add(
-                                    "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
+                                    !string.IsNullOrEmpty(helpImage)
+                                    ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                     ";component/Resources/Help/" + helpImage
+                                    : string.Empty
                                     );
                             }
                         LoadedFunctions.Add(lf);
@@ -287,7 +290,7 @@ namespace ModPlus.Helpers
         }
     }
 
-    internal class LoadedFunction 
+    internal class LoadedFunction
     {
         public string Name { get; set; }
         public string LName { get; set; }
@@ -309,13 +312,17 @@ namespace ModPlus.Helpers
 
     internal static class WPFMenuesHelper
     {
-        public static Button AddButton(FrameworkElement sourceWindow, string name, string lname, string img32, string description, string fullDescription, string helpImage)
+        public static Button AddButton(
+            FrameworkElement sourceWindow, string name,
+            string lname, string img32, string description, string fullDescription, string helpImage,
+            bool statTextWidth)
         {
             var brd = new Border
             {
                 Padding = new Thickness(1),
                 Margin = new Thickness(1),
-                Background = Brushes.White
+                Background = Brushes.White,
+                HorizontalAlignment = HorizontalAlignment.Left
             };
             try
             {
@@ -336,24 +343,27 @@ namespace ModPlus.Helpers
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
-                Width = 150,
                 Text = lname,
                 Margin = new Thickness(3, 0, 1, 0)
             };
-            var stck = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            stck.Children.Add(brd);
-            stck.Children.Add(txt);
+            if (statTextWidth)
+                txt.Width = 150;
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.Children.Add(brd);
+            grid.Children.Add(txt);
+            brd.SetValue(Grid.ColumnProperty, 0);
+            txt.SetValue(Grid.ColumnProperty, 1);
             var btn = new Button
             {
                 Name = name,
-                Content = stck,
+                Content = grid,
                 ToolTip = AddTooltip(description, fullDescription, helpImage),
                 Margin = new Thickness(1),
-                Padding = new Thickness(1)
+                Padding = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Left
             };
             btn.Click += CommandButtonClick;
 
@@ -406,7 +416,7 @@ namespace ModPlus.Helpers
             {
                 // ignored
             }
-            
+
             tt.Content = stck;
             return tt;
         }

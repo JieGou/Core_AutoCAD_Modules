@@ -239,26 +239,6 @@ namespace ModPlus.App
         {
             try
             {
-                // Так как эти значения хранятся в переменных, то их нужно перезаписать
-                //MpVars.MpChkDrwsOnMnu = ChkMpChkDrwsOnMnu.IsChecked.Value;
-                //MpVars.MpFloatMenu = ChkMpFloatMenu.IsChecked.Value;
-                //MpVars.MpPalette = ChkMpPalette.IsChecked.Value;
-                //MpVars.MpPaletteDrawings = ChkMpPaletteDrawings.IsChecked.Value;
-                //MpVars.MpPaletteFunctions = ChkMpPaletteFunctions.IsChecked.Value;
-                //MpVars.MpRibbon = ChkMpRibbon.IsChecked.Value;
-                //MpVars.MpSeparator = CbSeparatorSettings.SelectedIndex.ToString(CultureInfo.InvariantCulture);
-                //MpVars.QuietLoading = ChkQuietLoading.IsChecked.Value;
-                //MpVars.FloatMenuCollapseTo = CbFloatMenuCollapseTo.SelectedIndex;
-                //MpVars.DrawingsCollapseTo = CbDrawingsCollapseTo.SelectedIndex;
-                //MpVars.DrawingsAlone = ChkMpDrawingsAlone.IsChecked.Value;
-                //// Сохраняем в реестр почту, если изменилась
-                //MpVars.UserEmail = TbEmailAdress.Text;
-                //if (!TbEmailAdress.Text.Equals(_curUserEmail))
-                //{
-                //    var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("ModPlus");
-                //    using (key)
-                //        key?.SetValue("email", TbEmailAdress.Text);
-                //}
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
