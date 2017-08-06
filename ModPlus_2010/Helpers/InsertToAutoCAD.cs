@@ -19,7 +19,7 @@ namespace ModPlus.Helpers
         /// <param name="firstStr">Первая строка. Замена разделителя действует только для неё</param>
         /// <param name="secondString">Вторая строка. Необязательно. Замена разделителя не действует</param>
         /// <param name="useSeparator">Использовать разделитель (для цифровых значений). Заменяет запятую на точку, а затем на текущий разделитель</param>
-        public static void AddStringgToAutoCadTableCell(string firstStr, string secondString, bool useSeparator)
+        public static void AddStringToAutoCadTableCell(string firstStr, string secondString, bool useSeparator)
         {
             try
             {
