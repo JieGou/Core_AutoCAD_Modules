@@ -76,13 +76,14 @@ namespace ModPlus.Windows
                         var loadedFunction =
                             LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
                         if (loadedFunction == null) continue;
-
+                        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                         var btn = WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
                             loadedFunction.BigIconUrl, loadedFunction.Description,
                             loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage, false);
-                        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                        btn.SetValue(Grid.ColumnProperty, index);
+                        
+                        btn.SetValue(Grid.RowProperty, index);
                         grid.Children.Add(btn);
+
                         index++;
                         
                         if (loadedFunction.SubFunctionsNames.Any())
@@ -95,7 +96,7 @@ namespace ModPlus.Windows
                                     loadedFunction.SubDescriptions[i], loadedFunction.SubFullDescriptions[i],
                                     loadedFunction.SubHelpImages[i], false);
                                 grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                                btn.SetValue(Grid.ColumnProperty, index);
+                                btn.SetValue(Grid.RowProperty, index);
                                 grid.Children.Add(btn);
                                 index++;
                             }
@@ -112,11 +113,10 @@ namespace ModPlus.Windows
                                 loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
                                 loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage, false);
                             grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                            btn.SetValue(Grid.ColumnProperty, index);
+                            btn.SetValue(Grid.RowProperty, index);
                             grid.Children.Add(btn);
                             index++;
                         }
-
                     }
                     exp.Content = grid;
                     // Добавляем группу, если заполнились функции!
