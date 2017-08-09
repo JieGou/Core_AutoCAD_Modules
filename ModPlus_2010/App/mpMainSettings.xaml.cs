@@ -12,6 +12,7 @@ using MahApps.Metro;
 using ModPlus.MinFuncWins;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using ModPlusAPI.Windows.Helpers;
 
 namespace ModPlus.App
 {

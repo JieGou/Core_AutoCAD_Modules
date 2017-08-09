@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using ModPlusAPI.Windows;
+using ModPlusAPI.Windows.Helpers;
 
 namespace ModPlus.MinFuncWins
 {

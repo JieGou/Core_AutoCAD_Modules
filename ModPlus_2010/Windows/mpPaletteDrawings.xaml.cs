@@ -19,7 +19,7 @@ namespace ModPlus.Windows
         internal mpPaletteDrawings()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.ChangeThemeForResutceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResutceDictionary(this.Resources, true);
             Loaded += MpPaletteDrawings_Loaded;
         }
 

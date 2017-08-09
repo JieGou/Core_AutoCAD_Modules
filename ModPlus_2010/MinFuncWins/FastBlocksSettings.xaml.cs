@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Windows;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using ModPlusAPI.Windows.Helpers;
 using Visibility = System.Windows.Visibility;
 
 namespace ModPlus.MinFuncWins

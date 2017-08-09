@@ -40,7 +40,7 @@ namespace ModPlus
                 Left = 60;
             }
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.ChangeThemeForResutceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResutceDictionary(this.Resources, true);
 
             MouseEnter += Window_MouseEnter;
             MouseLeave += Window_MouseLeave;
