@@ -139,7 +139,7 @@ namespace ModPlus
                     if (key != null)
                     {
                         var assemblies = key.GetValue("Dll").ToString().Split('/').ToList();
-                        foreach (var file in Directory.GetFiles(key.GetValue("TopDir").ToString(), "*.dll", SearchOption.AllDirectories))
+                        foreach (var file in Directory.GetFiles(Constants.ExtensionsDirectory, "*.dll", SearchOption.AllDirectories))
                         {
                             if (assemblies.Contains((new FileInfo(file)).Name))
                             {

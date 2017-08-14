@@ -17,24 +17,24 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
+    <OutputPath>..\..\..\..\..\ModPlus\Extensions\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\ModPlus\ExtDlls\ModPlus.xml</DocumentationFile>
+    <DocumentationFile>E:\ModPlus\Extensions\ModPlus.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\ModPlus\</OutputPath>
+    <OutputPath>..\..\..\..\..\ModPlus\Extensions\</OutputPath>
     <DefineConstants>TRACE;ac2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>..\..\..\..\..\ModPlus\ExtDlls\ModPlus.xml</DocumentationFile>
+    <DocumentationFile>E:\ModPlus\Extensions\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
@@ -55,11 +55,11 @@
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ModPlus\MahApps.Metro.dll</HintPath>
+      <HintPath>..\..\..\..\..\ModPlus\Extensions\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ModPlusAPI">
-      <HintPath>..\..\..\..\..\ModPlus\ModPlusAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
