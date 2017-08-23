@@ -21,7 +21,7 @@ namespace ModPlus.Windows
         internal mpPaletteFunctions()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResutceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, true);
             Loaded += MpPaletteFunctions_Loaded;
         }
 
