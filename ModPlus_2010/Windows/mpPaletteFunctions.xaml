@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Background="White">
+             mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -31,26 +31,26 @@
             </Canvas>
         </Grid.Resources>
         <Button Grid.Row="0" Grid.Column="0" Margin="2" Name="BtFields" 
-                Width="24" Height="24" Padding="0"
-                 ToolTip="Вызов функции Поля"
-                HorizontalAlignment="Right" Click="BtFields_OnClick"></Button>
+                Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
+                 ToolTip="Вызов функции Поля" 
+                HorizontalAlignment="Right" Click="BtFields_OnClick">
+            <Image Source="../Resources/MpStampFields_16x16.png" Stretch="Fill"
+                   Width="16" Height="16"></Image>
+        </Button>
         <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="BtSettings"
-                Padding="0" Width="24" Height="24"
+                Padding="2" 
                  Click="BtSettings_OnClick"
                 ToolTip="Настройки ModPlus" HorizontalAlignment="Right">
-            <Rectangle Width="18" Height="18" Fill="DimGray">
+            <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
                                                  Visual="{StaticResource appbar_settings}"></VisualBrush>
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
-
             <ScrollViewer Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
-                          VerticalScrollBarVisibility="Auto">
-                <StackPanel CanVerticallyScroll="True" Name="FunctionsPanel">
-
-                </StackPanel>
-            </ScrollViewer>
+                          VerticalScrollBarVisibility="Auto" Background="White">
+                <StackPanel CanVerticallyScroll="True" Name="FunctionsPanel"></StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -38,7 +38,7 @@
             </Canvas>
         </Grid.Resources>
         <Button Grid.Column="0" Margin="2" Name="BtAddDrawing" Click="BtAddDrawing_OnClick"
-                 ToolTip="Новый чертеж" Padding="2">
+                 ToolTip="Новый чертеж" Padding="2" SnapsToDevicePixels="True">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
@@ -48,7 +48,7 @@
         </Button>
         <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="BtOpenDrawing"
                 Click="BtOpenDrawing_OnClick" Padding="2"
-                 ToolTip="Открыть чертеж">
+                 ToolTip="Открыть чертеж" SnapsToDevicePixels="True">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
@@ -56,8 +56,8 @@
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
-        <Button Grid.Row="0" Grid.Column="2" 
-                Name="BtClose" ToolTip="Закрыть текущий чертеж" Padding="0"
+        <Button Grid.Row="0" Grid.Column="2" SnapsToDevicePixels="True"
+                Name="BtClose" ToolTip="Закрыть текущий чертеж" Padding="2"
                 Click="BtCloseDwg_Click" Margin="0,2,2,2">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
