@@ -115,7 +115,7 @@ namespace ModPlus.App
                 if (confCuiXel != null)
                     foreach (var group in confCuiXel.Elements("Group"))
                     {
-                        if(group.Attribute("GroupName") == null) continue;
+                        if (group.Attribute("GroupName") == null) continue;
                         // create the panel source
                         var ribSourcePanel = new RibbonPanelSource
                         {
@@ -141,7 +141,7 @@ namespace ModPlus.App
                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(fNameAttr)))
                             {
                                 var loadedFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(fNameAttr));
-                                if(loadedFunction == null) continue;
+                                if (loadedFunction == null) continue;
                                 hasFunctions = true;
                                 if (nr == 0) ribRowPanel = new RibbonRowPanel();
                                 // В зависимости от размера
@@ -181,7 +181,7 @@ namespace ModPlus.App
                                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(subFunc.Attribute("Name")?.Value)))
                                             {
                                                 var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
-                                                if(loadedSubFunction == null) continue;
+                                                if (loadedSubFunction == null) continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                     loadedSubFunction.Name, loadedSubFunction.LName, loadedSubFunction.SmallIconUrl, loadedSubFunction.BigIconUrl,
                                                     loadedSubFunction.Description, Orientation.Horizontal, loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage
@@ -283,7 +283,7 @@ namespace ModPlus.App
                                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(subFunc.Attribute("Name")?.Value)))
                                             {
                                                 var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
-                                                if(loadedSubFunction == null) continue;
+                                                if (loadedSubFunction == null) continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                     loadedSubFunction.Name, loadedSubFunction.LName, loadedSubFunction.BigIconUrl,
                                                     loadedSubFunction.Description, Orientation.Horizontal, loadedSubFunction.FullDescription,
@@ -380,9 +380,12 @@ namespace ModPlus.App
                 "Основные настройки плагина ModPlus - темы оформления, включение/отключение меню, настройки контекстных меню для мини-функций. Так же позволяет узнать Ваш регистрационный ключ, не запуская Конфигуратор",
                 ""
                 ));
+            ribSourcePanel.Items.Add(ribRowPanel);
             // 
+            ribRowPanel = new RibbonRowPanel();
             string icon;
             if (LoadFunctionsHelper.HasmpStampsFunction(out icon))
+            {
                 ribRowPanel.Items.Add(
                     RibbonHelpers.AddSmallButton(
                         "mpStampFields",
@@ -393,8 +396,29 @@ namespace ModPlus.App
                         ""
                         )
                     );
-
-
+                ribRowPanel.Items.Add(new RibbonRowBreak());
+            }
+            
+            ribRowPanel.Items.Add(
+                RibbonHelpers.AddSmallButton(
+                    "mpShowProductIcons",
+                    "Вкл. иконку изделий",
+                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png",
+                    "Включить иконку идентификации изделий",
+                    "При включении иконки идентификации у всех примитивов, имеющих расширенные данные со сведениями об изделии, будет отображаться условная иконка в виде синего двутавра. Иконка отображается в правом верхнем углу относительно описанного вокруг примитива прямоугольника. Размер иконки меняется после регенерации в зависимости от размеров видимой части экрана",
+                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png"
+                    ));
+            ribRowPanel.Items.Add(new RibbonRowBreak());
+            
+            ribRowPanel.Items.Add(
+                RibbonHelpers.AddSmallButton(
+                    "mpHideProductIcons",
+                    "Откл. иконку изделий",
+                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png",
+                    "Отключить иконку идентификации изделий",
+                    "",
+                    ""
+                ));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
     }

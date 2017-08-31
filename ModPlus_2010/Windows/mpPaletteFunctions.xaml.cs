@@ -170,5 +170,17 @@ namespace ModPlus.Windows
             if (AcApp.DocumentManager.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSTAMPFIELDS ", false, false, false);
         }
+
+        private void BtHideProductIcon_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (AcApp.DocumentManager.Count > 0)
+                AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPHIDEPRODUCTICONS ", false, false, false);
+        }
+
+        private void BtShowProductIcon_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (AcApp.DocumentManager.Count > 0)
+                AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSHOWPRODUCTICONS ", false, false, false);
+        }
     }
 }

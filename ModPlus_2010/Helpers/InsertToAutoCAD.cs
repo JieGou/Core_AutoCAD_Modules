@@ -4,6 +4,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -57,7 +58,8 @@ namespace ModPlus.Helpers
                                     {
                                         var cell = new Cell(tbl, tblhittestinfo.Row, tblhittestinfo.Column);
                                         if (useSeparator)
-                                            cell.TextString = ModPlusAPI.IO.String.ReplaceSeparator(firstStr) + secondString;
+                                            cell.TextString =
+                                                ModPlusAPI.IO.String.ReplaceSeparator(firstStr) + secondString;
                                         else cell.TextString = firstStr + secondString;
                                         end = true;
                                     }
@@ -81,182 +83,154 @@ namespace ModPlus.Helpers
                 ExceptionBox.ShowForConfigurator(ex);
             }
         }
-        /// <summary>Вставка элемента спецификации в строку таблицы AutoCad</summary>
-        /// <param name="pos">Поз.</param>
-        /// <param name="designation">Обозначение</param>
-        /// <param name="name">Наименование</param>
-        /// <param name="massa">Масса</param>
-        /// <param name="note">Примечание</param>
-        /// <remarks>Вставка значений в таблицу ведется согласно количеству столбцов. Подробнее на сайте api.modplus.org</remarks>
-        public static void AddSpecificationItemToTableRow(string pos, string designation, string name, string massa, string note)
+        
+        /// <summary>Вставка элемента спецификации в строку таблицы AutoCad с выбором таблицы и указанием строки</summary>
+        /// <param name="specificationItemForTable">Экземпляр вспомогательного элемента для заполнения строительной спецификации</param>
+        public static void AddSpecificationItemToTableRow(SpecificationItemForTable specificationItemForTable)
         {
-            try
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var db = doc.Database;
+            var ed = doc.Editor;
+            using (doc.LockDocument())
             {
-                var doc = AcApp.DocumentManager.MdiActiveDocument;
-                var db = doc.Database;
-                var ed = doc.Editor;
-                using (doc.LockDocument())
+                var options = new PromptEntityOptions("\nВыберите таблицу: ");
+                options.SetRejectMessage("\nНеверный выбор! Это не таблица!");
+                options.AddAllowedClass(typeof(Table), false);
+                var entity = ed.GetEntity(options);
+                if (entity.Status == PromptStatus.OK)
                 {
-                    var options = new PromptEntityOptions("\nВыберите таблицу: ");
-                    options.SetRejectMessage("\nНеверный выбор! Это не таблица!");
-                    options.AddAllowedClass(typeof(Table), false);
-                    var entity = ed.GetEntity(options);
-                    if (entity.Status == PromptStatus.OK)
+                    using (var tr = db.TransactionManager.StartTransaction())
                     {
-                        using (var tr = db.TransactionManager.StartTransaction())
+                        var table = (Table)tr.GetObject(entity.ObjectId, OpenMode.ForWrite);
+                        var selectedRow = 2;
+                        var ppo = new PromptPointOptions("\nВыберите строку: ");
+                        var end = false;
+                        var vector = new Vector3d(0.0, 0.0, 1.0);
+                        while (end == false)
                         {
-                            var table = (Table)tr.GetObject(entity.ObjectId, OpenMode.ForWrite);
-                            var columnsCount = table.Columns.Count;
-
-                            if (columnsCount == 6)
+                            var ppr = ed.GetPoint(ppo);
+                            if (ppr.Status != PromptStatus.OK) return;
+                            try
                             {
-                                var options2 = new PromptPointOptions("\nВыберите строку: ");
-                                var flag = false;
-                                var viewVector = new Vector3d(0.0, 0.0, 1.0);
-                                while (!flag)
+                                var tblhittestinfo = table.HitTest(ppr.Value, vector);
+                                if (tblhittestinfo.Type == TableHitTestType.Cell)
                                 {
-                                    var point = ed.GetPoint(options2);
-                                    if (point.Status != PromptStatus.OK)
-                                        return;
-                                    try
-                                    {
-                                        var info = table.HitTest(point.Value, viewVector);
-                                        if (info.Type == TableHitTestType.Cell)
-                                        {
-                                            // Заполняем
-                                            // Поз.
-                                            table.Cells[info.Row, 0].SetValue(pos, ParseOption.SetDefaultFormat);
-                                            // Обозначение
-                                            table.Cells[info.Row, 1].SetValue(designation, ParseOption.SetDefaultFormat);
-                                            // Наименование
-                                            table.Cells[info.Row, 2].SetValue(name, ParseOption.SetDefaultFormat);
-                                            //Масса
-                                            table.Cells[info.Row, table.Columns.Count - 2].SetValue(massa, ParseOption.SetDefaultFormat);
-                                            // Примечание
-                                            table.Cells[info.Row, table.Columns.Count - 1].SetValue(note, ParseOption.SetDefaultFormat);
-                                            flag = true;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        MessageBox.Show("Не попали в ячейку!");
-                                    }
+                                    selectedRow = tblhittestinfo.Row;
+                                    end = true;
                                 }
-                            }
-                            else if (columnsCount == 4)
+                            } // try
+                            catch
                             {
-                                var options2 = new PromptPointOptions("\nВыберите строку: ");
-                                var flag = false;
-                                var viewVector = new Vector3d(0.0, 0.0, 1.0);
-                                while (!flag)
-                                {
-                                    var point = ed.GetPoint(options2);
-                                    if (point.Status != PromptStatus.OK)
-                                        return;
-                                    try
-                                    {
-                                        TableHitTestInfo info = table.HitTest(point.Value, viewVector);
-                                        if (info.Type == TableHitTestType.Cell)
-                                        {
-                                            //Cell cell;
-                                            // Заполняем                                            
-                                            // Наименование
-                                            table.Cells[info.Row, 1].SetValue(name, ParseOption.SetDefaultFormat);
-                                            //Масса
-                                            table.Cells[info.Row, table.Columns.Count - 1].SetValue(massa, ParseOption.SetDefaultFormat);
-                                            flag = true;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        MessageBox.Show("Не попали в ячейку!");
-                                    }
-                                }
+                                MessageBox.Show("Не попали в ячейку!");
                             }
-                            else if (columnsCount == 5)
-                            {
-                                var options2 = new PromptPointOptions("\nВыберите строку: ");
-                                var flag = false;
-                                var viewVector = new Vector3d(0.0, 0.0, 1.0);
-                                while (!flag)
-                                {
-                                    var point = ed.GetPoint(options2);
-                                    if (point.Status != PromptStatus.OK)
-                                        return;
-                                    try
-                                    {
-                                        var info = table.HitTest(point.Value, viewVector);
-                                        if (info.Type == TableHitTestType.Cell)
-                                        {
-                                            //Cell cell;
-                                            // Заполняем
-                                            // Обозначение
-                                            //cell = new Cell(table, info.Row, 1);
-                                            //cell.TextString = designation;
-                                            //table.SetTextString(info.Row, 1, designation);
-                                            // Наименование
-                                            //cell = new Cell(table, info.Row, 2);
-                                            //cell.TextString = name;
-                                            //table.SetTextString(info.Row, 2, name);
-
-                                            flag = true;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        MessageBox.Show("Не попали в ячейку!");
-                                    }
-                                }
-                            }
-                            else if (columnsCount == 7)
-                            {
-                                var options2 = new PromptPointOptions("\nВыберите строку: ");
-                                var flag = false;
-                                var viewVector = new Vector3d(0.0, 0.0, 1.0);
-                                while (!flag)
-                                {
-                                    var point = ed.GetPoint(options2);
-                                    if (point.Status != PromptStatus.OK)
-                                        return;
-                                    try
-                                    {
-                                        var info = table.HitTest(point.Value, viewVector);
-                                        if (info.Type == TableHitTestType.Cell)
-                                        {
-                                            //Cell cell;
-                                            // Заполняем
-                                            // Обозначение
-                                            //cell = new Cell(table, info.Row, 3);
-                                            //cell.TextString = designation;
-                                            //table.SetTextString(info.Row, 3, designation);
-                                            // Наименование
-                                            //cell = new Cell(table, info.Row, 4);
-                                            //cell.TextString = name;
-                                            //table.SetTextString(info.Row, 4, name);
-
-                                            flag = true;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        MessageBox.Show("Не попали в ячейку!");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                MessageBox.Show("Неверное количество столбцов в таблице!", MessageBoxIcon.Alert);
-                            }
-                            tr.Commit();
-                        }
+                        } // while
+                        TableHelpers.AddSpecificationItemToTableRow(table, selectedRow, specificationItemForTable);
+                        tr.Commit();
                     }
                 }
             }
-            catch (Exception ex)
+        }
+        /// <summary>Вставка нескольких элементов спецификации в таблицу AutoCAD с выбором таблицы</summary>
+        /// <param name="specificationItemsForTable">Список экземпляров вспомогательного элемента для заполнения строительной спецификации</param>
+        /// <param name="askForSelectRow">Указание пользователем строки, с которой начинается заполнение</param>
+        /// <remarks>Метод проверяет в таблице наличие нужного количества пустых строк и в случае их нехватки добавляет новые</remarks>
+        public static void AddSpecificationItemsToTable(
+            List<SpecificationItemForTable> specificationItemsForTable,
+            bool askForSelectRow)
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var db = doc.Database;
+            var ed = doc.Editor;
+            using (doc.LockDocument())
             {
-                ExceptionBox.ShowForConfigurator(ex);
+                var options = new PromptEntityOptions("\nВыберите таблицу: ");
+                options.SetRejectMessage("\nНеверный выбор! Это не таблица!");
+                options.AddAllowedClass(typeof(Table), false);
+                var entity = ed.GetEntity(options);
+                if (entity.Status == PromptStatus.OK)
+                {
+                    using (var tr = db.TransactionManager.StartTransaction())
+                    {
+                        var table = (Table)tr.GetObject(entity.ObjectId, OpenMode.ForWrite);
+                        var startRow = 2;
+                        if (!askForSelectRow)
+                        {
+                            if (table.TableStyleName.Equals("Mp_GOST_P_21.1101_F8"))
+                            {
+                                startRow = 3;
+                            }
+                            int firstEmptyRow;
+                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out firstEmptyRow);
+                            TableHelpers.FillTableRows(table, firstEmptyRow, specificationItemsForTable);
+                        }
+                        else
+                        {
+                            var ppo = new PromptPointOptions("\nВыберите строку: ");
+                            var end = false;
+                            var vector = new Vector3d(0.0, 0.0, 1.0);
+                            while (end == false)
+                            {
+                                var ppr = ed.GetPoint(ppo);
+                                if (ppr.Status != PromptStatus.OK) return;
+                                try
+                                {
+                                    var tblhittestinfo = table.HitTest(ppr.Value, vector);
+                                    if (tblhittestinfo.Type == TableHitTestType.Cell)
+                                    {
+                                        startRow = tblhittestinfo.Row;
+                                        end = true;
+                                    }
+                                } // try
+                                catch
+                                {
+                                    MessageBox.Show("Не попали в ячейку!");
+                                }
+                            } // while
+                            int firstEmptyRow;
+                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out firstEmptyRow);
+                            TableHelpers.FillTableRows(table, startRow, specificationItemsForTable);
+                        }
+                        tr.Commit();
+                    }
+                }
             }
         }
+        
+        /// <summary>Элемент для заполнения строительной спецификации</summary>
+        public class SpecificationItemForTable
+        {
+            /// <summary>Инициализация экземпляра вспомогательного элемента для заполнения спецификации</summary>
+            /// <param name="position">Позиция</param>
+            /// <param name="designation">Обозначение</param>
+            /// <param name="name">Наименование</param>
+            /// <param name="mass">Масса</param>
+            /// <param name="count">Количество</param>
+            /// <param name="note">Примечание</param>
+            public SpecificationItemForTable(
+                string position, string designation, string name,
+                string mass, string count, string note)
+            {
+                Position = position;
+                Designation = designation;
+                Name = name;
+                Mass = mass;
+                Count = count;
+                Note = note;
+            }
+            /// <summary>Позиция</summary>
+            public string Position { get; set; }
+            /// <summary>Обозначение</summary>
+            public string Designation { get; set; }
+            /// <summary>Наименование</summary>
+            public string Name { get; set; }
+            /// <summary>Масса</summary>
+            public string Mass { get; set; }
+            /// <summary>Количество</summary>
+            public string Count { get; set; }
+            /// <summary>Примечание</summary>
+            public string Note { get; set; }
+        }
+
         /// <summary>Вставка однострочного текста</summary>
         /// <param name="text">Содержимое однострочного текста</param>
         public static void InsertDbText(string text)
@@ -465,5 +439,270 @@ namespace ModPlus.Helpers
             }
         }
         #endregion
+    }
+
+    internal static class TableHelpers
+    {
+        public static bool CheckColumnsCount(int columns, int need)
+        {
+            return columns == need || MessageBox.ShowYesNo(
+                       "В таблице неверное количество столбцов!" + Environment.NewLine + "Продолжить?",
+                       MessageBoxIcon.Question);
+        }
+        public static void CheckAndAddRowCount(Table table, int startRow, int sItemsCount, out int firstEmptyRow)
+        {
+            var rows = table.Rows.Count;
+            var firstRow = startRow;
+            firstEmptyRow = startRow; // Первая пустая строка
+            // Пробегаем по всем ячейкам и проверяем "чистоту" таблицы
+            var empty = true;
+            var stopLoop = false;
+            for (var i = startRow; i <= table.Rows.Count - 1; i++)
+            {
+                for (var j = 0; j < table.Columns.Count; j++)
+                {
+                    if (!table.Cells[i, j].TextString.Equals(string.Empty))
+                    {
+                        empty = false;
+                        stopLoop = true;
+                        break;
+                    }
+                }
+                if (stopLoop) break;
+            }
+            // Если не пустая
+            if (!empty)
+            {
+                if (!MessageBox.ShowYesNo("Таблица не пуста! Переписать?" + Environment.NewLine + "Да - переписать, Нет - дополнить",
+                    MessageBoxIcon.Question))
+                {
+                    // Если "Нет", тогда ищем последуюю пустую строку
+                    // Если последняя строка не пуста, то добавляем 
+                    // еще строчку, иначе...
+                    var findEmpty = true;
+                    for (var j = 0; j < table.Columns.Count; j++)
+                    {
+                        if (!string.IsNullOrEmpty(table.Cells[rows - 1, j].TextString))
+                        {
+                            //table.InsertRows(rows, 8, 1);
+                            table.InsertRowsAndInherit(rows, rows - 1, 1);
+                            rows++;
+                            firstRow = rows - 1; // Так как таблица не обновляется
+                            findEmpty = false; // чтобы не искать последнюю пустую
+                            break;
+                        }
+                    }
+                    if (findEmpty)
+                    {
+                        // идем по таблице в обратном порядке.
+                        stopLoop = false;
+                        for (var i = rows - 1; i >= 2; i--)
+                        {
+                            // Сделаем счетчик k
+                            // Если ячейка пустая - будем увеличивать, а иначе - обнулять
+                            var k = 1;
+                            for (var j = 0; j < table.Columns.Count; j++)
+                            {
+                                if (table.Cells[i, j].TextString.Equals(string.Empty))
+                                {
+                                    firstRow = i;
+                                    k++;
+                                    // Если счетчик k равен количеству колонок
+                                    // значит вся строка пустая и можно тормозить цикл
+                                    if (k == table.Columns.Count)
+                                    {
+                                        stopLoop = true;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    stopLoop = true;
+                                    break;
+                                }
+                            }
+                            if (stopLoop) break;
+                        }
+                        // Разбиваем ячейки
+                        ////////////////////////////////////////
+                    }
+                }
+                // Если "да", то очищаем таблицу
+                else
+                {
+                    for (var i = startRow; i <= rows - 1; i++)
+                    {
+                        for (var j = 0; j < table.Columns.Count; j++)
+                        {
+                            table.Cells[i, j].TextString = string.Empty;
+                            table.Cells[i, j].IsMergeAllEnabled = false;
+                        }
+                    }
+                    // Разбиваем ячейки
+                    //table.UnmergeCells(
+                }
+            }
+            // Если в таблице мало строк
+            if (sItemsCount > rows - firstRow)
+                table.InsertRowsAndInherit(firstRow, firstRow, (sItemsCount - (rows - firstRow) + 1));
+            // После всех манипуляций ищем первую пустую строчку
+            for (var j = 0; j < rows; j++)
+            {
+                var isEmpty = table.Rows[j].IsEmpty;
+                if (isEmpty != null && isEmpty.Value)
+                {
+                    firstEmptyRow = j;
+                    break;
+                }
+            }
+        }
+
+        public static void FillTableRows(Table table, int firstRow, 
+            List<InsertToAutoCad.SpecificationItemForTable> specificationItemsForTable)
+        {
+            for (var i = 0; i < specificationItemsForTable.Count; i++)
+            {
+                AddSpecificationItemToTableRow(table, firstRow + i, specificationItemsForTable[i]);
+            }
+        }
+        public static void AddSpecificationItemToTableRow(
+            Table table, int rowNum, InsertToAutoCad.SpecificationItemForTable specificationItemForTable)
+        {
+            // Если это таблица ModPlus
+            if (table.TableStyleName.Contains("Mp_"))
+            {
+                if (table.TableStyleName.Equals("Mp_GOST_P_21.1101_F7") |
+                    table.TableStyleName.Equals("Mp_DSTU_B_A.2.4-4_F7") |
+                    table.TableStyleName.Equals("Mp_STB_2255_Z1"))
+                {
+                    if (CheckColumnsCount(table.Columns.Count, 6))
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Обозначение
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                        // Масса
+                        table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
+                    }
+                }
+                if (table.TableStyleName.Equals("Mp_GOST_P_21.1101_F8"))
+                {
+                    // Позиция
+                    table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                    // Обозначение
+                    table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+                    // Наименование
+                    table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                    // Количество
+                    table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                    // Масса
+                    table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
+                }
+                if (table.TableStyleName.Equals("Mp_GOST_21.501_F7"))
+                {
+                    if (CheckColumnsCount(table.Columns.Count, 4))
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Count;
+                        // Масса
+                        table.Cells[rowNum, table.Columns.Count - 1].TextString = specificationItemForTable.Mass.Trim();
+                    }
+                }
+                if (table.TableStyleName.Equals("Mp_GOST_21.501_F8"))
+                {
+                    if (CheckColumnsCount(table.Columns.Count, 6))
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Position.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                        // Масса
+                        table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
+                    }
+                }
+                if (table.TableStyleName.Equals("Mp_GOST_2.106_F1"))
+                {
+                    if (CheckColumnsCount(table.Columns.Count, 7))
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Position.Trim();
+                        // Обозначение
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Designation.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 4].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 5].TextString = specificationItemForTable.Count;
+                    }
+                }
+                if (table.TableStyleName.Equals("Mp_GOST_2.106_F1a"))
+                {
+                    if (CheckColumnsCount(table.Columns.Count, 5))
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Обозначение
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                    }
+                }
+            }
+            else
+                // Если таблица не из плагина
+            {
+                if (MessageBox.ShowYesNo(
+                    "Таблица не является таблицей ModPlus. Данные могут заполнится не верно!" +
+                    Environment.NewLine + "Продолжить?", MessageBoxIcon.Question))
+                {
+                    if (table.Columns.Count == 4)
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Count;
+                        // Масса
+                        table.Cells[rowNum, table.Columns.Count - 1].TextString = specificationItemForTable.Mass.Trim();
+                    }
+                    if (table.Columns.Count == 5)
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Обозначение
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                    }
+                    if (table.Columns.Count >= 6)
+                    {
+                        // Позиция
+                        table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+                        // Обозначение
+                        table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+                        // Наименование
+                        table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+                        // Количество
+                        table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+                        // Масса
+                        table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
+                    }
+                }
+            }
+        }
     }
 }

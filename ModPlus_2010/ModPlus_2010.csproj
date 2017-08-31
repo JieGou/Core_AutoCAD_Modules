@@ -78,6 +78,7 @@
     <Compile Include="App\mpMainSettings.xaml.cs">
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="App\MpProductsDrawableOverrule.cs" />
     <Compile Include="App\RibbonBuilder.cs" />
     <Compile Include="Helpers\AutocadHelpers.cs" />
     <Compile Include="Helpers\GetFromAutoCAD.cs" />
@@ -166,7 +167,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\mpIcon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\mpHideProductIcons_16x16.png" />
+    <Resource Include="Resources\mpShowProductIcons_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpShowProductIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

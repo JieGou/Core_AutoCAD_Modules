@@ -81,6 +81,9 @@
       <Link>App\mpMainSettings.xaml.cs</Link>
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\ModPlus_2010\App\MpProductsDrawableOverrule.cs">
+      <Link>App\MpProductsDrawableOverrule.cs</Link>
+    </Compile>
     <Compile Include="..\ModPlus_2010\App\RibbonBuilder.cs">
       <Link>App\RibbonBuilder.cs</Link>
     </Compile>
@@ -203,7 +206,17 @@
       <Link>Resources\mpIcon.ico</Link>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2010\Resources\mpHideProductIcons_16x16.png">
+      <Link>Resources\mpHideProductIcons_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2010\Resources\mpShowProductIcon.png">
+      <Link>Resources\mpShowProductIcon.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2010\Resources\mpShowProductIcons_16x16.png">
+      <Link>Resources\mpShowProductIcons_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

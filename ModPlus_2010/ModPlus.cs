@@ -23,7 +23,6 @@ using System.Windows.Forms.Integration;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-#pragma warning disable 1591
 
 namespace ModPlus
 {
@@ -78,11 +77,20 @@ namespace ModPlus
                 MiniFunctions.LoadUnloadContextMenues();
                 // проверка загруженности модуля автообновления
                 CheckAutoUpdaterLoaded();
+                // Включение иконок для продуктов
+                var showProductsIcon = !bool.TryParse(UserConfigFile.GetValue(
+                    UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),
+                    out bool b) || b; // true
+                if(showProductsIcon)
+                    MpProductIconFunctions.ShowIcon();
 
                 sw.Stop();
                 ed.WriteMessage("\nЗагрузка плагина ModPlus завершена. Затрачено времени (мc): " + sw.ElapsedMilliseconds);
                 ed.WriteMessage("\nПриятной работы!");
                 ed.WriteMessage("\n***************************");
+
+
+                
             }
             catch (System.Exception exception)
             {
@@ -335,6 +343,13 @@ namespace ModPlus
     {
         private const string AppName = "ModPlusProduct";
 
+        public static bool IsModPlusProduct(this Entity ent)
+        {
+            using (var rb = ent.GetXDataForApplication(AppName))
+            {
+                return rb != null;
+            }
+        }
         public static void SaveDataToEntity(object product, DBObject ent, Transaction tr)
         {
             var regTable = (RegAppTable)tr.GetObject(ent.Database.RegAppTableId, OpenMode.ForWrite);
