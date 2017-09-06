@@ -130,6 +130,17 @@ namespace ModPlus.Helpers
                 }
             }
         }
+
+        /// <summary>Вставка элемента спецификации в указанную строку выбранной таблицы AutoCad</summary>
+        /// <param name="specificationItemForTable">Экземпляр вспомогательного элемента для заполнения строительной спецификации</param>
+        /// <param name="table">Таблица AutoCAD</param>
+        /// <param name="rowNumber">Номер строки для вставки элемента спецификации</param>
+        /// <remarks>Метод нужно вызывать внутри открытой транзакции и открытой на запись таблицы</remarks>
+        public static void AddSpecificationItemToTableRow(SpecificationItemForTable specificationItemForTable,Table table, int rowNumber)
+        {
+            TableHelpers.AddSpecificationItemToTableRow(table, rowNumber, specificationItemForTable);
+        }
+
         /// <summary>Вставка нескольких элементов спецификации в таблицу AutoCAD с выбором таблицы</summary>
         /// <param name="specificationItemsForTable">Список экземпляров вспомогательного элемента для заполнения строительной спецификации</param>
         /// <param name="askForSelectRow">Указание пользователем строки, с которой начинается заполнение</param>
@@ -195,7 +206,19 @@ namespace ModPlus.Helpers
                 }
             }
         }
-        
+
+        /// <summary>Вставка нескольких элементов спецификации в выбранную таблицу AutoCAD</summary>
+        /// <param name="table">Таблица AutoCAD</param>
+        /// <param name="rowNumber">Номер строки с которой начинается заполнение таблицы</param>
+        /// <param name="specificationItemsForTable">Список экземпляров вспомогательного элемента для заполнения строительной спецификации</param>
+        /// <remarks>Метод проверяет в таблице наличие нужного количества пустых строк и в случае их нехватки добавляет новые</remarks>
+        /// <remarks>Метод нужно вызывать внутри открытой транзакции и открытой на запись таблицы</remarks>
+        public static void AddSpecificationItemsToTable(Table table, int rowNumber,
+            List<SpecificationItemForTable> specificationItemsForTable)
+        {
+            TableHelpers.FillTableRows(table, rowNumber, specificationItemsForTable);
+        }
+
         /// <summary>Элемент для заполнения строительной спецификации</summary>
         public class SpecificationItemForTable
         {
