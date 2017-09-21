@@ -52,7 +52,7 @@ namespace ModPlus
                     ed.WriteMessage("\n***************************");
                     return;
                 }
-                ModPlusAPI.Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
+                Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
                 ed.WriteMessage("\n***************************");
                 ed.WriteMessage("\nЗагрузка плагина ModPlus...");
                 if (!_quiteLoad) ed.WriteMessage("\nЗагрузка рабочих компонентов...");
@@ -78,9 +78,7 @@ namespace ModPlus
                 // проверка загруженности модуля автообновления
                 CheckAutoUpdaterLoaded();
                 // Включение иконок для продуктов
-                var showProductsIcon = !bool.TryParse(UserConfigFile.GetValue(
-                    UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),
-                    out bool b) || b; // true
+                var showProductsIcon = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),out var b) && b; //false
                 if(showProductsIcon)
                     MpProductIconFunctions.ShowIcon();
 
@@ -88,9 +86,6 @@ namespace ModPlus
                 ed.WriteMessage("\nЗагрузка плагина ModPlus завершена. Затрачено времени (мc): " + sw.ElapsedMilliseconds);
                 ed.WriteMessage("\nПриятной работы!");
                 ed.WriteMessage("\n***************************");
-
-
-                
             }
             catch (System.Exception exception)
             {

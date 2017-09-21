@@ -19,14 +19,13 @@ using ModPlusAPI.Windows;
 
 namespace ModPlus
 {
-    internal class MiniFunctions
+    public class MiniFunctions
     {
         public static void LoadUnloadContextMenues()
         {
             // ent by block
-            bool b;
             // ent by block
-            var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out b) || b;
+            var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b;
             if (entByBlockObjContMen)
                 ContextMenues.EntByBlockObjectContextMenu.Attach();
             else ContextMenues.EntByBlockObjectContextMenu.Detach();

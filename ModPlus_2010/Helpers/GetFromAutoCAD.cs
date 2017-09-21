@@ -5,9 +5,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using ModPlusAPI.Windows;
@@ -97,7 +95,7 @@ namespace ModPlus.Helpers
                                         lens[1] += ((Circle)ent).Circumference;
                                         break;
                                     case "Polyline":
-                                        lens[2] += ((Autodesk.AutoCAD.DatabaseServices.Polyline)ent).Length;
+                                        lens[2] += ((Polyline)ent).Length;
                                         break;
                                     case "Arc":
                                         lens[3] += ((Arc)ent).Length;

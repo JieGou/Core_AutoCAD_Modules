@@ -4,15 +4,13 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
 namespace ModPlus.Helpers
 {
+    /// <summary>Различные вспомогательные методы для работы в AutoCAD</summary>
     public static class AutocadHelpers
     {
         /// <summary>ObjectId блока для стрелки</summary>

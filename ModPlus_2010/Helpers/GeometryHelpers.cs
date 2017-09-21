@@ -30,19 +30,31 @@ namespace ModPlus.Helpers
 
             return ConvertPoint3dToPoint2d(pt3);
         }
+        /// <summary>Получение 2d точки на продолжении условного отрезка</summary>
+        /// <param name="p1">Первая точка условного отрезка</param>
+        /// <param name="p2">Вторая точка условного отрезка</param>
+        /// <param name="distance">Расстояние</param>
         public static Point2d GetPointToExtendLine(Point3d p1, Point3d p2, double distance)
         {
             return (p1 + (p2 - p1).DivideBy((p2 - p1).Length) * distance).Convert2d(new Plane());
         }
+        /// <summary>Получение 2d точки на указанном расстоянии от условного отрезка, полуаемого точками p1 и p2</summary>
+        /// <param name="p1">Первая точка условного отрезка</param>
+        /// <param name="p2">Вторая точка условногоотрезка</param>
+        /// <param name="distance">Расстояние в перпендикулярном направлении от отрезка</param>
         public static Point2d GetPerpendicularPoint2d(Point3d p1, Point3d p2, double distance)
         {
             return (p2 + (p2 - p1).GetPerpendicularVector() * distance).Convert2d(new Plane());
         }
+        /// <summary>Получение 3d точки на указанном расстоянии от условного отрезка, полуаемого точками p1 и p2</summary>
+        /// <param name="p1">Первая точка условного отрезка</param>
+        /// <param name="p2">Вторая точка условного отрезка</param>
+        /// <param name="distance">Расстояние в перпендикулярном направлении от отрезка</param>
         public static Point3d GetPerpendicularPoint3d(Point3d p1, Point3d p2, double distance)
         {
             return (p2 + (p2 - p1).GetPerpendicularVector() * distance);
         }
-        /// <summary>Конвертирование 2Д точки в 3Д точку</summary>
+        /// <summary>Конвертирование 2Д точки в 3Д точку с нулевой ординатой z</summary>
         /// <param name="point2D">Исходная 2Д точка</param>
         /// <returns>Результирующая 3Д точка</returns>
         public static Point3d ConvertPoint2DToPoint3D(Point2d point2D)

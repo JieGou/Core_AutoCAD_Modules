@@ -13,9 +13,7 @@ namespace ModPlus.Helpers
     /// <summary>Вспомогательные методы для работы с расширенными данными (XData)</summary>
     public static class XDataHelpers
     {
-        /// <summary>
-        /// Добавление (регистрация) имени приложения
-        /// </summary>
+        /// <summary>Добавление (регистрация) имени приложения</summary>
         /// <param name="regAppName">Регистрационное имя приложения</param>
         public static void AddRegAppTableRecord(string regAppName)
         {
