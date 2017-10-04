@@ -11,17 +11,15 @@ using System.Windows.Controls;
 
 namespace ModPlus.Helpers
 {
-    internal static class RibbonHelpers
+    public static class RibbonHelpers
     {
-        /// <summary>
-        /// Создание маленькой кнопки
-        /// </summary>
+        /// <summary>Создание маленькой кнопки</summary>
         /// <param name="fName">Навание функции (= параметр запуска функции)</param>
         /// <param name="lName">Локальное название функции</param>
         /// <param name="img">Иконка</param>
         /// <param name="description">Описание функции</param>
-        /// <param name="fullDescription"></param>
-        /// <param name="helpImage"></param>
+        /// <param name="fullDescription">Полное описание</param>
+        /// <param name="helpImage">Имя файла картинки для ToolTip. Файл должен располагаться в каталоге /Resources/Help проекта</param>
         /// <returns></returns>
         public static RibbonButton AddSmallButton(string fName, string lName, string img, string description, string fullDescription, string helpImage)
         {
@@ -73,16 +71,14 @@ namespace ModPlus.Helpers
             }
         }
 
-        /// <summary>
-        /// Создание большой кнопки
-        /// </summary>
+        /// <summary>Создание большой кнопки</summary>
         /// <param name="fName">Навание функции (= параметр запуска функции)</param>
         /// <param name="lName">Локальное название функции</param>
         /// <param name="img">Иконка</param>
         /// <param name="description">Описание функции</param>
         /// <param name="orientation">Ориентация кнопки: горизонтальная или вертикальная</param>
-        /// <param name="fullDescription"></param>
-        /// <param name="helpImage"></param>
+        /// <param name="fullDescription">Полное описание</param>
+        /// <param name="helpImage">Имя файла картинки для ToolTip. Файл должен располагаться в каталоге /Resources/Help проекта</param>
         /// <returns></returns>
         public static RibbonButton AddBigButton(string fName, string lName, string img, string description, Orientation orientation, string fullDescription, string helpImage)
         {
@@ -221,19 +217,6 @@ namespace ModPlus.Helpers
             var nearestDelta = lName.Select((c, i) => new { index = i, value = c }).Where(w => w.value == ' ')
                 .OrderBy(x => Math.Abs(x.index - center)).First().index;
             return lName.Substring(0, nearestDelta) + Environment.NewLine + lName.Substring(nearestDelta + 1);
-            //else
-            //{
-            //    var lst = lName.Split(' ');
-            //    var newLName = string.Empty;
-            //    int center = (int)(lst.Length / 2.0);
-            //    for (int i = 0; i < lst.Length; i++)
-            //    {
-            //        var s = lst[i];
-            //        if (i != center) newLName = newLName + s;
-            //        else newLName = newLName + s + Environment.NewLine;
-            //    }
-            //    return newLName;
-            //}
         }
     }
 }
