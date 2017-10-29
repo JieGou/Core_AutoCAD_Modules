@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("modplus.org")]
 [assembly: AssemblyProduct("ModPlus")]
-[assembly: AssemblyCopyright("modplus.org")]
-[assembly: AssemblyTrademark("ModPlus")]
+[assembly: AssemblyCopyright("Copyright ©  ModPlus 2017")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Установка значения False для параметра ComVisible делает типы в этой сборке невидимыми
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номер сборки и номер редакции по умолчанию.
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.8.3.5")]
-[assembly: AssemblyFileVersion("1.8.3.5")]
+[assembly: AssemblyVersion("1.8.3.6")]
+[assembly: AssemblyFileVersion("1.8.3.6")]
