@@ -3,7 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
-                      ShowIconOnTitleBar="False" Title="Частоиспользуемые блоки"
+                      ShowIconOnTitleBar="False" 
                       ShowMaxRestoreButton="False" Topmost="True"
                       ShowMinButton="False" ShowInTaskbar="False" 
                       ShowTitleBar="False" ResizeMode="NoResize"
@@ -18,6 +18,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="5">
@@ -38,7 +39,7 @@
                 <Path Width="27.7083" Height="35.625" Canvas.Left="24.1458" Canvas.Top="19.7917" Stretch="Fill" Fill="Black" Data="F1 M 25.3333,23.75L 50.6667,23.75C 51.5411,23.75 51.8541,27.3125 51.8541,27.3125L 24.1458,27.3125C 24.1458,27.3125 24.4589,23.75 25.3333,23.75 Z M 35.625,19.7917L 40.375,19.7917C 40.8122,19.7917 41.9583,20.9378 41.9583,21.375C 41.9583,21.8122 40.8122,22.9584 40.375,22.9584L 35.625,22.9584C 35.1878,22.9584 34.0416,21.8122 34.0416,21.375C 34.0416,20.9378 35.1878,19.7917 35.625,19.7917 Z M 27.7083,28.5L 48.2916,28.5C 49.1661,28.5 49.875,29.2089 49.875,30.0834L 48.2916,53.8334C 48.2916,54.7078 47.5828,55.4167 46.7083,55.4167L 29.2917,55.4167C 28.4172,55.4167 27.7083,54.7078 27.7083,53.8334L 26.125,30.0834C 26.125,29.2089 26.8339,28.5 27.7083,28.5 Z M 30.0833,31.6667L 30.4792,52.25L 33.25,52.25L 32.8542,31.6667L 30.0833,31.6667 Z M 36.4167,31.6667L 36.4167,52.25L 39.5833,52.25L 39.5833,31.6667L 36.4167,31.6667 Z M 43.1458,31.6667L 42.75,52.25L 45.5208,52.25L 45.9167,31.6667L 43.1458,31.6667 Z "/>
             </Canvas>
         </Grid.Resources>
-        <Label Grid.Row="0" FontSize="16">ЧАСТОИСПОЛЬЗУЕМЫЕ БЛОКИ</Label>
+        <Label Grid.Row="0" FontSize="16" Content="{Binding Source={StaticResource Lang}, XPath=h29}"></Label>
         <ListView Grid.Row="1" Grid.Column="0" Width="310" Height="300" Margin="2,2,0,2"
                   SelectionMode="Single" Name="LwFastBlocks" BorderThickness="1"
                   BorderBrush="{DynamicResource GrayBrush5}" SelectionChanged="LwFastBlocks_OnSelectionChanged">
@@ -58,14 +59,14 @@
                         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Name}" FontSize="14"></TextBlock>
                         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="10">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Margin="0,0,2,0">Файл: </TextBlock>
+                                <TextBlock Margin="0,0,2,0" Text="{Binding Source={StaticResource Lang}, XPath=h30}"></TextBlock>
                                 <TextBlock Text="{Binding File}" TextWrapping="Wrap" MaxWidth="270"></TextBlock>
                             </StackPanel>
                         </TextBlock>
                         <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="10"
                                    TextWrapping="Wrap">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Margin="0,0,2,0">Имя блока: </TextBlock>
+                                <TextBlock Margin="0,0,2,0" Text="{Binding Source={StaticResource Lang}, XPath=h31}"></TextBlock>
                                 <TextBlock Text="{Binding BlockName}" TextWrapping="Wrap" MaxWidth="250"></TextBlock>
                             </StackPanel>
                         </TextBlock>
@@ -80,7 +81,7 @@
                 <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>
                         <VisualBrush Stretch="Uniform"
-                                         Visual="{StaticResource appbar_add}"></VisualBrush>
+                                     Visual="{StaticResource appbar_add}"></VisualBrush>
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>
@@ -89,13 +90,12 @@
                 <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>
                         <VisualBrush Stretch="Uniform"
-                                         Visual="{StaticResource appbar_delete}"></VisualBrush>
+                                     Visual="{StaticResource appbar_delete}"></VisualBrush>
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>
         </StackPanel>
-        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2">
-            ВНИМАНИЕ! Не используйте блоки с атрибутами!
-        </TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="2"
+                   Text="{Binding Source={StaticResource Lang}, XPath=h32}"></TextBlock>
     </Grid>
 </controls:MetroWindow>

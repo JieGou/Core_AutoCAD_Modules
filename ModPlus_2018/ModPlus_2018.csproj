@@ -212,5 +212,10 @@
       <Link>Resources\mpShowProductIcons_16x16.png</Link>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2010\Resources\forIcon_256.png">
+      <Link>Resources\forIcon_256.png</Link>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

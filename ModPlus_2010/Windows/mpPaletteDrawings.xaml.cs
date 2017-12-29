@@ -14,12 +14,13 @@ namespace ModPlus.Windows
     internal partial class mpPaletteDrawings 
     {
         // Переменные
-        private readonly DocumentCollection Docs = AcApp.DocumentManager;
+        private readonly DocumentCollection _docs = AcApp.DocumentManager;
         
         internal mpPaletteDrawings()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
+            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
             Loaded += MpPaletteDrawings_Loaded;
         }
 
@@ -48,7 +49,7 @@ namespace ModPlus.Windows
             try
             {
                 Drawings.Items.Clear();
-                foreach (Document doc in Docs)
+                foreach (Document doc in _docs)
                 {
                     var lbi = new ListBoxItem();
                     var filename = Path.GetFileName(doc.Name);
@@ -74,8 +75,8 @@ namespace ModPlus.Windows
             {
                 foreach (ListBoxItem item in Drawings.Items)
                 {
-                    if (item.Content.Equals(Path.GetFileName(Docs.MdiActiveDocument.Name)) &
-                        item.ToolTip.Equals(Docs.MdiActiveDocument.Name))
+                    if (item.Content.Equals(Path.GetFileName(_docs.MdiActiveDocument.Name)) &
+                        item.ToolTip.Equals(_docs.MdiActiveDocument.Name))
                         Drawings.SelectedItem = item;
                 }
             }
@@ -105,14 +106,14 @@ namespace ModPlus.Windows
                 foreach (
                     var doc in
                     from Document doc
-                        in Docs
+                        in _docs
                     let filename = Path.GetFileName(doc.Name)
                     where doc.Name == lbi.ToolTip.ToString() & filename == lbi.Content.ToString()
                     select doc)
                 {
-                    if (Docs.MdiActiveDocument != null && Docs.MdiActiveDocument != doc)
+                    if (_docs.MdiActiveDocument != null && _docs.MdiActiveDocument != doc)
                     {
-                        Docs.MdiActiveDocument = doc;
+                        _docs.MdiActiveDocument = doc;
                     }
                     break;
                 }
@@ -130,9 +131,9 @@ namespace ModPlus.Windows
                 if (Drawings.SelectedIndex != -1)
                 {
                     var lbi = (ListBoxItem)Drawings.SelectedItem;
-                    foreach (var doc in Docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
+                    foreach (var doc in _docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
                     {
-                        if (Docs.MdiActiveDocument == doc)
+                        if (_docs.MdiActiveDocument == doc)
                         {
                             AcApp.DocumentManager.
                                 MdiActiveDocument.SendStringToExecute("_CLOSE ", true, false, false);
@@ -149,13 +150,13 @@ namespace ModPlus.Windows
 
         private void BtAddDrawing_OnClick(object sender, RoutedEventArgs e)
         {
-            if(Docs.Count > 0)
+            if(_docs.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_NEW ", true, false, false);
         }
 
         private void BtOpenDrawing_OnClick(object sender, RoutedEventArgs e)
         {
-            if (Docs.Count > 0)
+            if (_docs.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_OPEN ", true, false, false);
         }
     }

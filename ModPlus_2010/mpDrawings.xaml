@@ -1,11 +1,11 @@
 ﻿<Window x:Class="ModPlus.MpDrawings" x:ClassModifier="internal"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                      mc:Ignorable="d" ShowInTaskbar="False" ShowActivated="False"
-                      SizeToContent="WidthAndHeight"
-                      ResizeMode="NoResize" WindowStyle="None">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        mc:Ignorable="d" ShowInTaskbar="False" ShowActivated="False"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,6 +16,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -32,8 +33,9 @@
         <!--Заголовок окна-->
         <Image Source="Resources/dwg.png" Width="32" Name="ImgIcon" Margin="2"></Image>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Grid.Row="0" Grid.Column="0" Name="TbHeader"
-                           FontWeight="Bold" Margin="5">Чертежи</TextBlock>
+                   Grid.Row="0" Grid.Column="0" Name="TbHeader"
+                   FontWeight="Bold" Margin="5"
+                   Text="{Binding Source={StaticResource Lang}, XPath=h20}"></TextBlock>
 
         <!--Открытые чертежи-->
         <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" Margin="2"
@@ -50,8 +52,7 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </Border>
-            <Button Name="BtCloseDwg" Content="Закрыть" HorizontalAlignment="Center"
-                            
+            <Button Name="BtCloseDwg" Content="{Binding Source={StaticResource Lang}, XPath=close}" HorizontalAlignment="Center"
                             Margin="2" Click="BtCloseDwg_Click"></Button>
         </StackPanel>
     </Grid>

@@ -28,6 +28,7 @@ namespace ModPlus
 {
     public class ModPlus : IExtensionApplication
     {
+        private static string _langItem = "AutocadDlls";
         private static bool _quiteLoad;
         // Инициализация плагина
         public void Initialize()
@@ -36,6 +37,8 @@ namespace ModPlus
             {
                 var sw = new Stopwatch();
                 sw.Start();
+                // inint lang
+                Language.Initialize();
                 // Получим значение переменной "Тихая загрузка" в первую очередь
                 _quiteLoad = GetQuiteLoad();
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -46,23 +49,23 @@ namespace ModPlus
                 if (!CheckCadVersion())
                 {
                     ed.WriteMessage("\n***************************");
-                    ed.WriteMessage("\nВНИМАНИЕ!");
-                    ed.WriteMessage("\nПопытка загрузки плагина в несоответсвующую версию автокада!");
-                    ed.WriteMessage("\nЗавершение загрузки");
+                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p1"));
+                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p2"));
+                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p3"));
                     ed.WriteMessage("\n***************************");
                     return;
                 }
                 Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
                 ed.WriteMessage("\n***************************");
-                ed.WriteMessage("\nЗагрузка плагина ModPlus...");
-                if (!_quiteLoad) ed.WriteMessage("\nЗагрузка рабочих компонентов...");
+                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p4"));
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p5"));
                 // Принудительная загрузка сборок
                 LoadAssms(ed);
-                if (!_quiteLoad) ed.WriteMessage("\nЗагрузка баз данных...");
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p6"));
                 LoadBaseAssemblies(ed);
-                if (!_quiteLoad) ed.WriteMessage("\nИнициализация файла конфигурации:");
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p7"));
                 UserConfigFile.InitConfigFile();
-                if (!_quiteLoad) ed.WriteMessage("\nЗагрузка функций...");
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p8"));
                 LoadFunctions(ed);
                 // Строим: ленту, меню, плавающее меню
                 // Загрузка ленты
@@ -78,13 +81,14 @@ namespace ModPlus
                 // проверка загруженности модуля автообновления
                 CheckAutoUpdaterLoaded();
                 // Включение иконок для продуктов
-                var showProductsIcon = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),out var b) && b; //false
-                if(showProductsIcon)
+                var showProductsIcon = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
+                    "mpProductInsert", "ShowIcon"), out var b) && b; //false
+                if (showProductsIcon)
                     MpProductIconFunctions.ShowIcon();
 
                 sw.Stop();
-                ed.WriteMessage("\nЗагрузка плагина ModPlus завершена. Затрачено времени (мc): " + sw.ElapsedMilliseconds);
-                ed.WriteMessage("\nПриятной работы!");
+                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p9") + " " + sw.ElapsedMilliseconds);
+                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p10"));
                 ed.WriteMessage("\n***************************");
             }
             catch (System.Exception exception)
@@ -94,7 +98,7 @@ namespace ModPlus
         }
         public void Terminate()
         {
-            
+
         }
         // Значение тихой загрузки
         private static bool GetQuiteLoad()
@@ -141,7 +145,7 @@ namespace ModPlus
                     var extDll = Path.Combine(Constants.ExtensionsDirectory, fileName);
                     if (File.Exists(extDll))
                     {
-                        if (!_quiteLoad) ed.WriteMessage("\n* Загрузка компонента: " + fileName);
+                        if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p11") + " " + fileName);
                         Assembly.LoadFrom(extDll);
                     }
                 }
@@ -174,16 +178,16 @@ namespace ModPlus
                                 var file = Path.Combine(directory, baseFile);
                                 if (File.Exists(file))
                                 {
-                                    if (!_quiteLoad) ed.WriteMessage("\n* Загрузка файла базы данных: " + baseFile);
+                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p12") + " " + baseFile);
                                     Assembly.LoadFrom(file);
                                 }
                                 else
-                                    if (!_quiteLoad) ed.WriteMessage("\n* Не найден файл базы данных: " + baseFile);
+                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p13") + " " + baseFile);
                             }
                         }
                         else
                         {
-                            if (!_quiteLoad) ed.WriteMessage("\nНе найдена папка Data!");
+                            if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p14"));
                         }
                     }
                 }
@@ -243,7 +247,7 @@ namespace ModPlus
                                             if (File.Exists(conFuncFileAttr.Value))
                                             {
                                                 if (!_quiteLoad)
-                                                    ed.WriteMessage("\n* Загрузка функции: " + confFuncNameAttr.Value);
+                                                    ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p15") + " " + confFuncNameAttr.Value);
                                                 var loadedFuncAssembly = Assembly.LoadFrom(conFuncFileAttr.Value);
                                                 LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
                                             }
@@ -255,7 +259,7 @@ namespace ModPlus
                                                 if (File.Exists(findedFile))
                                                 {
                                                     if (!_quiteLoad)
-                                                        ed.WriteMessage("\n* Загрузка функции: " + confFuncNameAttr.Value);
+                                                        ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p15") + " " + confFuncNameAttr.Value);
                                                     var loadedFuncAssembly = Assembly.LoadFrom(findedFile);
                                                     LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
                                                 }
@@ -298,7 +302,7 @@ namespace ModPlus
         {
             try
             {
-                var  loadWithWindows =!bool.TryParse(Regestry.GetValue("AutoUpdater","LoadWithWindows"), out bool b) || b;
+                var loadWithWindows = !bool.TryParse(Regestry.GetValue("AutoUpdater", "LoadWithWindows"), out bool b) || b;
                 if (loadWithWindows)
                 {
                     // Если "грузить с виндой", то проверяем, что модуль запущен
@@ -436,6 +440,7 @@ namespace ModPlus
     /// <summary>Методы создания и работы с палитрой ModPlus</summary>
     public static class MpPalette
     {
+        private static string _langItem = "AutocadDlls";
         public static PaletteSet MpPaletteSet;
         [CommandMethod("mpPalette")]
         public static void CreatePalette()
@@ -444,7 +449,7 @@ namespace ModPlus
             {
                 if (MpPaletteSet == null)
                 {
-                    MpPaletteSet = new PaletteSet("Палитра ModPlus", "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB75"));
+                    MpPaletteSet = new PaletteSet(Language.GetItem(_langItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB75"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
                     AddRemovePaletts();
@@ -466,16 +471,18 @@ namespace ModPlus
             }
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
-
+        
         private static void AddRemovePaletts()
         {
+            var funName = Language.GetItem(_langItem, "h19");
+            var drwName = Language.GetItem(_langItem, "h20");
             // functions
             if (ModPlusAPI.Variables.FunctionsInPalette)
             {
                 var hasP = false;
                 foreach (Palette p in MpPaletteSet)
                 {
-                    if (p.Name.Equals("Функции")) hasP = true;
+                    if (p.Name.Equals(funName)) hasP = true;
                 }
                 if (!hasP)
                 {
@@ -486,14 +493,14 @@ namespace ModPlus
                         Dock = System.Windows.Forms.DockStyle.Fill,
                         Child = palette
                     };
-                    MpPaletteSet.Add("Функции", host);
+                    MpPaletteSet.Add(funName, host);
                 }
             }
             else
             {
                 for (var i = 0; i < MpPaletteSet.Count; i++)
                 {
-                    if (MpPaletteSet[i].Name.Equals("Функции"))
+                    if (MpPaletteSet[i].Name.Equals(funName))
                     {
                         MpPaletteSet.Remove(i);
                         break;
@@ -506,7 +513,7 @@ namespace ModPlus
                 var hasP = false;
                 foreach (Palette p in MpPaletteSet)
                 {
-                    if (p.Name.Equals("Чертежи")) hasP = true;
+                    if (p.Name.Equals(drwName)) hasP = true;
                 }
                 if (!hasP)
                 {
@@ -517,14 +524,14 @@ namespace ModPlus
                         Dock = System.Windows.Forms.DockStyle.Fill,
                         Child = palette
                     };
-                    MpPaletteSet.Add("Чертежи", host);
+                    MpPaletteSet.Add(drwName, host);
                 }
             }
             else
             {
                 for (var i = 0; i < MpPaletteSet.Count; i++)
                 {
-                    if (MpPaletteSet[i].Name.Equals("Чертежи"))
+                    if (MpPaletteSet[i].Name.Equals(drwName))
                     {
                         MpPaletteSet.Remove(i);
                         break;

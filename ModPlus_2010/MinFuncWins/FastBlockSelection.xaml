@@ -3,7 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
-                      ShowIconOnTitleBar="False" Title="Выбор блока"
+                      ShowIconOnTitleBar="False"
                       ShowMaxRestoreButton="False" Topmost="True"
                       ShowMinButton="False" ShowInTaskbar="False" 
                       ShowTitleBar="False" ResizeMode="NoResize"
@@ -18,6 +18,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="5">
@@ -25,7 +26,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" FontSize="16">ВЫБОР БЛОКА</Label>
+        <Label Grid.Row="0" FontSize="16" Content="{Binding Source={StaticResource Lang}, XPath=h27}"></Label>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -40,14 +41,14 @@
                      Width="200" Height="200" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
                      Name="LbBlocks" SelectionMode="Single"></ListBox>
             <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="2"
-                     controls:TextBoxHelper.Watermark="Отображаемое имя блока"
+                     controls:TextBoxHelper.Watermark="{Binding Source={StaticResource Lang}, XPath=h28}"
                      MaxWidth="200" MaxLength="20" Name="TbBlockName"></TextBox>
             <Button Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    Margin="2" 
-                    Name="BtOk" Click="BtOk_OnClick">Принять</Button>
+                    Margin="2" Content="{Binding Source={StaticResource Lang}, XPath=accept}"
+                    Name="BtOk" Click="BtOk_OnClick"></Button>
             <Button Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    Margin="2" 
-                    Name="BtCancel" Click="BtCancel_OnClick">Отмена</Button>
+                    Margin="2" Content="{Binding Source={StaticResource Lang}, XPath=cancel}"
+                    Name="BtCancel" Click="BtCancel_OnClick"></Button>
         </Grid>
     </Grid>
 </controls:MetroWindow>

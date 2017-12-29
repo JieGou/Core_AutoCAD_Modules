@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -27,42 +28,42 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.Resources>
-            <Canvas x:Key="appbar_page_add" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Canvas x:Key="AppbarPageAdd" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path Width="36" Height="42" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="Black" Data="F1 M 43,30L 50.75,30L 43,22.25L 43,30 Z M 52,34L 39,34L 39,21L 24,21L 24,45L 20,45L 20,17L 43.25,17L 56,29.75L 56,59L 34,59L 34,55L 52,55L 52,34 Z M 28,38L 33,38L 33,46L 41,46L 41,51L 33,51L 33,59L 28,59L 28,51L 20,51L 20,46L 28,46L 28,38 Z M 20,59L 20,52L 24,52L 24,55L 27,55L 27,59L 20,59 Z "/>
             </Canvas>
-            <Canvas x:Key="appbar_page_delete" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Canvas x:Key="AppbarPageDelete" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path Width="36" Height="42" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="Black" Data="F1 M 43,30L 50.75,30L 43,22.25L 43,30 Z M 52,34L 39,34L 39,21L 24,21L 24,39L 20,43L 20,17L 43.25,17L 56,29.75L 56,59L 36.5,59L 40.5,55L 52,55L 52,34 Z M 35.1379,40.67L 38.4967,44.0287L 32.8988,49.6266L 38.4967,55.2246L 35.1379,58.5833L 29.54,52.9854L 23.9421,58.5833L 20.5833,55.2246L 26.1813,49.6266L 20.5833,44.0287L 23.9421,40.67L 29.54,46.2679L 35.1379,40.67 Z "/>
             </Canvas>
-            <Canvas  x:Key="appbar_page_download" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Canvas  x:Key="AppbarPageDownload" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path Width="36" Height="42" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="Black" Data="F1 M 20,17L 43.25,17L 56,29.75L 56,59L 20,59L 20,17 Z M 24,21L 24,55L 52,55L 52,34L 39,34L 39,21L 24,21 Z M 43,22.25L 43,30L 50.75,30L 43,22.25 Z M 30,33L 34,33L 34,41.5L 37,38.5L 37,43.25L 32,48.25L 27,42.75L 27,38.5L 30,41.5L 30,33 Z M 38,49L 38,53L 26,53L 26,49L 38,49 Z "/>
             </Canvas>
         </Grid.Resources>
         <Button Grid.Column="0" Margin="2" Name="BtAddDrawing" Click="BtAddDrawing_OnClick"
-                 ToolTip="Новый чертеж" Padding="2" SnapsToDevicePixels="True">
+                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h34}" Padding="2" SnapsToDevicePixels="True">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
-                                 Visual="{DynamicResource appbar_page_add}"></VisualBrush>
+                                 Visual="{DynamicResource AppbarPageAdd}"></VisualBrush>
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
         <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="BtOpenDrawing"
                 Click="BtOpenDrawing_OnClick" Padding="2"
-                 ToolTip="Открыть чертеж" SnapsToDevicePixels="True">
+                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}" SnapsToDevicePixels="True">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
-                                 Visual="{DynamicResource appbar_page_download}"></VisualBrush>
+                                 Visual="{DynamicResource AppbarPageDownload}"></VisualBrush>
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
         <Button Grid.Row="0" Grid.Column="2" SnapsToDevicePixels="True"
-                Name="BtClose" ToolTip="Закрыть текущий чертеж" Padding="2"
+                Name="BtClose" ToolTip="{Binding Source={StaticResource Lang}, XPath=h36}" Padding="2"
                 Click="BtCloseDwg_Click" Margin="0,2,2,2">
             <Rectangle Width="20" Height="20" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform"
-                                 Visual="{DynamicResource appbar_page_delete}"></VisualBrush>
+                                 Visual="{DynamicResource AppbarPageDelete}"></VisualBrush>
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>

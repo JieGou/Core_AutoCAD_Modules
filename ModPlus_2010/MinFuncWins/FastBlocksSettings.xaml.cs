@@ -16,7 +16,9 @@ namespace ModPlus.MinFuncWins
 {
     public partial class FastBlocksSettings
     {
-        class FastBlock
+        private static string _langItem = "AutocadDlls";
+
+        private class FastBlock
         {
             public string Name { get; set; }
             public string File { get; set; }
@@ -53,11 +55,11 @@ namespace ModPlus.MinFuncWins
             LwFastBlocks.ItemsSource = _fastBlocks;
         }
         // save to settings file
-        private  void SaveToSettingsFile()
+        private void SaveToSettingsFile()
         {
             if (File.Exists(UserConfigFile.FullFileName))
             {
-                var configXml = UserConfigFile.ConfigFileXml;
+                XElement configXml = UserConfigFile.ConfigFileXml;
                 if (configXml != null)
                 {
                     var settingsXml = configXml.Element("Settings");
@@ -74,7 +76,7 @@ namespace ModPlus.MinFuncWins
                         foreach (var fb in _fastBlocks)
                         {
                             var fbXml = new XElement("FastBlock");
-                            fbXml.SetAttributeValue("Name",fb.Name);
+                            fbXml.SetAttributeValue("Name", fb.Name);
                             fbXml.SetAttributeValue("BlockName", fb.BlockName);
                             fbXml.SetAttributeValue("File", fb.File);
                             fastBlocksXml.Add(fbXml);
@@ -86,7 +88,7 @@ namespace ModPlus.MinFuncWins
             }
             else
             {
-                ModPlusAPI.Windows.MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
+                ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err4"), MessageBoxIcon.Close);
             }
         }
         // load from settings file
@@ -109,25 +111,24 @@ namespace ModPlus.MinFuncWins
                             File = fbXml.Attribute("File").Value
                         };
                         _fastBlocks.Add(fb);
-                    }   
+                    }
                 }
             }
             else
             {
-                ModPlusAPI.Windows.MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
+                ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err4"), MessageBoxIcon.Close);
             }
         }
         private void LwFastBlocks_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var lw = sender as ListView;
-            if (lw != null) BtRemoveBlock.IsEnabled = lw.SelectedIndex != -1;
+            if (sender is ListView lw) BtRemoveBlock.IsEnabled = lw.SelectedIndex != -1;
         }
         // remove item from list
         private void BtRemoveBlock_OnClick(object sender, RoutedEventArgs e)
         {
             if (LwFastBlocks.SelectedIndex != -1)
             {
-                if (ModPlusAPI.Windows.MessageBox.ShowYesNo("Вы уверены, что хотите удалить данный блок из списка?", MessageBoxIcon.Question))
+                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(_langItem, "err5"), MessageBoxIcon.Question))
                 {
                     var selectedItem = LwFastBlocks.SelectedItem as FastBlock;
                     _fastBlocks.Remove(selectedItem);
@@ -146,7 +147,7 @@ namespace ModPlus.MinFuncWins
             {
                 if (_fastBlocks.Count < 10)
                 {
-                    var ofd = new OpenFileDialog("Укажите файл", "", "dwg", "",
+                    var ofd = new OpenFileDialog(ModPlusAPI.Language.GetItem(_langItem, "err6"), "", "dwg", "",
                         OpenFileDialog.OpenFileDialogFlags.NoFtpSites | OpenFileDialog.OpenFileDialogFlags.NoUrls);
                     Topmost = false;
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -166,7 +167,7 @@ namespace ModPlus.MinFuncWins
                         var validateNames = _fastBlocks.Select(fastBlock => fastBlock.Name).ToList();
                         var fbs = new FastBlockSelection(validateNames)
                         {
-                            LbBlocks = {ItemsSource = blocks}
+                            LbBlocks = { ItemsSource = blocks }
                         };
                         if (fbs.ShowDialog() == true)
                         {
@@ -188,7 +189,7 @@ namespace ModPlus.MinFuncWins
                 }
                 else
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Максимально допустимое количество блоков: 10", MessageBoxIcon.Alert);
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "h33"), MessageBoxIcon.Alert);
                 }
             }
             catch (Exception exception)

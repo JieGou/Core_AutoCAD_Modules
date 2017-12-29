@@ -4,6 +4,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Autodesk.Windows;
@@ -23,11 +24,14 @@ namespace ModPlus.App
 {
     internal static class RibbonBuilder
     {
+        private static string _langItem = "AutocadDlls";
+
         public static void BuildRibbon()
         {
             if (!IsLoaded())
             {
                 CreateRibbon();
+                AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                 AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
             }
         }
@@ -37,7 +41,7 @@ namespace ModPlus.App
             var ribCntrl = ComponentManager.Ribbon;
             foreach (var tab in ribCntrl.Tabs)
             {
-                if (tab.Id.Equals("ModPlus_ID") & tab.Title.Equals("ModPlus"))
+                if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
                     loaded = true;
                 else loaded = false;
             }
@@ -51,7 +55,7 @@ namespace ModPlus.App
                 {
                     var ribCntrl = ComponentManager.Ribbon;
                     foreach (var tab in ribCntrl.Tabs.Where(
-                        tab => tab.Id.Equals("ModPlus_ID") & tab.Title.Equals("ModPlus")))
+                        tab => tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus")))
                     {
                         ribCntrl.Tabs.Remove(tab);
                         AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
@@ -96,18 +100,20 @@ namespace ModPlus.App
                 // Расположение файла конфигурации
                 var confF = UserConfigFile.FullFileName;
                 // Грузим
-                var configFile = XElement.Load(confF);
+                XElement configFile;
+                using (FileStream fs = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.None))
+                    configFile = XElement.Load(fs);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
+                    MessageBox.Show(Language.GetItem(_langItem, "err7"), MessageBoxIcon.Close);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Functions
                 if (element?.Element("Functions") == null)
                 {
-                    MessageBox.Show("Файл конфигурации поврежден! Невозможно построить ленту", MessageBoxIcon.Close);
+                    MessageBox.Show(Language.GetItem(_langItem, "err7"), MessageBoxIcon.Close);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -119,7 +125,7 @@ namespace ModPlus.App
                         // create the panel source
                         var ribSourcePanel = new RibbonPanelSource
                         {
-                            Title = group.Attribute("GroupName")?.Value
+                            Title = Language.TryGetCuiLocalGroupName(group.Attribute("GroupName")?.Value)
                         };
                         // now the panel
                         var ribPanel = new RibbonPanel
@@ -168,10 +174,14 @@ namespace ModPlus.App
                                         };
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddButton(
-                                            loadedFunction.Name, loadedFunction.LName, loadedFunction.SmallIconUrl,
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.SmallIconUrl,
                                             loadedFunction.BigIconUrl,
-                                            loadedFunction.Description, Orientation.Horizontal,
-                                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Orientation.Horizontal,
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                         );
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
@@ -180,11 +190,18 @@ namespace ModPlus.App
                                         {
                                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(subFunc.Attribute("Name")?.Value)))
                                             {
-                                                var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
+                                                var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions
+                                                    .FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
                                                 if (loadedSubFunction == null) continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddButton(
-                                                    loadedSubFunction.Name, loadedSubFunction.LName, loadedSubFunction.SmallIconUrl, loadedSubFunction.BigIconUrl,
-                                                    loadedSubFunction.Description, Orientation.Horizontal, loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage
+                                                    loadedSubFunction.Name,
+                                                    Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
+                                                    loadedSubFunction.SmallIconUrl,
+                                                    loadedSubFunction.BigIconUrl,
+                                                    Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                                    Orientation.Horizontal,
+                                                    Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
+                                                    loadedSubFunction.ToolTipHelpImage
                                                     ));
                                             }
                                         }
@@ -207,10 +224,14 @@ namespace ModPlus.App
                                         };
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddButton(
-                                            loadedFunction.Name, loadedFunction.LName, loadedFunction.SmallIconUrl,
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.SmallIconUrl,
                                             loadedFunction.BigIconUrl,
-                                            loadedFunction.Description, Orientation.Horizontal,
-                                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Orientation.Horizontal,
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                         );
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
@@ -218,10 +239,14 @@ namespace ModPlus.App
                                         for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                                         {
                                             risSplitBtn.Items.Add(RibbonHelpers.AddButton(
-                                                loadedFunction.SubFunctionsNames[i], loadedFunction.SubFunctionsLNames[i],
-                                                loadedFunction.SubSmallIconsUrl[i], loadedFunction.SubBigIconsUrl[i],
-                                                loadedFunction.SubDescriptions[i], Orientation.Horizontal,
-                                                loadedFunction.SubFullDescriptions[i], loadedFunction.SubHelpImages[i]
+                                                loadedFunction.SubFunctionsNames[i],
+                                                Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
+                                                loadedFunction.SubSmallIconsUrl[i],
+                                                loadedFunction.SubBigIconsUrl[i],
+                                                Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                                Orientation.Horizontal,
+                                                Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
+                                                loadedFunction.SubHelpImages[i]
                                                 ));
                                         }
                                         ribRowPanel.Items.Add(risSplitBtn);
@@ -230,8 +255,12 @@ namespace ModPlus.App
                                     else
                                     {
                                         ribRowPanel.Items.Add(RibbonHelpers.AddSmallButton(
-                                            loadedFunction.Name, loadedFunction.LName, loadedFunction.SmallIconUrl,
-                                            loadedFunction.Description, loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.SmallIconUrl,
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                             ));
                                     }
                                     nr++;
@@ -271,9 +300,13 @@ namespace ModPlus.App
                                         };
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddBigButton(
-                                            loadedFunction.Name, loadedFunction.LName, loadedFunction.BigIconUrl,
-                                            loadedFunction.Description, Orientation.Horizontal,
-                                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.BigIconUrl,
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Orientation.Horizontal,
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                         );
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
@@ -285,8 +318,12 @@ namespace ModPlus.App
                                                 var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
                                                 if (loadedSubFunction == null) continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
-                                                    loadedSubFunction.Name, loadedSubFunction.LName, loadedSubFunction.BigIconUrl,
-                                                    loadedSubFunction.Description, Orientation.Horizontal, loadedSubFunction.FullDescription,
+                                                    loadedSubFunction.Name,
+                                                    Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
+                                                    loadedSubFunction.BigIconUrl,
+                                                    Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                                    Orientation.Horizontal,
+                                                    Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
                                                     loadedSubFunction.ToolTipHelpImage
                                                 ));
                                             }
@@ -310,9 +347,13 @@ namespace ModPlus.App
                                         };
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddBigButton(
-                                            loadedFunction.Name, loadedFunction.LName, loadedFunction.BigIconUrl,
-                                            loadedFunction.Description, Orientation.Horizontal,
-                                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.BigIconUrl,
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Orientation.Horizontal,
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                         );
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
@@ -321,10 +362,13 @@ namespace ModPlus.App
                                         for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                                         {
                                             risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
-                                                loadedFunction.SubFunctionsNames[i], loadedFunction.SubFunctionsLNames[i],
+                                                loadedFunction.SubFunctionsNames[i],
+                                                Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                                 loadedFunction.SubBigIconsUrl[i],
-                                                loadedFunction.SubDescriptions[i], Orientation.Horizontal,
-                                                loadedFunction.SubFullDescriptions[i], loadedFunction.SubHelpImages[i]
+                                                Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                                Orientation.Horizontal,
+                                                Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
+                                                loadedFunction.SubHelpImages[i]
                                             ));
                                         }
                                         ribRowPanel.Items.Add(risSplitBtn);
@@ -333,9 +377,13 @@ namespace ModPlus.App
                                     else
                                     {
                                         ribRowPanel.Items.Add(RibbonHelpers.AddBigButton(
-                                            loadedFunction.Name, loadedFunction.LName,
-                                            loadedFunction.BigIconUrl, loadedFunction.Description,
-                                            Orientation.Vertical, loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage
+                                            loadedFunction.Name,
+                                            Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                            loadedFunction.BigIconUrl,
+                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Orientation.Vertical,
+                                            Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                            loadedFunction.ToolTipHelpImage
                                             ));
                                     }
                                     ribSourcePanel.Items.Add(ribRowPanel);
@@ -374,48 +422,48 @@ namespace ModPlus.App
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                 "mpSettings",
-                "Настройки",
+                Language.GetItem(_langItem, "h12"),
                 "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt.png",
-                "Настройки ModPlus", Orientation.Vertical,
-                "Основные настройки плагина ModPlus - темы оформления, включение/отключение меню, настройки контекстных меню для мини-функций. Так же позволяет узнать Ваш регистрационный ключ, не запуская Конфигуратор",
+                Language.GetItem(_langItem, "h41"),
+                Orientation.Vertical,
+                Language.GetItem(_langItem, "h42"),
                 ""
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
             // 
             ribRowPanel = new RibbonRowPanel();
-            string icon;
-            if (LoadFunctionsHelper.HasmpStampsFunction(out icon))
+            if (LoadFunctionsHelper.HasmpStampsFunction(out var icon))
             {
                 ribRowPanel.Items.Add(
                     RibbonHelpers.AddSmallButton(
                         "mpStampFields",
-                        "Поля",
+                        Language.GetItem(_langItem, "h43"),
                         icon,
-                        "Редактор полей",
-                        "Редактор полей, используемых при заполнении штампов",
+                        Language.GetItem(_langItem, "h44"),
+                        Language.GetItem(_langItem, "h45"),
                         ""
                         )
                     );
                 ribRowPanel.Items.Add(new RibbonRowBreak());
             }
-            
+
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddSmallButton(
                     "mpShowProductIcons",
-                    "Вкл. иконку изделий",
+                    Language.GetItem(_langItem, "h46"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png",
-                    "Включить иконку идентификации изделий",
-                    "При включении иконки идентификации у всех примитивов, имеющих расширенные данные со сведениями об изделии, будет отображаться условная иконка в виде синего двутавра. Иконка отображается в правом верхнем углу относительно описанного вокруг примитива прямоугольника. Размер иконки меняется после регенерации в зависимости от размеров видимой части экрана",
+                    Language.GetItem(_langItem, "h37"),
+                    Language.GetItem(_langItem, "h38"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png"
                     ));
             ribRowPanel.Items.Add(new RibbonRowBreak());
-            
+
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddSmallButton(
                     "mpHideProductIcons",
-                    "Откл. иконку изделий",
+                    Language.GetItem(_langItem, "h47"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png",
-                    "Отключить иконку идентификации изделий",
+                    Language.GetItem(_langItem, "h39"),
                     "",
                     ""
                 ));

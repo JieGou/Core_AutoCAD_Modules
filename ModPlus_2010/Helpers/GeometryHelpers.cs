@@ -1,8 +1,10 @@
-﻿using Autodesk.AutoCAD.Geometry;
+﻿using System.Diagnostics.CodeAnalysis;
+using Autodesk.AutoCAD.Geometry;
 
 namespace ModPlus.Helpers
 {
     /// <summary>Вспомогательные методы построения геометрии</summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class GeometryHelpers
     {
         /// <summary>3Д точка по направлению. Направление берется как единычный вектор из точки pt2 к точке pt1, перемножается на указанную

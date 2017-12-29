@@ -4,6 +4,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,12 +15,16 @@ using ModPlusAPI.Windows;
 
 namespace ModPlus.Windows
 {
+    // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteFunctions
     {
+        private static string _langItem = "AutocadDlls";
+
         internal mpPaletteFunctions()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
+            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
             Loaded += MpPaletteFunctions_Loaded;
         }
 
@@ -37,18 +42,20 @@ namespace ModPlus.Windows
                 // Расположение файла конфигурации
                 var confF = UserConfigFile.FullFileName;
                 // Грузим
-                var configFile = XElement.Load(confF);
+                XElement configFile;
+                using (FileStream fs = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.None))
+                    configFile = XElement.Load(fs);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"));
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню");
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"));
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -59,11 +66,11 @@ namespace ModPlus.Windows
                 {
                     var exp = new Expander
                     {
-                        Header = group.Attribute("GroupName")?.Value,
+                        Header = ModPlusAPI.Language.TryGetCuiLocalGroupName(group.Attribute("GroupName")?.Value),
                         IsExpanded = false,
                         Margin = new Thickness(1)
                     };
-                    var grid = new Grid(){HorizontalAlignment = HorizontalAlignment.Stretch};
+                    var grid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
                     var index = 0;
                     // Проходим по функциям группы
                     foreach (var func in group.Elements("Function"))
@@ -74,26 +81,32 @@ namespace ModPlus.Windows
                         var loadedFunction =
                             LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
                         if (loadedFunction == null) continue;
-                        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                        var btn = WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
-                            loadedFunction.BigIconUrl, loadedFunction.Description,
-                            loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage, false);
-                        
+                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                        var btn = WPFMenuesHelper.AddButton(this,
+                            loadedFunction.Name,
+                            ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                            loadedFunction.BigIconUrl,
+                            ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                            ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                            loadedFunction.ToolTipHelpImage, false);
+
                         btn.SetValue(Grid.RowProperty, index);
                         grid.Children.Add(btn);
 
                         index++;
-                        
+
                         if (loadedFunction.SubFunctionsNames.Any())
                         {
                             for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                             {
                                 btn = WPFMenuesHelper.AddButton(this,
                                     loadedFunction.SubFunctionsNames[i],
-                                    loadedFunction.SubFunctionsLNames[i], loadedFunction.SubBigIconsUrl[i],
-                                    loadedFunction.SubDescriptions[i], loadedFunction.SubFullDescriptions[i],
+                                    ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
+                                    loadedFunction.SubBigIconsUrl[i],
+                                    ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                    ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                     loadedFunction.SubHelpImages[i], false);
-                                grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                                 btn.SetValue(Grid.RowProperty, index);
                                 grid.Children.Add(btn);
                                 index++;
@@ -107,10 +120,14 @@ namespace ModPlus.Windows
                             var loadedSubFunction =
                                 LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
                             if (loadedSubFunction == null) continue;
-                            btn = WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
-                                loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
-                                loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage, false);
-                            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                            btn = WPFMenuesHelper.AddButton(this,
+                                loadedSubFunction.Name,
+                                ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
+                                loadedSubFunction.BigIconUrl,
+                                ModPlusAPI.Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                ModPlusAPI.Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
+                                loadedSubFunction.ToolTipHelpImage, false);
+                            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                             btn.SetValue(Grid.RowProperty, index);
                             grid.Children.Add(btn);
                             index++;
@@ -130,33 +147,9 @@ namespace ModPlus.Windows
 
         private void FillFieldsFunction()
         {
-            if (LoadFunctionsHelper.HasmpStampsFunction(out string _))
-            {
-                BtFields.Visibility = Visibility.Visible;
-                //try
-                //{
-                //    var bitmapImage = new BitmapImage(new Uri(icon, UriKind.RelativeOrAbsolute));
-                //    var img = new Image
-                //    {
-                //        Source = bitmapImage,
-                //        Stretch = Stretch.Uniform,
-                //        Width = 16,
-                //        Height = 16,
-                //        SnapsToDevicePixels = true
-                //    };
-                //    BtFields.Content = img;
-                //}
-                //catch
-                //{
-                //    // ignored
-                //}
-            }
-            else
-            {
-                BtFields.Visibility = Visibility.Collapsed;
-            }
+            BtFields.Visibility = LoadFunctionsHelper.HasmpStampsFunction(out string _) ? Visibility.Visible : Visibility.Collapsed;
         }
-        
+
         private void BtSettings_OnClick(object sender, RoutedEventArgs e)
         {
             if (AcApp.DocumentManager.Count > 0)

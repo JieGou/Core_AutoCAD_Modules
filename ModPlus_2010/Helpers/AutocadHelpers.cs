@@ -4,6 +4,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -68,6 +69,7 @@ namespace ModPlus.Helpers
             return arrObjId;
         }
         /// <summary>Стандартные стрелки AutoCAD</summary>
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public enum StandardArrowhead
         {
             /// <summary>Заполненная замкнутая</summary>
@@ -161,7 +163,7 @@ namespace ModPlus.Helpers
         public static string EffectiveBlockName(Transaction tr, BlockReference bref)
         {
             BlockTableRecord btr;
-            if ((bref.IsDynamicBlock) | (bref.Name.StartsWith("*U", StringComparison.InvariantCultureIgnoreCase)))
+            if (bref.IsDynamicBlock | bref.Name.StartsWith("*U", StringComparison.InvariantCultureIgnoreCase))
             {
                 btr = tr.GetObject(bref.DynamicBlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
             }

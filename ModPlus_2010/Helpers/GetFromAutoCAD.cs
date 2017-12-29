@@ -5,16 +5,20 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using ModPlusAPI;
 using ModPlusAPI.Windows;
 
 namespace ModPlus.Helpers
 {
     /// <summary>Методы получения различных данных из AutoCAD</summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class GetFromAutoCAD
     {
+        private static string _langItem = "AutocadDlls";
         /// <summary>Получения расстояния между двумя указанными точками в виде double</summary>
         /// <param name="showError">Отображать окно ошибки (Exception) в случае возникновения</param>
         /// <returns>Полученное расстояние или double.NaN в случае отмены или ошибки</returns>
@@ -56,8 +60,7 @@ namespace ModPlus.Helpers
                 {
                     var selOpts = new PromptSelectionOptions
                     {
-                        MessageForAdding =
-                            "\n" + "Выберите отрезки, полилинии, окружности, дуги, эллипсы или сплайны: "
+                        MessageForAdding = "\n" + Language.GetItem(_langItem, "msg1")
                     };
                     TypedValue[] values =
                     {
@@ -102,13 +105,13 @@ namespace ModPlus.Helpers
                                         break;
                                     case "Spline":
                                         lens[4] +=
-                                        (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                     case "Ellipse":
                                         lens[5] +=
-                                        (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                 }
                                 ent.Dispose();
@@ -137,10 +140,10 @@ namespace ModPlus.Helpers
         /// <param name="lens">Сумма длин для каждого примитива</param>
         /// <param name="objectIds">Список ObjectId выбранных примитивов</param>
         public static void GetLenFromEntities(
-            out double sumLen, 
-            out List<string> entities, 
+            out double sumLen,
+            out List<string> entities,
             out List<int> count,
-            out List<double> lens, 
+            out List<double> lens,
             out List<List<ObjectId>> objectIds)
         {
             // Поддерживаемые примитивы
@@ -172,7 +175,7 @@ namespace ModPlus.Helpers
                     var selOpts = new PromptSelectionOptions
                     {
                         MessageForAdding =
-                            "\n" + "Выберите отрезки, полилинии, окружности, дуги, эллипсы или сплайны: "
+                            "\n" + Language.GetItem(_langItem, "msg1")
                     };
                     TypedValue[] values =
                     {
@@ -227,15 +230,15 @@ namespace ModPlus.Helpers
                                         count[4]++;
                                         objectIds[4].Add(objId);
                                         lens[4] +=
-                                        (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                     case "Ellipse":
                                         count[5]++;
                                         objectIds[5].Add(objId);
                                         lens[5] +=
-                                        (((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
-                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam));
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).EndParam) -
+                                        ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                 }
                                 ent.Dispose();

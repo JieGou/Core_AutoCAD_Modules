@@ -20,8 +20,7 @@ namespace ModPlus
     partial class MpDrawings
     {
         // Переменные
-        DocumentCollection Docs = AcApp.DocumentManager;
-        string GlobalFileName = string.Empty;
+        readonly DocumentCollection _docs = AcApp.DocumentManager;
 
         internal MpDrawings()
         {
@@ -36,7 +35,8 @@ namespace ModPlus
                 Left = 60;
             }
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
+            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
 
             MouseEnter += Window_MouseEnter;
             MouseLeave += Window_MouseLeave;
@@ -68,7 +68,7 @@ namespace ModPlus
             try
             {
                 Drawings.Items.Clear();
-                foreach (Document doc in Docs)
+                foreach (Document doc in _docs)
                 {
                     var lbi = new ListBoxItem();
                     var filename = Path.GetFileName(doc.Name);
@@ -93,8 +93,8 @@ namespace ModPlus
             {
                 foreach (ListBoxItem item in Drawings.Items)
                 {
-                    if (item.Content.Equals(Path.GetFileName(Docs.MdiActiveDocument.Name)) &
-                        item.ToolTip.Equals(Docs.MdiActiveDocument.Name))
+                    if (item.Content.Equals(Path.GetFileName(_docs.MdiActiveDocument.Name)) &
+                        item.ToolTip.Equals(_docs.MdiActiveDocument.Name))
                         Drawings.SelectedItem = item;
                 }
             }
@@ -118,7 +118,7 @@ namespace ModPlus
         // Наведение мышки на окно
         private void Window_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (Docs.Count > 0)
+            if (_docs.Count > 0)
             {
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
@@ -128,12 +128,12 @@ namespace ModPlus
                 //{
                     ExpOpenDrawings.Visibility = Visibility.Visible;
                     //////////////////////////////////
-                    if (Docs.Count != Drawings.Items.Count)
+                    if (_docs.Count != Drawings.Items.Count)
                     {
-                        var names = new string[Docs.Count];
-                        var docnames = new string[Docs.Count];
+                        var names = new string[_docs.Count];
+                        var docnames = new string[_docs.Count];
                         var i = 0;
-                        foreach (Document doc in Docs)
+                        foreach (Document doc in _docs)
                         {
                             var filename = Path.GetFileName(doc.Name);
                             names.SetValue(filename, i);
@@ -150,7 +150,7 @@ namespace ModPlus
                     try
                     {
                         Drawings.Items.Clear();
-                        foreach (Document doc in Docs)
+                        foreach (Document doc in _docs)
                         {
                             var lbi = new ListBoxItem();
                             var filename = Path.GetFileName(doc.Name);
@@ -166,7 +166,7 @@ namespace ModPlus
                     try
                     {
                         foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
-                            lbi => lbi.ToolTip.ToString() == Docs.MdiActiveDocument.Name))
+                            lbi => lbi.ToolTip.ToString() == _docs.MdiActiveDocument.Name))
                         {
                             Drawings.SelectedItem = lbi;
                             break;
@@ -184,12 +184,12 @@ namespace ModPlus
         // Убирание мышки с окна
         private void Window_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (Docs.Count > 0)
+            if (_docs.Count > 0)
                 OnMouseLeaving();
         }
         private void OnMouseLeaving()
         {
-            if (ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo.Equals(0)) //icon
+            if (Variables.DrawingsFloatMenuCollapseTo.Equals(0)) //icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
@@ -216,14 +216,14 @@ namespace ModPlus
                 foreach (
                     var doc in
                     from Document doc
-                        in Docs
+                        in _docs
                     let filename = Path.GetFileName(doc.Name)
                     where doc.Name == lbi.ToolTip.ToString() & filename == lbi.Content.ToString()
                     select doc)
                 {
-                    if (Docs.MdiActiveDocument != null && Docs.MdiActiveDocument != doc)
+                    if (_docs.MdiActiveDocument != null && _docs.MdiActiveDocument != doc)
                     {
-                        Docs.MdiActiveDocument = doc;
+                        _docs.MdiActiveDocument = doc;
                     }
                     break;
                 }
@@ -241,9 +241,9 @@ namespace ModPlus
                 if (Drawings.SelectedIndex != -1)
                 {
                     var lbi = (ListBoxItem)Drawings.SelectedItem;
-                    foreach (var doc in Docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
+                    foreach (var doc in _docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
                     {
-                        if (Docs.MdiActiveDocument == doc)
+                        if (_docs.MdiActiveDocument == doc)
                         {
                             AcApp.DocumentManager.
                                 MdiActiveDocument.SendStringToExecute("_CLOSE ", true, false, false);
@@ -269,7 +269,7 @@ namespace ModPlus
         /// </summary>
         public static void LoadMainMenu()
         {
-            if (ModPlusAPI.Variables.DrawingsFloatMenu)
+            if (Variables.DrawingsFloatMenu)
             {
                 if (MpDrawingsWin == null)
                 {

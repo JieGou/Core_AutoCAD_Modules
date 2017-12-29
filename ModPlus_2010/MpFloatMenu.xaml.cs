@@ -24,8 +24,8 @@ namespace ModPlus
     partial class MpFloatMenu
     {
         // Переменные
-        DocumentCollection Docs = AcApp.DocumentManager;
-        string GlobalFileName = string.Empty;
+        readonly DocumentCollection _docs = AcApp.DocumentManager;
+        private static string _langItem = "AutocadDlls";
 
         public MpFloatMenu()
         {
@@ -40,7 +40,8 @@ namespace ModPlus
                 Left = 60;
             }
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, true);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
+            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
 
             MouseEnter += Window_MouseEnter;
             MouseLeave += Window_MouseLeave;
@@ -61,7 +62,7 @@ namespace ModPlus
                 try
                 {
                     Drawings.Items.Clear();
-                    foreach (Document doc in Docs)
+                    foreach (Document doc in _docs)
                     {
                         var lbi = new ListBoxItem();
                         var filename = Path.GetFileName(doc.Name);
@@ -100,18 +101,20 @@ namespace ModPlus
                 // Расположение файла конфигурации
                 var confF = UserConfigFile.FullFileName;
                 // Грузим
-                var configFile = XElement.Load(confF);
+                XElement configFile;
+                using (FileStream fs = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.None))
+                    configFile = XElement.Load(fs);
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню", MessageBoxIcon.Alert);
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show("Файл конфигурации поврежден! Невозможно заполнить плавающее меню", MessageBoxIcon.Alert);
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -121,7 +124,7 @@ namespace ModPlus
                 {
                     var exp = new Expander
                     {
-                        Header = group.Attribute("GroupName")?.Value,
+                        Header = ModPlusAPI.Language.TryGetCuiLocalGroupName(group.Attribute("GroupName")?.Value),
                         IsExpanded = false,
                         Margin = new Thickness(1)
                     };
@@ -137,9 +140,13 @@ namespace ModPlus
                         if (loadedFunction == null) continue;
 
                         expStck.Children.Add(
-                            WPFMenuesHelper.AddButton(this, loadedFunction.Name, loadedFunction.LName,
-                                loadedFunction.BigIconUrl, loadedFunction.Description,
-                                loadedFunction.FullDescription, loadedFunction.ToolTipHelpImage,true)
+                            WPFMenuesHelper.AddButton(this,
+                            loadedFunction.Name,
+                            ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                            loadedFunction.BigIconUrl,
+                            ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                            ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                            loadedFunction.ToolTipHelpImage, true)
                         );
                         if (loadedFunction.SubFunctionsNames.Any())
                         {
@@ -147,8 +154,10 @@ namespace ModPlus
                             {
                                 expStck.Children.Add(WPFMenuesHelper.AddButton(this,
                                     loadedFunction.SubFunctionsNames[i],
-                                    loadedFunction.SubFunctionsLNames[i], loadedFunction.SubBigIconsUrl[i],
-                                    loadedFunction.SubDescriptions[i], loadedFunction.SubFullDescriptions[i],
+                                    ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
+                                    loadedFunction.SubBigIconsUrl[i],
+                                    ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                    ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                     loadedFunction.SubHelpImages[i], true));
                             }
                         }
@@ -160,9 +169,13 @@ namespace ModPlus
                             var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
                             if (loadedSubFunction == null) continue;
                             expStck.Children.Add(
-                                WPFMenuesHelper.AddButton(this, loadedSubFunction.Name, loadedSubFunction.LName,
-                                loadedSubFunction.BigIconUrl, loadedSubFunction.Description,
-                                loadedSubFunction.FullDescription, loadedSubFunction.ToolTipHelpImage, true)
+                                WPFMenuesHelper.AddButton(this,
+                                loadedSubFunction.Name,
+                                ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
+                                loadedSubFunction.BigIconUrl,
+                                ModPlusAPI.Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                ModPlusAPI.Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
+                                loadedSubFunction.ToolTipHelpImage, true)
                                 );
                         }
                     }
@@ -174,7 +187,7 @@ namespace ModPlus
             }
             catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
         }
-        
+
         // Чертеж закрыт
         void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {
@@ -212,22 +225,23 @@ namespace ModPlus
         // Наведение мышки на окно
         private void Window_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (Docs.Count > 0)
+            if (_docs.Count > 0)
             {
                 ExpMpFunctions.Visibility = Visibility.Visible;
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
                 BtMpSettings.Visibility = Visibility.Visible;
-                if (ModPlusAPI.Variables.DrawingsInFloatMenu)
+                BtFields.Visibility = Visibility.Visible;
+                if (Variables.DrawingsInFloatMenu)
                 {
                     ExpOpenDrawings.Visibility = Visibility.Visible;
                     //////////////////////////////////
-                    if (Docs.Count != Drawings.Items.Count)
+                    if (_docs.Count != Drawings.Items.Count)
                     {
-                        var names = new string[Docs.Count];
-                        var docnames = new string[Docs.Count];
+                        var names = new string[_docs.Count];
+                        var docnames = new string[_docs.Count];
                         var i = 0;
-                        foreach (Document doc in Docs)
+                        foreach (Document doc in _docs)
                         {
                             var filename = Path.GetFileName(doc.Name);
                             names.SetValue(filename, i);
@@ -244,7 +258,7 @@ namespace ModPlus
                     try
                     {
                         Drawings.Items.Clear();
-                        foreach (Document doc in Docs)
+                        foreach (Document doc in _docs)
                         {
                             var lbi = new ListBoxItem();
                             var filename = Path.GetFileName(doc.Name);
@@ -260,7 +274,7 @@ namespace ModPlus
                     try
                     {
                         foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
-                            lbi => lbi.ToolTip.ToString() == Docs.MdiActiveDocument.Name))
+                            lbi => lbi.ToolTip.ToString() == _docs.MdiActiveDocument.Name))
                         {
                             Drawings.SelectedItem = lbi;
                             break;
@@ -279,12 +293,12 @@ namespace ModPlus
         // Убирание мышки с окна
         private void Window_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (Docs.Count > 0)
+            if (_docs.Count > 0)
                 OnMouseLeaving();
         }
         private void OnMouseLeaving()
         {
-            if (ModPlusAPI.Variables.FloatMenuCollapseTo.Equals(0)) //icon
+            if (Variables.FloatMenuCollapseTo.Equals(0)) //icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
@@ -294,6 +308,7 @@ namespace ModPlus
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
                 BtMpSettings.Visibility = Visibility.Collapsed;
+                BtFields.Visibility = Visibility.Collapsed;
             }
             ExpMpFunctions.Visibility = Visibility.Collapsed;
             ExpOpenDrawings.Visibility = Visibility.Collapsed;
@@ -313,14 +328,14 @@ namespace ModPlus
                 foreach (
                     var doc in
                     from Document doc
-                        in Docs
+                        in _docs
                     let filename = Path.GetFileName(doc.Name)
                     where doc.Name == lbi.ToolTip.ToString() & filename == lbi.Content.ToString()
                     select doc)
                 {
-                    if (Docs.MdiActiveDocument != null && Docs.MdiActiveDocument != doc)
+                    if (_docs.MdiActiveDocument != null && _docs.MdiActiveDocument != doc)
                     {
-                        Docs.MdiActiveDocument = doc;
+                        _docs.MdiActiveDocument = doc;
                     }
                     break;
                 }
@@ -338,9 +353,9 @@ namespace ModPlus
                 if (Drawings.SelectedIndex != -1)
                 {
                     var lbi = (ListBoxItem)Drawings.SelectedItem;
-                    foreach (var doc in Docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
+                    foreach (var doc in _docs.Cast<Document>().Where(doc => doc.Name == lbi.ToolTip.ToString()))
                     {
-                        if (Docs.MdiActiveDocument == doc)
+                        if (_docs.MdiActiveDocument == doc)
                         {
                             AcApp.DocumentManager.
                                 MdiActiveDocument.SendStringToExecute("_CLOSE ", true, false, false);

@@ -6,30 +6,31 @@ namespace ModPlus.MinFuncWins
 {
     internal partial class FastBlockSelection
     {
-        private readonly List<string> ValidateNames;
+        private readonly List<string> _validateNames;
+        private static string _langItem = "AutocadDlls";
 
         internal FastBlockSelection(List<string> validateNames)
         {
-            ValidateNames = validateNames;
+            _validateNames = validateNames;
             InitializeComponent();
             this.OnWindowStartUp();
         }
 
         private void BtOk_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ValidateNames.Contains(TbBlockName.Text))
+            if (_validateNames.Contains(TbBlockName.Text))
             {
-                ModPlusAPI.Windows.MessageBox.Show("Такое имя уже используется! Придумайте другое");
+                ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err1"));
                 return;
             }
             if (string.IsNullOrEmpty(TbBlockName.Text))
             {
-                ModPlusAPI.Windows.MessageBox.Show("Нужно указать отображаемое имя блока!");
+                ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err2"));
                 return;
             }
             if (LbBlocks.SelectedIndex == -1)
             {
-                ModPlusAPI.Windows.MessageBox.Show("Нужно выбрать блок в списке!");
+                ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err3"));
                 return;
             }
             DialogResult = true;
