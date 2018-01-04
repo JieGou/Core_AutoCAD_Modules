@@ -21,6 +21,8 @@ namespace ModPlus
 {
     public class MiniFunctions
     {
+        private const string LangItem = "AutocadDlls";
+
         public static void LoadUnloadContextMenues()
         {
             // ent by block
@@ -53,7 +55,7 @@ namespace ModPlus
                 {
                     var pso = new PromptSelectionOptions
                     {
-                        MessageForAdding = "\nВыберите блоки: ",
+                        MessageForAdding = "\n" + Language.GetItem(LangItem, "msg2"),
                         MessageForRemoval = "\n",
                         AllowSubSelections = false,
                         AllowDuplicates = false
@@ -153,14 +155,14 @@ namespace ModPlus
                 {
                     using (var tr = doc.TransactionManager.StartTransaction())
                     {
-                        if (tr.GetObject(selection.Value[0].ObjectId,OpenMode.ForRead) is Viewport)
+                        if (tr.GetObject(selection.Value[0].ObjectId, OpenMode.ForRead) is Viewport)
                             objectId = selection.Value[0].ObjectId;
                         tr.Dispose();
                     }
                 }
                 else
                 {
-                    var peo = new PromptEntityOptions("\nВыберите видовой экран: ");
+                    var peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg3"));
                     peo.SetRejectMessage("\nReject");
                     peo.AllowNone = false;
                     peo.AllowObjectOnLockedLayer = true;
@@ -194,7 +196,7 @@ namespace ModPlus
                         }
                         else
                         {
-                            MessageBox.Show("Указанный объект не является объектом подрезки видового экрана", MessageBoxIcon.Alert);
+                            MessageBox.Show(Language.GetItem(LangItem, "msg4"), MessageBoxIcon.Alert);
                             return;
                         }
                     }
@@ -226,7 +228,7 @@ namespace ModPlus
                         pline.Closed = true;
                         // свойства
                         pline.Layer = "0";
-                        
+
                         var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                         var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                         btr?.AppendEntity(pline);
@@ -300,8 +302,9 @@ namespace ModPlus
                     }
                     else
                     {
-                        MessageBox.Show("Видовой экран подрезан необрабатываемым объектом!"
-                            + $"\nВидовой экран №{viewport.Number}, объект подрезки: {ent}\n");
+                        MessageBox.Show(Language.GetItem(LangItem, "msg5")
+                            + "\n" + Language.GetItem(LangItem, "msg6") + viewport.Number + ", " +
+                            Language.GetItem(LangItem, "msg7") + ent + "\n");
                     }
                 }
             }
@@ -344,7 +347,7 @@ namespace ModPlus
                     {
                         // For Entity
                         ContextMenu = new ContextMenuExtension();
-                        var miEnt = new MenuItem("Mp:Задать вложения ПоБлоку");
+                        var miEnt = new MenuItem(Language.GetItem(LangItem, "h49"));
                         miEnt.Click += StartFunction;
                         ContextMenu.MenuItems.Add(miEnt);
 
@@ -385,7 +388,7 @@ namespace ModPlus
                             {
                                 if (fastBlocksXml.Elements("FastBlock").Any())
                                 {
-                                    ContextMenu = new ContextMenuExtension { Title = "Mp:Вставить блок" };
+                                    ContextMenu = new ContextMenuExtension { Title = Language.GetItem(LangItem, "h50") };
                                     foreach (var fbXml in fastBlocksXml.Elements("FastBlock"))
                                     {
                                         var mi = new MenuItem(fbXml.Attribute("Name").Value);
@@ -399,7 +402,7 @@ namespace ModPlus
                         }
                         else
                         {
-                            MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
+                            MessageBox.Show(Language.GetItem(LangItem, "err4"), MessageBoxIcon.Close);
                         }
                     }
                 }
@@ -417,8 +420,7 @@ namespace ModPlus
                 {
                     try
                     {
-                        var mi = sender as MenuItem;
-                        if (mi != null)
+                        if (sender is MenuItem mi)
                         {
                             if (File.Exists(UserConfigFile.FullFileName))
                             {
@@ -445,7 +447,7 @@ namespace ModPlus
                             }
                             else
                             {
-                                MessageBox.Show("Не найден файл настроек!", MessageBoxIcon.Close);
+                                MessageBox.Show(Language.GetItem(LangItem, "err4"), MessageBoxIcon.Close);
                             }
                         }
                     }
@@ -571,7 +573,7 @@ namespace ModPlus
                         {
                             case 0:
                                 {
-                                    JigPromptPointOptions jigOpts = new JigPromptPointOptions("\nТочка вставки:");
+                                    JigPromptPointOptions jigOpts = new JigPromptPointOptions("\n" + Language.GetItem(LangItem, "msg8"));
                                     jigOpts.UserInputControls =
                                     UserInputControls.Accept3dCoordinates |
                                     UserInputControls.NoZeroResponseAccepted |
@@ -592,7 +594,7 @@ namespace ModPlus
                                 }
                             case 1:
                                 {
-                                    JigPromptAngleOptions jigOpts = new JigPromptAngleOptions("\nУгол поворота:");
+                                    JigPromptAngleOptions jigOpts = new JigPromptAngleOptions("\n" + Language.GetItem(LangItem, "msg9"));
                                     jigOpts.UserInputControls =
                                     UserInputControls.Accept3dCoordinates |
                                     UserInputControls.NoNegativeResponseAccepted |
@@ -658,7 +660,7 @@ namespace ModPlus
                     if (ContextMenuForVP == null)
                     {
                         ContextMenuForVP = new ContextMenuExtension();
-                        var miEnt = new MenuItem("Mp:Границы ВЭ в модель");
+                        var miEnt = new MenuItem(Language.GetItem(LangItem, "h51"));
                         miEnt.Click += StartFunction;
                         ContextMenuForVP.MenuItems.Add(miEnt);
 
@@ -668,7 +670,7 @@ namespace ModPlus
                     if (ContextMenuForCurve == null)
                     {
                         ContextMenuForCurve = new ContextMenuExtension();
-                        var miEnt = new MenuItem("Mp:Границы ВЭ в модель");
+                        var miEnt = new MenuItem(Language.GetItem(LangItem, "h51"));
                         miEnt.Click += StartFunction;
                         ContextMenuForCurve.MenuItems.Add(miEnt);
 
