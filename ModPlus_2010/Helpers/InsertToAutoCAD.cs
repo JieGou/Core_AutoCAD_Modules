@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+using ModPlusAPI;
 using ModPlusAPI.Windows;
 
 namespace ModPlus.Helpers
@@ -16,6 +17,7 @@ namespace ModPlus.Helpers
     /// <summary>Функции вставки/добавления в автокад</summary>
     public class InsertToAutoCad
     {
+        private const string LangItem = "AutocadDlls";
         /// <summary>Вставить строкове значение в ячейку таблицы автокада</summary>
         /// <param name="firstStr">Первая строка. Замена разделителя действует только для неё</param>
         /// <param name="secondString">Вторая строка. Необязательно. Замена разделителя не действует</param>
@@ -28,8 +30,8 @@ namespace ModPlus.Helpers
                 var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
                 using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
                 {
-                    var peo = new PromptEntityOptions("\nВыберите таблицу: ");
-                    peo.SetRejectMessage("\nНеверный выбор! Это не таблица!");
+                    var peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg11"));
+                    peo.SetRejectMessage("\n" + Language.GetItem(LangItem, "msg13"));
                     peo.AddAllowedClass(typeof(Table), false);
                     var per = ed.GetEntity(peo);
                     if (per.Status != PromptStatus.OK)
@@ -43,7 +45,7 @@ namespace ModPlus.Helpers
                         {
                             var entId = per.ObjectId;
                             var tbl = (Table)tr.GetObject(entId, OpenMode.ForWrite);
-                            var ppo = new PromptPointOptions("\nВыберите ячейку: ");
+                            var ppo = new PromptPointOptions("\n" + Language.GetItem(LangItem, "msg12"));
                             var end = false;
                             var vector = new Vector3d(0.0, 0.0, 1.0);
                             while (end == false)
@@ -66,7 +68,7 @@ namespace ModPlus.Helpers
                                 } // try
                                 catch
                                 {
-                                    MessageBox.Show("Не попали в ячейку!");
+                                    MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                                 }
                             } // while
                             tr.Commit();
@@ -93,8 +95,8 @@ namespace ModPlus.Helpers
             var ed = doc.Editor;
             using (doc.LockDocument())
             {
-                var options = new PromptEntityOptions("\nВыберите таблицу: ");
-                options.SetRejectMessage("\nНеверный выбор! Это не таблица!");
+                var options = new PromptEntityOptions("\n"+ Language.GetItem(LangItem, "msg11"));
+                options.SetRejectMessage("\n"+ Language.GetItem(LangItem, "msg13"));
                 options.AddAllowedClass(typeof(Table), false);
                 var entity = ed.GetEntity(options);
                 if (entity.Status == PromptStatus.OK)
@@ -103,7 +105,7 @@ namespace ModPlus.Helpers
                     {
                         var table = (Table)tr.GetObject(entity.ObjectId, OpenMode.ForWrite);
                         var selectedRow = 2;
-                        var ppo = new PromptPointOptions("\nВыберите строку: ");
+                        var ppo = new PromptPointOptions("\n" + Language.GetItem(LangItem, "msg12"));
                         var end = false;
                         var vector = new Vector3d(0.0, 0.0, 1.0);
                         while (end == false)
@@ -121,7 +123,7 @@ namespace ModPlus.Helpers
                             } // try
                             catch
                             {
-                                MessageBox.Show("Не попали в ячейку!");
+                                MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                             }
                         } // while
                         TableHelpers.AddSpecificationItemToTableRow(table, selectedRow, specificationItemForTable);
@@ -154,8 +156,8 @@ namespace ModPlus.Helpers
             var ed = doc.Editor;
             using (doc.LockDocument())
             {
-                var options = new PromptEntityOptions("\nВыберите таблицу: ");
-                options.SetRejectMessage("\nНеверный выбор! Это не таблица!");
+                var options = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg11"));
+                options.SetRejectMessage("\n" + Language.GetItem(LangItem, "msg13"));
                 options.AddAllowedClass(typeof(Table), false);
                 var entity = ed.GetEntity(options);
                 if (entity.Status == PromptStatus.OK)
@@ -176,7 +178,7 @@ namespace ModPlus.Helpers
                         }
                         else
                         {
-                            var ppo = new PromptPointOptions("\nВыберите строку: ");
+                            var ppo = new PromptPointOptions("\n"+ Language.GetItem(LangItem, "msg15"));
                             var end = false;
                             var vector = new Vector3d(0.0, 0.0, 1.0);
                             while (end == false)
@@ -194,7 +196,7 @@ namespace ModPlus.Helpers
                                 } // try
                                 catch
                                 {
-                                    MessageBox.Show("Не попали в ячейку!");
+                                    MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                                 }
                             } // while
                             int firstEmptyRow;
@@ -302,7 +304,7 @@ namespace ModPlus.Helpers
             var db = HostApplicationServices.WorkingDatabase;
             using (doc.LockDocument())
             {
-                var ppo = new PromptPointOptions("\nУкажите точку: ") { AllowNone = true };
+                var ppo = new PromptPointOptions("\n"+ Language.GetItem(LangItem, "msg16")) { AllowNone = true };
                 var ppr = ed.GetPoint(ppo);
                 if (ppr.Status != PromptStatus.OK) return;
                 // arrowHead
@@ -351,7 +353,7 @@ namespace ModPlus.Helpers
                                          UserInputControls.NoZeroResponseAccepted |
                                          UserInputControls.AcceptOtherInputString |
                                          UserInputControls.NoNegativeResponseAccepted),
-                    Message = "\nТочка вставки: "
+                    Message = "\n"+ Language.GetItem(LangItem, "msg8")
                 };
                 var dres = prompts.AcquirePoint(jigOpts);
                 if (_mActualPoint == dres.Value)
@@ -405,7 +407,7 @@ namespace ModPlus.Helpers
                     UseBasePoint = true,
                     UserInputControls = UserInputControls.Accept3dCoordinates |
                                         UserInputControls.GovernedByUCSDetect,
-                    Message = "\nТочка вставки: "
+                    Message = "\n"+ Language.GetItem(LangItem, "msg8")
                 };
 
                 var res = prompts.AcquirePoint(jpo);
@@ -466,10 +468,11 @@ namespace ModPlus.Helpers
 
     internal static class TableHelpers
     {
+        private const string LangItem = "AutocadDlls";
         public static bool CheckColumnsCount(int columns, int need)
         {
             return columns == need || MessageBox.ShowYesNo(
-                       "В таблице неверное количество столбцов!" + Environment.NewLine + "Продолжить?",
+                       Language.GetItem(LangItem, "msg17"),
                        MessageBoxIcon.Question);
         }
         public static void CheckAndAddRowCount(Table table, int startRow, int sItemsCount, out int firstEmptyRow)
@@ -496,7 +499,7 @@ namespace ModPlus.Helpers
             // Если не пустая
             if (!empty)
             {
-                if (!MessageBox.ShowYesNo("Таблица не пуста! Переписать?" + Environment.NewLine + "Да - переписать, Нет - дополнить",
+                if (!MessageBox.ShowYesNo(Language.GetItem(LangItem, "msg18"),
                     MessageBoxIcon.Question))
                 {
                     // Если "Нет", тогда ищем последуюю пустую строку
@@ -685,9 +688,7 @@ namespace ModPlus.Helpers
             else
                 // Если таблица не из плагина
             {
-                if (MessageBox.ShowYesNo(
-                    "Таблица не является таблицей ModPlus. Данные могут заполнится не верно!" +
-                    Environment.NewLine + "Продолжить?", MessageBoxIcon.Question))
+                if (MessageBox.ShowYesNo(Language.GetItem(LangItem, "msg19"), MessageBoxIcon.Question))
                 {
                     if (table.Columns.Count == 4)
                     {

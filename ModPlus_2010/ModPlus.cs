@@ -28,7 +28,8 @@ namespace ModPlus
 {
     public class ModPlus : IExtensionApplication
     {
-        private static string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
+
         private static bool _quiteLoad;
         // Инициализация плагина
         public void Initialize()
@@ -49,23 +50,23 @@ namespace ModPlus
                 if (!CheckCadVersion())
                 {
                     ed.WriteMessage("\n***************************");
-                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p1"));
-                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p2"));
-                    ed.WriteMessage("\n" + Language.GetItem(_langItem, "p3"));
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p1"));
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p2"));
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p3"));
                     ed.WriteMessage("\n***************************");
                     return;
                 }
                 Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
                 ed.WriteMessage("\n***************************");
-                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p4"));
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p5"));
+                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p4"));
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
                 // Принудительная загрузка сборок
                 LoadAssms(ed);
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p6"));
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
                 LoadBaseAssemblies(ed);
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p7"));
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p7"));
                 UserConfigFile.InitConfigFile();
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p8"));
+                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p8"));
                 LoadFunctions(ed);
                 // Строим: ленту, меню, плавающее меню
                 // Загрузка ленты
@@ -87,8 +88,8 @@ namespace ModPlus
                     MpProductIconFunctions.ShowIcon();
 
                 sw.Stop();
-                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p9") + " " + sw.ElapsedMilliseconds);
-                ed.WriteMessage("\n" + Language.GetItem(_langItem, "p10"));
+                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p9") + " " + sw.ElapsedMilliseconds);
+                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p10"));
                 ed.WriteMessage("\n***************************");
             }
             catch (System.Exception exception)
@@ -145,7 +146,7 @@ namespace ModPlus
                     var extDll = Path.Combine(Constants.ExtensionsDirectory, fileName);
                     if (File.Exists(extDll))
                     {
-                        if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p11") + " " + fileName);
+                        if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p11") + " " + fileName);
                         Assembly.LoadFrom(extDll);
                     }
                 }
@@ -178,16 +179,16 @@ namespace ModPlus
                                 var file = Path.Combine(directory, baseFile);
                                 if (File.Exists(file))
                                 {
-                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p12") + " " + baseFile);
+                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
                                     Assembly.LoadFrom(file);
                                 }
                                 else
-                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p13") + " " + baseFile);
+                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
                             }
                         }
                         else
                         {
-                            if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(_langItem, "p14"));
+                            if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
                         }
                     }
                 }
@@ -247,7 +248,7 @@ namespace ModPlus
                                             if (File.Exists(conFuncFileAttr.Value))
                                             {
                                                 if (!_quiteLoad)
-                                                    ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p15") + " " + confFuncNameAttr.Value);
+                                                    ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + confFuncNameAttr.Value);
                                                 var loadedFuncAssembly = Assembly.LoadFrom(conFuncFileAttr.Value);
                                                 LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
                                             }
@@ -259,7 +260,7 @@ namespace ModPlus
                                                 if (File.Exists(findedFile))
                                                 {
                                                     if (!_quiteLoad)
-                                                        ed.WriteMessage("\n* " + Language.GetItem(_langItem, "p15") + " " + confFuncNameAttr.Value);
+                                                        ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + confFuncNameAttr.Value);
                                                     var loadedFuncAssembly = Assembly.LoadFrom(findedFile);
                                                     LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
                                                 }

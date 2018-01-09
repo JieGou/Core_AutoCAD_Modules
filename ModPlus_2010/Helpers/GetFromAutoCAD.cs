@@ -18,7 +18,8 @@ namespace ModPlus.Helpers
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class GetFromAutoCAD
     {
-        private static string _langItem = "AutocadDlls";
+        private const string _langItem = "AutocadDlls";
+
         /// <summary>Получения расстояния между двумя указанными точками в виде double</summary>
         /// <param name="showError">Отображать окно ошибки (Exception) в случае возникновения</param>
         /// <returns>Полученное расстояние или double.NaN в случае отмены или ошибки</returns>
@@ -29,7 +30,7 @@ namespace ModPlus.Helpers
                 using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
                 {
                     var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
-                    var pdo = new PromptDistanceOptions("\nПервая точка: ");
+                    var pdo = new PromptDistanceOptions("\n" + Language.GetItem(_langItem, "msg10"));
                     var pdr = ed.GetDistance(pdo);
                     return pdr.Status != PromptStatus.OK ? double.NaN : pdr.Value;
                 }
