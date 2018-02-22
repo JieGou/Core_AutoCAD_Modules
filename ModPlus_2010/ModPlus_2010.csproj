@@ -23,7 +23,8 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DocumentationFile>E:\ModPlus\Extensions\ModPlus.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -38,19 +39,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
-      <HintPath>..\..\_Acad dlls\2010\AcCui.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2010\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\_Acad dlls\2010\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2010\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\_Acad dlls\2010\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2010\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\_Acad dlls\2010\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2010\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Autodesk.AutoCAD.Internal;
@@ -499,6 +500,11 @@ namespace ModPlus.App
             {
                 return false;
             }
+        }
+
+        private void TitleWin_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
         }
     }
 

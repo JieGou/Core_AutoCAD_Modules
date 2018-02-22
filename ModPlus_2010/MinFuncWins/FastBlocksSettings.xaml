@@ -2,13 +2,8 @@
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
-                      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                      SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
-                      ShowIconOnTitleBar="False" 
-                      ShowMaxRestoreButton="False" Topmost="True"
-                      ShowMinButton="False" ShowInTaskbar="False" 
-                      ShowTitleBar="False" ResizeMode="NoResize"
-                      >
+                      SizeToContent="WidthAndHeight" Topmost="True"
+                      ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

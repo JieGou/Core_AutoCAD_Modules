@@ -453,7 +453,7 @@ namespace ModPlus
                     }
                     catch (System.Exception exception)
                     {
-                        ExceptionBox.ShowForConfigurator(exception);
+                        ExceptionBox.Show(exception);
                     }
                 }
                 private static void InsertBlock(string file, string blockName)

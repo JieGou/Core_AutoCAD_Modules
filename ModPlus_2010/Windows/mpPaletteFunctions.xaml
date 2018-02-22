@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:decorators="clr-namespace:ModPlusAPI.Windows.Helpers.Decorators;assembly=ModPlusAPI"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -44,9 +43,8 @@
                     <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=h37}" MaxWidth="350" Margin="2" TextWrapping="Wrap"></TextBlock>
                     <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=h38}" 
                                MaxWidth="350" Margin="2" TextWrapping="Wrap"></TextBlock>
-                    <decorators:DevicePixels>
-                        <Image Source="../Resources/mpShowProductIcon.png" Stretch="None" Margin="2"></Image>
-                    </decorators:DevicePixels>
+                    <Image Source="../Resources/mpShowProductIcon.png" Stretch="None" Margin="2"
+                           RenderOptions.BitmapScalingMode="HighQuality"></Image>
                 </StackPanel>
             </Button.ToolTip>
         </Button>
@@ -55,14 +53,16 @@
                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h39}" 
                 HorizontalAlignment="Right" Click="BtHideProductIcon_OnClick">
             <Image Source="../Resources/mpHideProductIcons_16x16.png" Stretch="Fill"
-                   Width="16" Height="16"></Image>
+                   Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="2" MinWidth="0" Name="BtFields" 
                 Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
                  ToolTip="{Binding Source={StaticResource Lang}, XPath=h40}" 
                 HorizontalAlignment="Right" Click="BtFields_OnClick">
             <Image Source="../Resources/MpStampFields_16x16.png" Stretch="Fill"
-                   Width="16" Height="16"></Image>
+                   Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="3" MinWidth="0" Name="BtSettings"
                 Padding="4" Click="BtSettings_OnClick"

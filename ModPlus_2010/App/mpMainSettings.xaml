@@ -1,29 +1,23 @@
-﻿<controls:MetroWindow x:Class="ModPlus.App.MpMainSettings" x:ClassModifier="internal"
+﻿<mpc:BaseMetroWindow x:Class="ModPlus.App.MpMainSettings" x:ClassModifier="internal"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:decorators="clr-namespace:ModPlusAPI.Windows.Helpers.Decorators;assembly=ModPlusAPI"
+                      xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
                       SizeToContent="WidthAndHeight"
                       ResizeMode="NoResize"
-                      ShowMaxRestoreButton="False" ShowTitleBar="False"
-                      ShowMinButton="False" WindowStartupLocation="CenterScreen">
+                      ShowMaxRestoreButton="False"
+                      ShowMinButton="False" WindowStartupLocation="CenterScreen"
+                      Icon="../Resources/forIcon_256.png">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <!-- For IntelliSense -->
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareMetroButton}">
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Margin" Value="2"></Setter>
-            </Style>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Margin="5">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -33,11 +27,10 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <decorators:DevicePixels Grid.Column="0">
-                <Image Name="WinIcon" Source="/Resources/forIcon_256.png" Width="32"
-                       RenderOptions.BitmapScalingMode="HighQuality"></Image>
-            </decorators:DevicePixels>
-            <Label Grid.Column="1" Content="{Binding Source={StaticResource Lang}, XPath=h1}" FontSize="16"></Label>
+            <Image Name="WinIcon" Source="/Resources/forIcon_256.png" Width="32"
+                   RenderOptions.BitmapScalingMode="HighQuality"></Image>
+            <TextBlock Grid.Column="1" Margin="0,0,20,5" Name="TitleWin" MouseLeftButtonDown="TitleWin_OnMouseLeftButtonDown"
+                       Text="{Binding Source={StaticResource Lang}, XPath=h1}" FontSize="16"></TextBlock>
         </Grid>
         <TabControl Grid.Row="1">
             <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h13}" controls:ControlsHelper.HeaderFontSize="20">
@@ -295,7 +288,7 @@
                               VerticalAlignment="Center"
                               Content="{Binding Source={StaticResource Lang}, XPath=h25}"
                               ToolTip="{Binding Source={StaticResource Lang}, XPath=tt14}"></CheckBox>
-                    <Button Grid.Row="1" Grid.Column="1" 
+                    <Button Grid.Row="1" Grid.Column="1" MinWidth="0"
                             Padding="2" ToolTip="{Binding Source={StaticResource Lang}, XPath=tt15}"
                             Name="BtFastBlocksSettings" Click="BtFastBlocksSettings_OnClick">
                         <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
@@ -318,4 +311,5 @@
         </TabControl>
         
     </Grid>
-</controls:MetroWindow>
+</mpc:BaseMetroWindow>
+
