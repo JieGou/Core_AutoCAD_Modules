@@ -109,7 +109,7 @@ namespace ModPlus.App
         private static void LoadThemesAndColors()
         {
             // Загрузка тем
-            ThemeManager.AddAppTheme("DarkBlue", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Themes/DarkBlue.xaml"));
+            ThemeManager.AddAppTheme("BlueDark", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Themes/BlueDark.xaml"));
             // Загрузка акцентных цветов
             ThemeManager.AddAccent("mdAmber", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdAmber.xaml"));
             ThemeManager.AddAccent("mdBlue", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdBlue.xaml"));

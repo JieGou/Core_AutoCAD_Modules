@@ -31,7 +31,7 @@ namespace ModPlus.MinFuncWins
         public FastBlocksSettings()
         {
             InitializeComponent();
-            this.OnWindowStartUp();
+            Title = ModPlusAPI.Language.GetItem(_langItem, "h29");
             Loaded += FastBlocksSettings_Loaded;
             Closed += FastBlocksSettings_Closed;
         }

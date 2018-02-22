@@ -311,16 +311,11 @@ namespace ModPlus
                     var isOpen = Process.GetProcesses().Any(t => t.ProcessName == "mpAutoUpdater");
                     if (!isOpen)
                     {
-                        // ReSharper disable once AssignNullToNotNullAttribute
-                        var curDir = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName;
-                        if (curDir != null)
-                        {
-                            var fileToStart = Path.Combine(curDir, "mpAutoUpdater.exe");
+                            var fileToStart = Path.Combine(ModPlusAPI.Constants.CurrentDirectory, "mpAutoUpdater.exe");
                             if (File.Exists(fileToStart))
                             {
                                 Process.Start(fileToStart);
                             }
-                        }
                     }
                 }
             }

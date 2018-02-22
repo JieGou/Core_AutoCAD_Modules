@@ -14,7 +14,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
             <Canvas x:Key="MpSettings" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -48,9 +48,9 @@
                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
                            Grid.Column="0"
                            FontWeight="Bold" Margin="5">ModPlus</TextBlock>
-                <Button Grid.Column="1" Margin="2" Name="BtFields" 
-                        BorderThickness="0" 
-                        ToolTip="{Binding Source={StaticResource Lang}, XPath=h40}" Click="BtFields_OnClick"
+                <Button Grid.Column="1" MinWidth="0" Name="BtFields" 
+                        BorderThickness="0" ToolTip="{Binding Source={StaticResource Lang}, XPath=h40}"
+                        Click="BtFields_OnClick"
                         Padding="0" SnapsToDevicePixels="True">
                 <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>
@@ -59,10 +59,9 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>
-                <Button Margin="2" x:Name="BtMpSettings" BorderThickness="0"
+                <Button MinWidth="0"  x:Name="BtMpSettings" BorderThickness="0"
                         Grid.Column="2" HorizontalAlignment="Right"
-                         Padding="2"
-                        ToolTip="{Binding Source={StaticResource Lang}, XPath=h42}"
+                        Padding="2" ToolTip="{Binding Source={StaticResource Lang}, XPath=h42}"
                         Click="BtMpSettings_OnClick">
                     <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                         <Rectangle.OpacityMask>
