@@ -436,7 +436,7 @@ namespace ModPlus
     /// <summary>Методы создания и работы с палитрой ModPlus</summary>
     public static class MpPalette
     {
-        private static string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
         public static PaletteSet MpPaletteSet;
         [CommandMethod("mpPalette")]
         public static void CreatePalette()
@@ -445,10 +445,10 @@ namespace ModPlus
             {
                 if (MpPaletteSet == null)
                 {
-                    MpPaletteSet = new PaletteSet(Language.GetItem(_langItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB75"));
+                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
-                    AddRemovePaletts();
+                    //AddRemovePaletts();
                     MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
                     MpPaletteSet.Style =
                         PaletteSetStyles.ShowPropertiesMenu |
@@ -470,8 +470,8 @@ namespace ModPlus
         
         private static void AddRemovePaletts()
         {
-            var funName = Language.GetItem(_langItem, "h19");
-            var drwName = Language.GetItem(_langItem, "h20");
+            var funName = Language.GetItem(LangItem, "h19");
+            var drwName = Language.GetItem(LangItem, "h20");
             // functions
             if (ModPlusAPI.Variables.FunctionsInPalette)
             {

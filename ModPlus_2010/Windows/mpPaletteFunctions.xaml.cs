@@ -18,14 +18,14 @@ namespace ModPlus.Windows
     // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteFunctions
     {
-        private static string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
 
         internal mpPaletteFunctions()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
-            Loaded += MpPaletteFunctions_Loaded;
+            //ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
+            //ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
+            //Loaded += MpPaletteFunctions_Loaded;
         }
 
         private void MpPaletteFunctions_Loaded(object sender, RoutedEventArgs e)
@@ -48,14 +48,14 @@ namespace ModPlus.Windows
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"));
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"));
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"));
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"));
                     return;
                 }
                 var confCuiXel = element.Element("CUI");

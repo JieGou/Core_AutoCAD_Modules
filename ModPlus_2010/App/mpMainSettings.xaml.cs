@@ -37,20 +37,20 @@ namespace ModPlus.App
         private readonly string _curLang;
         public List<AccentColorMenuData> AccentColors { get; set; }
         public List<AppThemeMenuData> AppThemes { get; set; }
-        private static string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
 
         internal MpMainSettings()
         {
             InitializeComponent();
-
+            Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
             FillThemesAndColors();
-            ChangeWindowTheme();
+            //ChangeWindowTheme();
             SetAppRegistryKeyForCurrentUser();
             GetDataFromConfigFile();
             GetDataByVars();
             Closing += MpMainSettings_Closing;
             Closed += MpMainSettings_OnClosed;
-            ModPlusAPI.Language.SetLanguageProviderForWindow(this);
+            //ModPlusAPI.Language.SetLanguageProviderForWindow(this);
             // fill languages
             CbLanguages.ItemsSource = ModPlusAPI.Language.GetLanguagesByFiles();
             CbLanguages.SelectedItem = ((List<Language.LangItem>)CbLanguages.ItemsSource)
@@ -58,7 +58,7 @@ namespace ModPlus.App
             _curLang = ((Language.LangItem)CbLanguages.SelectedItem)?.Name;
             CbLanguages.SelectionChanged += CbLanguages_SelectionChanged;
             // image
-            WinIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/forIcon_256.png"));
+            //WinIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/forIcon_256.png"));
         }
         // Change language
         private void CbLanguages_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -150,10 +150,10 @@ namespace ModPlus.App
                 {
                     TbAboutRegKey.Visibility = Visibility.Visible;
                     if (regVariant.Equals("0"))
-                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(_langItem, "h10") + " " +
+                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h10") + " " +
                                              UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "HDmodel");
                     else if (regVariant.Equals("1"))
-                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(_langItem, "h11") + " " +
+                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h11") + " " +
                                              UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "gName");
                 }
             }
@@ -273,7 +273,7 @@ namespace ModPlus.App
                 {
                     TbEmailAdress.BorderBrush = Brushes.Red;
                     ModPlusAPI.Windows.MessageBox.Show(
-                        ModPlusAPI.Language.GetItem(_langItem, "tt4"));
+                        ModPlusAPI.Language.GetItem(LangItem, "tt4"));
                     TbEmailAdress.Focus();
                     e.Cancel = true;
                 }
@@ -286,7 +286,7 @@ namespace ModPlus.App
             {
                 bool needRestartByLang = !((Language.LangItem)CbLanguages.SelectedItem).Name.Equals(_curLang);
                 if (needRestartByLang)
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "tt17"));
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "tt17"));
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
