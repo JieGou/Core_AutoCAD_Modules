@@ -205,7 +205,9 @@ namespace ModPlus
                 // Расположение файла конфигурации
                 var confF = UserConfigFile.FullFileName;
                 // Грузим
-                var configFile = XElement.Load(confF);
+                XElement configFile;
+                using (var file = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    configFile= XElement.Load(file);
                 // Делаем итерацию по значениям в файле конфигурации
                 var xElement = configFile.Element("Config");
                 var el = xElement?.Element("Functions");
@@ -545,6 +547,7 @@ namespace ModPlus
         private static void _mpPaletteSet_Load(object sender, PalettePersistEventArgs e)
         {
             e.ConfigurationSection.WriteProperty("ModPlusPalette", 32.3);
+            AddRemovePaletts();
         }
 
         private static Icon GetEmbeddedIcon(string sName)

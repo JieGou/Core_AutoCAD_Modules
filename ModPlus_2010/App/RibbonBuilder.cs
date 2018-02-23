@@ -106,14 +106,14 @@ namespace ModPlus.App
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    MessageBox.Show(Language.GetItem(_langItem, "err7"), MessageBoxIcon.Close);
+                   System.Windows.MessageBox.Show(Language.GetItem(_langItem, "err7"), "ModPlus");
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Functions
                 if (element?.Element("Functions") == null)
                 {
-                    MessageBox.Show(Language.GetItem(_langItem, "err7"), MessageBoxIcon.Close);
+                    System.Windows.MessageBox.Show(Language.GetItem(_langItem, "err7"), "ModPlus");
                     return;
                 }
                 var confCuiXel = element.Element("CUI");

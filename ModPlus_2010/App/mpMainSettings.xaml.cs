@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Autodesk.AutoCAD.Internal;
 using Autodesk.AutoCAD.Runtime;
 using MahApps.Metro;
@@ -21,16 +19,13 @@ namespace ModPlus.App
 {
     partial class MpMainSettings
     {
-        private string _curUserEmail = string.Empty;
         private string _curTheme = string.Empty;
         private string _curColor = string.Empty;
-        private bool _curFloatMenu = false;
-        private bool _curPalette = false;
-        private bool _curPaletteFunctions = false;
-        private bool _curPaletteDrawings = false;
-        private bool _curDrwsOnMnu = false;
-        private bool _curRibbon = false;
-        private bool _curDrawingsAlone = false;
+        private bool _curFloatMenu;
+        private bool _curPalette;
+        private bool _curDrwsOnMnu;
+        private bool _curRibbon;
+        private bool _curDrawingsAlone;
         private int _curFloatMenuCollapseTo = 0;
         private int _curDrawingsCollapseTo = 1;
         private string _curBordersType = string.Empty;
@@ -44,21 +39,17 @@ namespace ModPlus.App
             InitializeComponent();
             Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
             FillThemesAndColors();
-            //ChangeWindowTheme();
             SetAppRegistryKeyForCurrentUser();
             GetDataFromConfigFile();
             GetDataByVars();
             Closing += MpMainSettings_Closing;
             Closed += MpMainSettings_OnClosed;
-            //ModPlusAPI.Language.SetLanguageProviderForWindow(this);
             // fill languages
             CbLanguages.ItemsSource = ModPlusAPI.Language.GetLanguagesByFiles();
             CbLanguages.SelectedItem = ((List<Language.LangItem>)CbLanguages.ItemsSource)
                 .FirstOrDefault(x => x.Name.Equals(ModPlusAPI.Language.CurrentLanguageName));
             _curLang = ((Language.LangItem)CbLanguages.SelectedItem)?.Name;
             CbLanguages.SelectionChanged += CbLanguages_SelectionChanged;
-            // image
-            //WinIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/forIcon_256.png"));
         }
         // Change language
         private void CbLanguages_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -72,7 +63,6 @@ namespace ModPlus.App
 
         private void FillThemesAndColors()
         {
-            LoadThemesAndColors();
             // create accent color menu items for the demo
             AccentColors = ThemeManager.Accents
                                             .Select(a => new AccentColorMenuData() { Name = a.Name, ColorBrush = a.Resources["AccentColorBrush"] as Brush })
@@ -106,31 +96,6 @@ namespace ModPlus.App
             {
                 //ignored
             }
-        }
-        private static void LoadThemesAndColors()
-        {
-            // Загрузка тем
-            ThemeManager.AddAppTheme("BlueDark", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Themes/BlueDark.xaml"));
-            // Загрузка акцентных цветов
-            ThemeManager.AddAccent("mdAmber", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdAmber.xaml"));
-            ThemeManager.AddAccent("mdBlue", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdBlue.xaml"));
-            ThemeManager.AddAccent("mdBlueGrey", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdBlueGrey.xaml"));
-            ThemeManager.AddAccent("mdBrown", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdBrown.xaml"));
-            ThemeManager.AddAccent("mdCyan", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdCyan.xaml"));
-            ThemeManager.AddAccent("mdDeepOrange", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdDeepOrange.xaml"));
-            ThemeManager.AddAccent("mdDeepPurple", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdDeepPurple.xaml"));
-            ThemeManager.AddAccent("mdGreen", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdGreen.xaml"));
-            ThemeManager.AddAccent("mdGrey", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdGrey.xaml"));
-            ThemeManager.AddAccent("mdIndigo", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdIndigo.xaml"));
-            ThemeManager.AddAccent("mdLightBlue", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdLightBlue.xaml"));
-            ThemeManager.AddAccent("mdLightGreen", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdLightGreen.xaml"));
-            ThemeManager.AddAccent("mdLime", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdLime.xaml"));
-            ThemeManager.AddAccent("mdOrange", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdOrange.xaml"));
-            ThemeManager.AddAccent("mdPink", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdPink.xaml"));
-            ThemeManager.AddAccent("mdPurple", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdPurple.xaml"));
-            ThemeManager.AddAccent("mdRed", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdRed.xaml"));
-            ThemeManager.AddAccent("mdTeal", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdTeal.xaml"));
-            ThemeManager.AddAccent("mdYellow", new Uri("pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Accents/mdYellow.xaml"));
         }
         // Заполнение поля Ключ продукта
         private void SetAppRegistryKeyForCurrentUser()
@@ -209,8 +174,8 @@ namespace ModPlus.App
                 // Адаптация
                 ChkMpFloatMenu.IsChecked = _curFloatMenu = ModPlusAPI.Variables.FloatMenu;
                 ChkMpPalette.IsChecked = _curPalette = ModPlusAPI.Variables.Palette;
-                ChkMpPaletteFunctions.IsChecked = _curPaletteFunctions = ModPlusAPI.Variables.FunctionsInPalette;
-                ChkMpPaletteDrawings.IsChecked = _curPaletteDrawings = ModPlusAPI.Variables.DrawingsInPalette;
+                ChkMpPaletteFunctions.IsChecked = ModPlusAPI.Variables.FunctionsInPalette;
+                ChkMpPaletteDrawings.IsChecked = ModPlusAPI.Variables.DrawingsInPalette;
                 ChkMpRibbon.IsChecked = _curRibbon = ModPlusAPI.Variables.Ribbon;
                 ChkMpChkDrwsOnMnu.IsChecked = _curDrwsOnMnu = ModPlusAPI.Variables.DrawingsInFloatMenu;
                 ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = ModPlusAPI.Variables.DrawingsFloatMenu;
@@ -228,7 +193,7 @@ namespace ModPlus.App
                 // Тихая загрузка
                 ChkQuietLoading.IsChecked = ModPlusAPI.Variables.QuietLoading;
                 // email
-                TbEmailAdress.Text = _curUserEmail = ModPlusAPI.Variables.UserEmail;
+                TbEmailAdress.Text = ModPlusAPI.Variables.UserEmail;
             }
             catch (System.Exception exception)
             {

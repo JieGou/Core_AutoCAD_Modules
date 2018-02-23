@@ -154,9 +154,6 @@
     <Resource Include="Resources\HelpBt.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\MpStampFields_16x16.png" />
   </ItemGroup>
   <ItemGroup>

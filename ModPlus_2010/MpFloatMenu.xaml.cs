@@ -25,7 +25,10 @@ namespace ModPlus
     {
         // Переменные
         readonly DocumentCollection _docs = AcApp.DocumentManager;
-        private static string _langItem = "AutocadDlls";
+        // Переменная хранит значение о налии функции "Поля"
+        private bool _hasFieldsFunction;
+
+        private const string LangItem = "AutocadDlls";
 
         public MpFloatMenu()
         {
@@ -51,7 +54,7 @@ namespace ModPlus
             FillFunctions();
 
             ////////////////////////////////////////////////////////
-            if (ModPlusAPI.Variables.DrawingsInFloatMenu)
+            if (Variables.DrawingsInFloatMenu)
             {
                 // Подключение обработчиков событий для создания и закрытия чертежей
                 AcApp.DocumentManager.DocumentCreated +=
@@ -107,14 +110,16 @@ namespace ModPlus
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
+                    //ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
+                    System.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), "ModPlus");
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
+                    //ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
+                    System.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), "ModPlus");
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -231,7 +236,8 @@ namespace ModPlus
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
                 BtMpSettings.Visibility = Visibility.Visible;
-                BtFields.Visibility = Visibility.Visible;
+                if(_hasFieldsFunction)
+                    BtFields.Visibility = Visibility.Visible;
                 if (Variables.DrawingsInFloatMenu)
                 {
                     ExpOpenDrawings.Visibility = Visibility.Visible;
@@ -386,7 +392,8 @@ namespace ModPlus
         }
         private void FillFieldsFunction()
         {
-            BtFields.Visibility = LoadFunctionsHelper.HasmpStampsFunction() ? Visibility.Visible : Visibility.Collapsed;
+            _hasFieldsFunction = LoadFunctionsHelper.HasmpStampsFunction();
+            BtFields.Visibility = _hasFieldsFunction ? Visibility.Visible : Visibility.Collapsed;
         }
     }
     public static class MpMenuFunction
@@ -397,7 +404,7 @@ namespace ModPlus
         /// </summary>
         public static void LoadMainMenu()
         {
-            if (ModPlusAPI.Variables.FloatMenu)
+            if (Variables.FloatMenu)
             {
                 if (MpMainMenuWin == null)
                 {

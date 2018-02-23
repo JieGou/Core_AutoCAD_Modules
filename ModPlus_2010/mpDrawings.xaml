@@ -52,8 +52,8 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </Border>
-            <Button Name="BtCloseDwg" Content="{Binding Source={StaticResource Lang}, XPath=close}" HorizontalAlignment="Center"
-                            Margin="2" Click="BtCloseDwg_Click"></Button>
+            <Button Name="BtCloseDwg" Content="{Binding Source={StaticResource Lang}, XPath=close}"
+                    HorizontalAlignment="Center" Margin="2" Click="BtCloseDwg_Click"></Button>
         </StackPanel>
     </Grid>
 </Window>

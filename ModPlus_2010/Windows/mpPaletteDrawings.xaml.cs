@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Autodesk.AutoCAD.ApplicationServices;
-using Path = System.IO.Path;
+using System.IO;
 
 namespace ModPlus.Windows
 {

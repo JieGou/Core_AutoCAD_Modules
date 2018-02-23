@@ -6,8 +6,7 @@
                       SizeToContent="WidthAndHeight"
                       ResizeMode="NoResize"
                       ShowMaxRestoreButton="False"
-                      ShowMinButton="False" WindowStartupLocation="CenterScreen"
-                      Icon="../Resources/forIcon_256.png">
+                      ShowMinButton="False" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -150,9 +150,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\HelpBt.png" />
   </ItemGroup>
   <ItemGroup>

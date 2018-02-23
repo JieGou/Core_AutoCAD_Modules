@@ -147,9 +147,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="..\ModPlus_2010\App\mpMainSettings.xaml">
       <Link>App\mpMainSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
