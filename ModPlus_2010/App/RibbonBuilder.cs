@@ -24,7 +24,7 @@ namespace ModPlus.App
 {
     internal static class RibbonBuilder
     {
-        private static string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
 
         public static void BuildRibbon()
         {
@@ -106,14 +106,14 @@ namespace ModPlus.App
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                   System.Windows.MessageBox.Show(Language.GetItem(_langItem, "err7"), "ModPlus");
+                    MessageBox.Show(Language.GetItem(LangItem, "err7"));
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Functions
                 if (element?.Element("Functions") == null)
                 {
-                    System.Windows.MessageBox.Show(Language.GetItem(_langItem, "err7"), "ModPlus");
+                    MessageBox.Show(Language.GetItem(LangItem, "err7"));
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
@@ -422,11 +422,11 @@ namespace ModPlus.App
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                 "mpSettings",
-                Language.GetItem(_langItem, "h12"),
+                Language.GetItem(LangItem, "h12"),
                 "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt.png",
-                Language.GetItem(_langItem, "h41"),
+                Language.GetItem(LangItem, "h41"),
                 Orientation.Vertical,
-                Language.GetItem(_langItem, "h42"),
+                Language.GetItem(LangItem, "h42"),
                 ""
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
@@ -437,10 +437,10 @@ namespace ModPlus.App
                 ribRowPanel.Items.Add(
                     RibbonHelpers.AddSmallButton(
                         "mpStampFields",
-                        Language.GetItem(_langItem, "h43"),
+                        Language.GetItem(LangItem, "h43"),
                         icon,
-                        Language.GetItem(_langItem, "h44"),
-                        Language.GetItem(_langItem, "h45"),
+                        Language.GetItem(LangItem, "h44"),
+                        Language.GetItem(LangItem, "h45"),
                         ""
                         )
                     );
@@ -450,10 +450,10 @@ namespace ModPlus.App
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddSmallButton(
                     "mpShowProductIcons",
-                    Language.GetItem(_langItem, "h46"),
+                    Language.GetItem(LangItem, "h46"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png",
-                    Language.GetItem(_langItem, "h37"),
-                    Language.GetItem(_langItem, "h38"),
+                    Language.GetItem(LangItem, "h37"),
+                    Language.GetItem(LangItem, "h38"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png"
                     ));
             ribRowPanel.Items.Add(new RibbonRowBreak());
@@ -461,9 +461,9 @@ namespace ModPlus.App
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddSmallButton(
                     "mpHideProductIcons",
-                    Language.GetItem(_langItem, "h47"),
+                    Language.GetItem(LangItem, "h47"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png",
-                    Language.GetItem(_langItem, "h39"),
+                    Language.GetItem(LangItem, "h39"),
                     "",
                     ""
                 ));

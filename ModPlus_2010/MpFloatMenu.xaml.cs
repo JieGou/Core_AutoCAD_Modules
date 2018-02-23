@@ -110,16 +110,14 @@ namespace ModPlus
                 // Проверяем есть ли группа Config
                 if (configFile.Element("Config") == null)
                 {
-                    //ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
-                    System.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), "ModPlus");
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), MessageBoxIcon.Alert);
                     return;
                 }
                 var element = configFile.Element("Config");
                 // Проверяем есть ли подгруппа Cui
                 if (element?.Element("CUI") == null)
                 {
-                    //ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err7"), MessageBoxIcon.Alert);
-                    System.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), "ModPlus");
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), MessageBoxIcon.Alert);
                     return;
                 }
                 var confCuiXel = element.Element("CUI");
