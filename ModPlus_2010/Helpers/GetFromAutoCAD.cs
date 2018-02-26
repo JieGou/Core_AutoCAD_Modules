@@ -38,7 +38,7 @@ namespace ModPlus.Helpers
             catch (Exception ex)
             {
                 if (showError)
-                    ExceptionBox.ShowForConfigurator(ex);
+                    ExceptionBox.Show(ex);
                 return double.NaN;
             }
 
@@ -123,7 +123,7 @@ namespace ModPlus.Helpers
                         }
                         catch (Exception ex)
                         {
-                            ExceptionBox.ShowForConfigurator(ex);
+                            ExceptionBox.Show(ex);
                             tr.Commit();
                         }
                     }
@@ -131,7 +131,7 @@ namespace ModPlus.Helpers
             }
             catch (Exception ex)
             {
-                ExceptionBox.ShowForConfigurator(ex);
+                ExceptionBox.Show(ex);
             }
         }
         /// <summary>Получение суммы длин выбранных примитивов: отрезки, полилинии, дуги, сплайны, эллипсы</summary>
@@ -250,7 +250,7 @@ namespace ModPlus.Helpers
                         }
                         catch (Exception ex)
                         {
-                            ExceptionBox.ShowForConfigurator(ex);
+                            ExceptionBox.Show(ex);
                             tr.Commit();
                         }
                     }
@@ -258,7 +258,7 @@ namespace ModPlus.Helpers
             }
             catch (Exception ex)
             {
-                ExceptionBox.ShowForConfigurator(ex);
+                ExceptionBox.Show(ex);
             }
         }
     }

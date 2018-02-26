@@ -188,7 +188,7 @@ namespace ModPlus
                         FunctionsPanel.Children.Add(exp);
                 }
             }
-            catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
+            catch (Exception exception) { ExceptionBox.Show(exception); }
         }
 
         // Чертеж закрыт

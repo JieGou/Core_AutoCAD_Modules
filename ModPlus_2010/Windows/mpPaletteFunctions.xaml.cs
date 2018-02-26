@@ -141,7 +141,7 @@ namespace ModPlus.Windows
             }
             catch (Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
 

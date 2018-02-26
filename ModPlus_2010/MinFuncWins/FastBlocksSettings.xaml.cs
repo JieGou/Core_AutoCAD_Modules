@@ -194,7 +194,7 @@ namespace ModPlus.MinFuncWins
             }
             catch (Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
     }

@@ -83,7 +83,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
 
@@ -244,7 +244,7 @@ namespace ModPlus
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         private Point3dCollection VPcontuorPoints(Viewport viewport, Transaction tr)

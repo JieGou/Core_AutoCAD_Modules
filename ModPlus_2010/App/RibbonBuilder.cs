@@ -65,7 +65,7 @@ namespace ModPlus.App
             }
             catch (Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
@@ -89,7 +89,7 @@ namespace ModPlus.App
             }
             catch (Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
 
@@ -400,7 +400,7 @@ namespace ModPlus.App
                             ribTab.Panels.Remove(ribPanel);
                     }
             }
-            catch (Exception exception) { ExceptionBox.ShowForConfigurator(exception); }
+            catch (Exception exception) { ExceptionBox.Show(exception); }
         }
 
         private static void AddHelpPanel(RibbonTab ribTab)

@@ -129,7 +129,7 @@ namespace ModPlus.App
             //Theme
             try
             {
-                ThemeManager.ChangeAppStyle(this,
+                ThemeManager.ChangeAppStyle(this.Resources,
                     ThemeManager.Accents.First(
                         x => x.Name.Equals(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor"))
                         ),
@@ -197,7 +197,7 @@ namespace ModPlus.App
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.ShowForConfigurator(exception);
+                ExceptionBox.Show(exception);
             }
         }
         // Выбор разделителя целой и дробной части для чисел

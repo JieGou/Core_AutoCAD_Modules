@@ -75,14 +75,14 @@ namespace ModPlus.Helpers
                         } //try
                         catch (Exception ex)
                         {
-                            ExceptionBox.ShowForConfigurator(ex);
+                            ExceptionBox.Show(ex);
                         }
                     } //using tr
                 } //using lock
             } //try
             catch (Exception ex)
             {
-                ExceptionBox.ShowForConfigurator(ex);
+                ExceptionBox.Show(ex);
             }
         }
         
@@ -290,7 +290,7 @@ namespace ModPlus.Helpers
             }
             catch (Exception ex)
             {
-                ExceptionBox.ShowForConfigurator(ex);
+                ExceptionBox.Show(ex);
             }
         }
 
