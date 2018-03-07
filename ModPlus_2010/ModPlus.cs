@@ -450,6 +450,7 @@ namespace ModPlus
                     MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
+                    MpPaletteSet.PaletteActivated += MpPaletteSet_PaletteActivated;
                     //AddRemovePaletts();
                     MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
                     MpPaletteSet.Style =
@@ -463,13 +464,17 @@ namespace ModPlus
                 }
                 else
                 {
-                    AddRemovePaletts();
                     MpPaletteSet.Visible = true;
                 }
             }
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
-        
+
+        private static void MpPaletteSet_PaletteActivated(object sender, PaletteActivatedEventArgs e)
+        {
+            AddRemovePaletts();
+        }
+
         private static void AddRemovePaletts()
         {
             var funName = Language.GetItem(LangItem, "h19");
@@ -547,9 +552,6 @@ namespace ModPlus
         private static void _mpPaletteSet_Load(object sender, PalettePersistEventArgs e)
         {
             e.ConfigurationSection.WriteProperty("ModPlusPalette", 32.3);
-#if !ac2010
-            AddRemovePaletts();
-#endif
         }
 
         private static Icon GetEmbeddedIcon(string sName)
