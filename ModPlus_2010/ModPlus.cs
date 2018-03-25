@@ -39,7 +39,7 @@ namespace ModPlus
                 var sw = new Stopwatch();
                 sw.Start();
                 // inint lang
-                Language.Initialize();
+                if(!Language.Initialize()) return;
                 // Получим значение переменной "Тихая загрузка" в первую очередь
                 _quiteLoad = GetQuiteLoad();
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
