@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModPlus_2010", "ModPlus_2010\ModPlus_2010.csproj", "{3CC014BF-973D-461F-8CED-232FFB3E3D1A}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModPlus_2017", "ModPlus_2017\ModPlus_2017.csproj", "{A523BE8A-C318-4DF2-8F96-6B65E986EDD6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModPlus_2018", "ModPlus_2018\ModPlus_2018.csproj", "{1144D567-CB51-44B5-96C0-EB51AD0CA090}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModPlus_2019", "ModPlus_2019\ModPlus_2019.csproj", "{418A566C-975D-4634-8154-5E8896B8E4D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,8 +65,15 @@ Global
 		{1144D567-CB51-44B5-96C0-EB51AD0CA090}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1144D567-CB51-44B5-96C0-EB51AD0CA090}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1144D567-CB51-44B5-96C0-EB51AD0CA090}.Release|Any CPU.Build.0 = Release|Any CPU
+		{418A566C-975D-4634-8154-5E8896B8E4D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{418A566C-975D-4634-8154-5E8896B8E4D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{418A566C-975D-4634-8154-5E8896B8E4D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{418A566C-975D-4634-8154-5E8896B8E4D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {628A9AC3-83C1-473D-9434-66BCCEF3909C}
 	EndGlobalSection
 EndGlobal

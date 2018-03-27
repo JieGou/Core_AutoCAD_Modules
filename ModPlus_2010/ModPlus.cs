@@ -552,6 +552,9 @@ namespace ModPlus
         private static void _mpPaletteSet_Load(object sender, PalettePersistEventArgs e)
         {
             e.ConfigurationSection.WriteProperty("ModPlusPalette", 32.3);
+#if ac2013
+            AddRemovePaletts();
+#endif
         }
 
         private static Icon GetEmbeddedIcon(string sName)
