@@ -175,6 +175,12 @@ namespace ModPlus.App
                 // Адаптация
                 ChkMpFloatMenu.IsChecked = _curFloatMenu = ModPlusAPI.Variables.FloatMenu;
                 ChkMpPalette.IsChecked = _curPalette = ModPlusAPI.Variables.Palette;
+                // palette by visibility
+                if (ModPlusAPI.Variables.Palette && !MpPalette.MpPaletteSet.Visible)
+                {
+                    ChkMpPalette.IsChecked = _curPalette = false;
+                    ModPlusAPI.Variables.Palette = false; //
+                }
                 ChkMpPaletteFunctions.IsChecked = ModPlusAPI.Variables.FunctionsInPalette;
                 ChkMpPaletteDrawings.IsChecked = ModPlusAPI.Variables.DrawingsInPalette;
                 ChkMpRibbon.IsChecked = _curRibbon = ModPlusAPI.Variables.Ribbon;

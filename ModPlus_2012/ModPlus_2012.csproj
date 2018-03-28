@@ -38,19 +38,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui">
-      <HintPath>..\..\_Acad dlls\2012\AcCui.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2012\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\_Acad dlls\2012\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2012\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\_Acad dlls\2012\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2012\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\_Acad dlls\2012\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2012\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">

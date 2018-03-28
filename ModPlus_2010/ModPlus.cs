@@ -20,6 +20,7 @@ using Autodesk.AutoCAD.Windows;
 using ModPlus.App;
 using ModPlus.Windows;
 using System.Windows.Forms.Integration;
+using Autodesk.Windows;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
@@ -447,11 +448,10 @@ namespace ModPlus
             {
                 if (MpPaletteSet == null)
                 {
-                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
+                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB73")); //6
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
-                    MpPaletteSet.PaletteActivated += MpPaletteSet_PaletteActivated;
-                    //AddRemovePaletts();
+                    MpPaletteSet.StateChanged += MpPaletteSet_StateChanged;
                     MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
                     MpPaletteSet.Style =
                         PaletteSetStyles.ShowPropertiesMenu |
@@ -470,11 +470,12 @@ namespace ModPlus
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
 
-        private static void MpPaletteSet_PaletteActivated(object sender, PaletteActivatedEventArgs e)
+        private static void MpPaletteSet_StateChanged(object sender, PaletteSetStateEventArgs e)
         {
-            AddRemovePaletts();
+            if(e.NewState == StateEventIndex.Show)
+                AddRemovePaletts();
         }
-
+        
         private static void AddRemovePaletts()
         {
             var funName = Language.GetItem(LangItem, "h19");
@@ -552,9 +553,6 @@ namespace ModPlus
         private static void _mpPaletteSet_Load(object sender, PalettePersistEventArgs e)
         {
             e.ConfigurationSection.WriteProperty("ModPlusPalette", 32.3);
-#if ac2013
-            AddRemovePaletts();
-#endif
         }
 
         private static Icon GetEmbeddedIcon(string sName)

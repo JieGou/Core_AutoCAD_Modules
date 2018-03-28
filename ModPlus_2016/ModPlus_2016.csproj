@@ -31,23 +31,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\..\_Acad dlls\2016\accoremgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2016\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcCui">
-      <HintPath>..\..\_Acad dlls\2016\AcCui.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2016\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\_Acad dlls\2016\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2016\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\_Acad dlls\2016\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2016\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\_Acad dlls\2016\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2016\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">

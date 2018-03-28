@@ -36,23 +36,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\..\_Acad dlls\2013\accoremgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2013\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcCui">
-      <HintPath>..\..\_Acad dlls\2013\AcCui.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2013\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\_Acad dlls\2013\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2013\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\_Acad dlls\2013\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2013\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\_Acad dlls\2013\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2013\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
