@@ -448,10 +448,10 @@ namespace ModPlus
             {
                 if (MpPaletteSet == null)
                 {
-                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB73")); //6
+                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
-                    MpPaletteSet.StateChanged += MpPaletteSet_StateChanged;
+                    AddRemovePaletts();
                     MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
                     MpPaletteSet.Style =
                         PaletteSetStyles.ShowPropertiesMenu |
@@ -469,78 +469,80 @@ namespace ModPlus
             }
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
-
-        private static void MpPaletteSet_StateChanged(object sender, PaletteSetStateEventArgs e)
-        {
-            if(e.NewState == StateEventIndex.Show)
-                AddRemovePaletts();
-        }
         
         private static void AddRemovePaletts()
         {
-            var funName = Language.GetItem(LangItem, "h19");
-            var drwName = Language.GetItem(LangItem, "h20");
-            // functions
-            if (ModPlusAPI.Variables.FunctionsInPalette)
+            if(MpPaletteSet == null) return;
+            try
             {
-                var hasP = false;
-                foreach (Palette p in MpPaletteSet)
+                var funName = Language.GetItem(LangItem, "h19");
+                var drwName = Language.GetItem(LangItem, "h20");
+                // functions
+                if (ModPlusAPI.Variables.FunctionsInPalette)
                 {
-                    if (p.Name.Equals(funName)) hasP = true;
-                }
-                if (!hasP)
-                {
-                    var palette = new mpPaletteFunctions();
-                    var host = new ElementHost
+                    var hasP = false;
+                    foreach (Palette p in MpPaletteSet)
                     {
-                        AutoSize = true,
-                        Dock = System.Windows.Forms.DockStyle.Fill,
-                        Child = palette
-                    };
-                    MpPaletteSet.Add(funName, host);
-                }
-            }
-            else
-            {
-                for (var i = 0; i < MpPaletteSet.Count; i++)
-                {
-                    if (MpPaletteSet[i].Name.Equals(funName))
+                        if (p.Name.Equals(funName)) hasP = true;
+                    }
+                    if (!hasP)
                     {
-                        MpPaletteSet.Remove(i);
-                        break;
+                        var palette = new mpPaletteFunctions();
+                        var host = new ElementHost
+                        {
+                            AutoSize = true,
+                            Dock = System.Windows.Forms.DockStyle.Fill,
+                            Child = palette
+                        };
+                        MpPaletteSet.Add(funName, host);
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < MpPaletteSet.Count; i++)
+                    {
+                        if (MpPaletteSet[i].Name.Equals(funName))
+                        {
+                            MpPaletteSet.Remove(i);
+                            break;
+                        }
+                    }
+                }
+                // drawings
+                if (ModPlusAPI.Variables.DrawingsInPalette)
+                {
+                    var hasP = false;
+                    foreach (Palette p in MpPaletteSet)
+                    {
+                        if (p.Name.Equals(drwName)) hasP = true;
+                    }
+                    if (!hasP)
+                    {
+                        var palette = new mpPaletteDrawings();
+                        var host = new ElementHost
+                        {
+                            AutoSize = true,
+                            Dock = System.Windows.Forms.DockStyle.Fill,
+                            Child = palette
+                        };
+                        MpPaletteSet.Add(drwName, host);
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < MpPaletteSet.Count; i++)
+                    {
+                        if (MpPaletteSet[i].Name.Equals(drwName))
+                        {
+                            MpPaletteSet.Remove(i);
+                            break;
+                        }
                     }
                 }
             }
-            // drawings
-            if (ModPlusAPI.Variables.DrawingsInPalette)
+            catch
             {
-                var hasP = false;
-                foreach (Palette p in MpPaletteSet)
-                {
-                    if (p.Name.Equals(drwName)) hasP = true;
-                }
-                if (!hasP)
-                {
-                    var palette = new mpPaletteDrawings();
-                    var host = new ElementHost
-                    {
-                        AutoSize = true,
-                        Dock = System.Windows.Forms.DockStyle.Fill,
-                        Child = palette
-                    };
-                    MpPaletteSet.Add(drwName, host);
-                }
-            }
-            else
-            {
-                for (var i = 0; i < MpPaletteSet.Count; i++)
-                {
-                    if (MpPaletteSet[i].Name.Equals(drwName))
-                    {
-                        MpPaletteSet.Remove(i);
-                        break;
-                    }
-                }
+                // ignore
             }
         }
 
