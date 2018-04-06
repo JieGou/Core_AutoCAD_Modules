@@ -20,7 +20,6 @@ using Autodesk.AutoCAD.Windows;
 using ModPlus.App;
 using ModPlus.Windows;
 using System.Windows.Forms.Integration;
-using Autodesk.Windows;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;

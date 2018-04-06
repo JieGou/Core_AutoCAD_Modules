@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A8A9303A-30C7-47DC-93C2-B9229122B4E3}</ProjectGuid>
+    <ProjectGuid>{3CC014BF-973D-461F-8CED-232FFB3E3D1A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModPlus</RootNamespace>
@@ -21,6 +21,10 @@
     <DefineConstants>TRACE;DEBUG;ac2013</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DocumentationFile>
+    </DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -31,31 +35,30 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>E:\ModPlus\Extensions\ModPlus.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\..\..\_Acad dlls\2013\accoremgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2013\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcCui">
-      <HintPath>..\..\..\_Acad dlls\2013\AcCui.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2013\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\..\_Acad dlls\2013\acdbmgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2013\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\..\_Acad dlls\2013\acmgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2013\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\..\_Acad dlls\2013\AdWindows.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2013\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ModPlus\Extensions\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
@@ -77,120 +80,82 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ModPlus_2010\App\mpMainSettings.xaml.cs">
-      <Link>App\mpMainSettings.xaml.cs</Link>
+    <Compile Include="App\mpMainSettings.xaml.cs">
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\App\MpProductsDrawableOverrule.cs">
-      <Link>App\MpProductsDrawableOverrule.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\App\RibbonBuilder.cs">
-      <Link>App\RibbonBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\AutocadHelpers.cs">
-      <Link>Helpers\AutocadHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\GeometryHelpers.cs">
-      <Link>Helpers\GeometryHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\GetFromAutoCAD.cs">
-      <Link>Helpers\GetFromAutoCAD.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\InsertToAutoCAD.cs">
-      <Link>Helpers\InsertToAutoCAD.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\LoadFunctionsHelper.cs">
-      <Link>Helpers\LoadFunctionsHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\RibbonHelpers.cs">
-      <Link>Helpers\RibbonHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Helpers\XDataHelpers.cs">
-      <Link>Helpers\XDataHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\MinFuncWins\FastBlockSelection.xaml.cs">
-      <Link>MinFuncWins\FastBlockSelection.xaml.cs</Link>
+    <Compile Include="App\MpProductsDrawableOverrule.cs" />
+    <Compile Include="App\RibbonBuilder.cs" />
+    <Compile Include="Helpers\AutocadHelpers.cs" />
+    <Compile Include="Helpers\GetFromAutoCAD.cs" />
+    <Compile Include="Helpers\InsertToAutoCAD.cs" />
+    <Compile Include="Helpers\LoadFunctionsHelper.cs" />
+    <Compile Include="Helpers\RibbonHelpers.cs" />
+    <Compile Include="Helpers\XDataHelpers.cs" />
+    <Compile Include="MinFuncWins\FastBlockSelection.xaml.cs">
       <DependentUpon>FastBlockSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\MinFuncWins\FastBlocksSettings.xaml.cs">
-      <Link>MinFuncWins\FastBlocksSettings.xaml.cs</Link>
+    <Compile Include="MinFuncWins\FastBlocksSettings.xaml.cs">
       <DependentUpon>FastBlocksSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\MiniFunctions.cs">
-      <Link>MiniFunctions.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\ModPlus.cs">
-      <Link>ModPlus.cs</Link>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\mpDrawings.xaml.cs">
-      <Link>mpDrawings.xaml.cs</Link>
+    <Compile Include="MiniFunctions.cs" />
+    <Compile Include="ModPlus.cs" />
+    <Compile Include="Helpers\GeometryHelpers.cs" />
+    <Compile Include="mpDrawings.xaml.cs">
       <DependentUpon>mpDrawings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\MpFloatMenu.xaml.cs">
-      <Link>MpFloatMenu.xaml.cs</Link>
+    <Compile Include="MpFloatMenu.xaml.cs">
       <DependentUpon>MpFloatMenu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\mpPaletteDrawings.xaml.cs">
-      <Link>Windows\mpPaletteDrawings.xaml.cs</Link>
-      <DependentUpon>mpPaletteDrawings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\ModPlus_2010\Windows\mpPaletteFunctions.xaml.cs">
-      <Link>Windows\mpPaletteFunctions.xaml.cs</Link>
-      <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="VersionData.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\mpPaletteDrawings.xaml.cs">
+      <DependentUpon>mpPaletteDrawings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\mpPaletteFunctions.xaml.cs">
+      <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="App\mpMainSettings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MinFuncWins\FastBlockSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MinFuncWins\FastBlocksSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="mpDrawings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MpFloatMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\mpPaletteDrawings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\mpPaletteFunctions.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\ModPlus_2010\App\mpMainSettings.xaml">
-      <Link>App\mpMainSettings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\MinFuncWins\FastBlockSelection.xaml">
-      <Link>MinFuncWins\FastBlockSelection.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\MinFuncWins\FastBlocksSettings.xaml">
-      <Link>MinFuncWins\FastBlocksSettings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\mpDrawings.xaml">
-      <Link>mpDrawings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\MpFloatMenu.xaml">
-      <Link>MpFloatMenu.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\mpPaletteDrawings.xaml">
-      <Link>Windows\mpPaletteDrawings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\ModPlus_2010\Windows\mpPaletteFunctions.xaml">
-      <Link>Windows\mpPaletteFunctions.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\HelpBt.png" />
@@ -202,25 +167,17 @@
     <Resource Include="Resources\dwg.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\ModPlus_2010\Resources\mpIcon.ico">
-      <Link>Resources\mpIcon.ico</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\mpIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\ModPlus_2010\Resources\mpHideProductIcons_16x16.png">
-      <Link>Resources\mpHideProductIcons_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2010\Resources\mpShowProductIcon.png">
-      <Link>Resources\mpShowProductIcon.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2010\Resources\mpShowProductIcons_16x16.png">
-      <Link>Resources\mpShowProductIcons_16x16.png</Link>
-    </Resource>
+    <Resource Include="Resources\mpHideProductIcons_16x16.png" />
+    <Resource Include="Resources\mpShowProductIcons_16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\ModPlus_2010\Resources\forIcon_256.png">
-      <Link>Resources\forIcon_256.png</Link>
-    </Resource>
+    <Resource Include="Resources\mpShowProductIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\forIcon_256.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

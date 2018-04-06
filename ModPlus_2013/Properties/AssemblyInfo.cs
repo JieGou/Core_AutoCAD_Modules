@@ -1,12 +1,11 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle("ModPlus")]
-[assembly: AssemblyDescription("2013")]
+[assembly: AssemblyDescription("2010")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("modplus.org")]
 [assembly: AssemblyProduct("ModPlus")]
@@ -20,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("66fde4f3-341f-4b83-8bf6-12b43337b650")]
+[assembly: Guid("262cdac8-4f1e-4d2a-84aa-5715e2c6ce61")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
