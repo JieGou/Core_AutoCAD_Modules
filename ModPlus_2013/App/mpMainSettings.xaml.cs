@@ -154,6 +154,7 @@ namespace ModPlus.App
             ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b; //true
             ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
             ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
+            ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; //true
 
             // Виды границ окна
             var border = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType");
@@ -411,6 +412,7 @@ namespace ModPlus.App
                 ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
+
         #region Контекстные меню
         // Задать вхождения ПоБлоку
         private void ChkEntByBlock_OnChecked(object sender, RoutedEventArgs e)
@@ -450,7 +452,19 @@ namespace ModPlus.App
                 else MiniFunctions.ContextMenues.VPtoMSobjectContextMenu.Detach();
             }
         }
+        // wipeout edit
+        private void ChkWipeoutEditOCM_OnChecked(object sender, RoutedEventArgs e)
+        {
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", true.ToString(), true);
+            MiniFunctions.ContextMenues.WipeoutEditObjectContextMenu.Attach();
+        }
+        private void ChkWipeoutEditOCM_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", false.ToString(), true);
+            MiniFunctions.ContextMenues.WipeoutEditObjectContextMenu.Detach(); 
+        }
         #endregion
+
         private void TbEmailAdress_OnLostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb)
@@ -472,11 +486,6 @@ namespace ModPlus.App
             {
                 return false;
             }
-        }
-
-        private void TitleWin_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
         }
     }
 

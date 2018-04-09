@@ -12,10 +12,13 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
+using Viewport = Autodesk.AutoCAD.DatabaseServices.Viewport;
 
 namespace ModPlus
 {
@@ -41,6 +44,11 @@ namespace ModPlus
             if (VPtoMSObjConMen)
                 ContextMenues.VPtoMSobjectContextMenu.Attach();
             else ContextMenues.VPtoMSobjectContextMenu.Detach();
+            // wipeout vertex edit
+            var wipeoutEditOCM = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; // true
+            if (wipeoutEditOCM)
+                ContextMenues.WipeoutEditObjectContextMenu.Attach();
+            else ContextMenues.WipeoutEditObjectContextMenu.Detach();
         }
 
         [CommandMethod("ModPlus", "mpEntByBlock", CommandFlags.UsePickSet | CommandFlags.Redraw)]
@@ -121,6 +129,7 @@ namespace ModPlus
             }
         }
 
+        #region VP to MS
 #if ac2010
         [DllImport("acad.exe", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
@@ -336,6 +345,275 @@ namespace ModPlus
             return msVpPnts;
         }
 
+        #endregion
+
+        #region Edit wipeout
+
+        [CommandMethod("ModPlus", "mpAddVertexToWipeout", CommandFlags.UsePickSet)]
+        public void AddVertexToWipeout()
+        {
+            try
+            {
+                Document doc = AcApp.DocumentManager.MdiActiveDocument;
+                Editor ed = doc.Editor;
+
+                var selectedObjects = ed.SelectImplied();
+                var selectedId = ObjectId.Null;
+                if (selectedObjects.Value == null || selectedObjects.Value.Count > 1)
+                {
+                    PromptEntityOptions peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg20") + ":");
+                    peo.SetRejectMessage("\nWrong!");
+                    peo.AllowNone = false;
+                    peo.AddAllowedClass(typeof(Wipeout), true);
+
+                    var ent = ed.GetEntity(peo);
+                    if (ent.Status != PromptStatus.OK) return;
+
+                    selectedId = ent.ObjectId;
+                }
+                else
+                {
+                    selectedId = selectedObjects.Value[0].ObjectId;
+                }
+                if (selectedId != ObjectId.Null)
+                    AddVertexToCurrentWipeout(selectedId);
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
+        [CommandMethod("ModPlus", "mpRemoveVertexFromWipeout", CommandFlags.UsePickSet)]
+        public void RemoveVertexToWipeout()
+        {
+            try
+            {
+                Document doc = AcApp.DocumentManager.MdiActiveDocument;
+                Editor ed = doc.Editor;
+
+                var selectedObjects = ed.SelectImplied();
+                var selectedId = ObjectId.Null;
+                if (selectedObjects.Value == null || selectedObjects.Value.Count > 1)
+                {
+                    PromptEntityOptions peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg20") + ":");
+                    peo.SetRejectMessage("\nWrong!");
+                    peo.AllowNone = false;
+                    peo.AddAllowedClass(typeof(Wipeout), true);
+
+                    var ent = ed.GetEntity(peo);
+                    if (ent.Status != PromptStatus.OK) return;
+
+                    selectedId = ent.ObjectId;
+                }
+                else
+                {
+                    selectedId = selectedObjects.Value[0].ObjectId;
+                }
+                if (selectedId != ObjectId.Null)
+                    RemoveVertexFromCurrentWipeout(selectedId);
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
+
+        public static void AddVertexToCurrentWipeout(ObjectId wipeoutId)
+        {
+            Document doc = AcApp.DocumentManager.MdiActiveDocument;
+            var loop = true;
+            while (loop)
+            {
+                using (doc.LockDocument())
+                {
+                    using (Transaction tr = doc.TransactionManager.StartTransaction())
+                    {
+                        Wipeout wipeout = tr.GetObject(wipeoutId, OpenMode.ForWrite) as Wipeout;
+                        if (wipeout != null)
+                        {
+                            var points3D = wipeout.GetVertices();
+
+                            Polyline polyline = new Polyline();
+                            for (int i = 0; i < points3D.Count; i++)
+                            {
+                                polyline.AddVertexAt(i, new Point2d(points3D[i].X, points3D[i].Y), 0.0, 0.0, 0.0);
+                            }
+                            var jig = new AddVertexJig();
+                            var jres = jig.StartJig(polyline);
+                            if (jres.Status != PromptStatus.OK) loop = false;
+                            else
+                            {
+                                polyline.AddVertexAt(jig.Vertex() + 1, jig.PickedPoint(), 0.0, 0.0, 0.0);
+                                var new2DPoints = new Point2dCollection();
+                                for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                {
+                                    new2DPoints.Add(polyline.GetPoint2dAt(i));
+                                }
+                                wipeout.SetFrom(new2DPoints, polyline.Normal);
+                            }
+                        }
+                        tr.Commit();
+                    }
+                }
+            }
+        }
+
+        public static void RemoveVertexFromCurrentWipeout(ObjectId wipeoutId)
+        {
+            Document doc = AcApp.DocumentManager.MdiActiveDocument;
+            Editor ed = doc.Editor;
+
+            var loop = true;
+            while (loop)
+            {
+                using (doc.LockDocument())
+                {
+                    using (Transaction tr = doc.TransactionManager.StartTransaction())
+                    {
+                        Wipeout wipeout = tr.GetObject(wipeoutId, OpenMode.ForWrite) as Wipeout;
+                        if (wipeout != null)
+                        {
+                            var points3D = wipeout.GetVertices();
+                            if (points3D.Count > 3)
+                            {
+                                Polyline polyline = new Polyline();
+                                for (int i = 0; i < points3D.Count; i++)
+                                {
+                                    polyline.AddVertexAt(i, new Point2d(points3D[i].X, points3D[i].Y), 0.0, 0.0, 0.0);
+                                }
+                                var pickedPt = ed.GetPoint("\n" + Language.GetItem(LangItem, "msg22") + ":");
+                                if (pickedPt.Status != PromptStatus.OK)
+                                    loop = false;
+                                else
+                                {
+                                    var pt = polyline.GetClosestPointTo(pickedPt.Value, false);
+                                    var param = polyline.GetParameterAtPoint(pt);
+                                    var vertex = Convert.ToInt32(Math.Truncate(param));
+                                    polyline.RemoveVertexAt(vertex);
+                                    var new2DPoints = new Point2dCollection();
+                                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                    {
+                                        new2DPoints.Add(polyline.GetPoint2dAt(i));
+                                    }
+                                    wipeout.SetFrom(new2DPoints, polyline.Normal);
+                                }
+                            }
+                            else
+                            {
+                                // message
+                                loop = false;
+                            }
+                        }
+                        tr.Commit();
+                    }
+                }
+            }
+        }
+
+        private class AddVertexJig : DrawJig
+        {
+            private Point3d _prevPoint;
+            private Point3d _currPoint;
+            private Point3d _startPoint;
+            private Polyline _pline;
+            private int _vertex;
+
+            public PromptResult StartJig(Polyline pline)
+            {
+                _pline = pline;
+                _prevPoint = _pline.GetPoint3dAt(0);
+                _startPoint = _pline.GetPoint3dAt(0);
+
+                return AcApp.DocumentManager.MdiActiveDocument.Editor.Drag(this);
+            }
+
+            public int Vertex()
+            {
+                return _vertex;
+            }
+
+            public Point2d PickedPoint()
+            {
+                return new Point2d(_currPoint.X, _currPoint.Y);
+            }
+
+            protected override SamplerStatus Sampler(JigPrompts prompts)
+            {
+                var ppo = new JigPromptPointOptions("\n" + Language.GetItem(LangItem, "msg21") + ":")
+                {
+                    BasePoint = _startPoint,
+                    UseBasePoint = true,
+                    UserInputControls = UserInputControls.Accept3dCoordinates
+                                        | UserInputControls.NullResponseAccepted
+                                        | UserInputControls.AcceptOtherInputString
+                                        | UserInputControls.NoNegativeResponseAccepted
+                };
+
+
+                var ppr = prompts.AcquirePoint(ppo);
+
+                if (ppr.Status != PromptStatus.OK)
+                    return SamplerStatus.Cancel;
+
+                if (ppr.Status == PromptStatus.OK)
+                {
+                    _currPoint = ppr.Value;
+
+                    if (CursorHasMoved())
+                    {
+                        _prevPoint = _currPoint;
+                        return SamplerStatus.OK;
+                    }
+                    return SamplerStatus.NoChange;
+                }
+
+                return SamplerStatus.NoChange;
+            }
+
+            protected override bool WorldDraw(WorldDraw draw)
+            {
+                var mods = System.Windows.Forms.Control.ModifierKeys;
+                var control = (mods & System.Windows.Forms.Keys.Control) > 0;
+                var pt = _pline.GetClosestPointTo(_currPoint, false);
+                var param = _pline.GetParameterAtPoint(pt);
+                _vertex = Convert.ToInt32(Math.Truncate(param));
+                var maxVx = _pline.NumberOfVertices - 1;
+                if (control)
+                {
+                    if (_vertex < maxVx)
+                        _vertex++;
+                }
+
+                if (_vertex != maxVx)
+                {
+                    // Если вершина не последня
+                    var line1 = new Line(_pline.GetPoint3dAt(_vertex), _currPoint);
+                    draw.Geometry.Draw(line1);
+                    var line2 = new Line(_pline.GetPoint3dAt(_vertex + 1), _currPoint);
+                    draw.Geometry.Draw(line2);
+                }
+                else
+                {
+                    var line1 = new Line(_pline.GetPoint3dAt(_vertex), _currPoint);
+                    draw.Geometry.Draw(line1);
+                    if (_pline.Closed)
+                    {
+                        // Если полилиния замкнута, то рисуем отрезок к первой вершине
+                        var line2 = new Line(_pline.GetPoint3dAt(0), _currPoint);
+                        draw.Geometry.Draw(line2);
+                    }
+                }
+                return true;
+            }
+
+            private bool CursorHasMoved()
+            {
+                return _currPoint.DistanceTo(_prevPoint) > Tolerance.Global.EqualPoint;
+            }
+        }
+
+        #endregion
+
         public class ContextMenues
         {
             public static class EntByBlockObjectContextMenu
@@ -352,7 +630,7 @@ namespace ModPlus
                         ContextMenu.MenuItems.Add(miEnt);
 
                         var rxcEnt = RXObject.GetClass(typeof(BlockReference));
-                        Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
+                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
                     }
                 }
                 public static void Detach()
@@ -360,7 +638,7 @@ namespace ModPlus
                     if (ContextMenu != null)
                     {
                         var rxcEnt = RXObject.GetClass(typeof(BlockReference));
-                        Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
+                        Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
                         ContextMenu = null;
                     }
                 }
@@ -395,7 +673,7 @@ namespace ModPlus
                                         mi.Click += Mi_Click;
                                         ContextMenu.MenuItems.Add(mi);
                                     }
-                                    Autodesk.AutoCAD.ApplicationServices.Application.AddDefaultContextMenuExtension(
+                                    Application.AddDefaultContextMenuExtension(
                                         ContextMenu);
                                 }
                             }
@@ -411,7 +689,7 @@ namespace ModPlus
                 {
                     if (ContextMenu != null)
                     {
-                        Autodesk.AutoCAD.ApplicationServices.Application.RemoveDefaultContextMenuExtension(ContextMenu);
+                        Application.RemoveDefaultContextMenuExtension(ContextMenu);
                         ContextMenu = null;
                     }
                 }
@@ -508,6 +786,7 @@ namespace ModPlus
                     }// lock
                 }
             }
+
             public static class BlockInsertion
             {
                 /// <summary>
@@ -665,7 +944,7 @@ namespace ModPlus
                         ContextMenuForVP.MenuItems.Add(miEnt);
 
                         var rxcEnt = RXObject.GetClass(typeof(Viewport));
-                        Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
+                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
                     }
                     if (ContextMenuForCurve == null)
                     {
@@ -675,7 +954,7 @@ namespace ModPlus
                         ContextMenuForCurve.MenuItems.Add(miEnt);
 
                         var rxcEnt = RXObject.GetClass(typeof(Curve));
-                        Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForCurve);
+                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForCurve);
                     }
                 }
                 public static void Detach()
@@ -683,13 +962,13 @@ namespace ModPlus
                     if (ContextMenuForVP != null)
                     {
                         var rxcEnt = RXObject.GetClass(typeof(Viewport));
-                        Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
+                        Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
                         ContextMenuForVP = null;
                     }
                     if (ContextMenuForCurve != null)
                     {
                         var rxcEnt = RXObject.GetClass(typeof(Curve));
-                        Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenuForCurve);
+                        Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenuForCurve);
                         ContextMenuForCurve = null;
                     }
                 }
@@ -697,6 +976,88 @@ namespace ModPlus
                 {
                     AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
                         "_.mpVPtoMS ", false, false, false);
+                }
+            }
+
+            public static class WipeoutEditObjectContextMenu
+            {
+                public static ContextMenuExtension ContextMenu;
+
+                public static void Attach()
+                {
+                    if (ContextMenu == null)
+                    {
+                        ContextMenu = new ContextMenuExtension();
+                        var mi1 = new MenuItem(Language.GetItem(LangItem, "h54"));
+                        mi1.Click += Mi1_Click;
+                        ContextMenu.MenuItems.Add(mi1);
+                        var mi2 = new MenuItem(Language.GetItem(LangItem, "h55"));
+                        mi2.Click += Mi2_Click;
+                        ContextMenu.MenuItems.Add(mi2);
+                        ContextMenu.Popup += ContextMenu_Popup;
+
+                        RXClass rxcEnt = RXObject.GetClass(typeof(Entity));
+                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
+                    }
+                }
+
+                public static void Detach()
+                {
+                    if (ContextMenu != null)
+                    {
+                        var rxcEnt = RXObject.GetClass(typeof(Entity));
+                        Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
+                        ContextMenu = null;
+                    }
+                }
+
+                private static void Mi2_Click(object sender, EventArgs e)
+                {
+                    AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        "_.mpRemoveVertexFromWipeout ", false, false, false);
+                }
+
+                private static void Mi1_Click(object sender, EventArgs e)
+                {
+                    AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        "_.mpAddVertexToWipeout ", false, false, false);
+                }
+                // Обработка выпадающего меню
+                private static void ContextMenu_Popup(object sender, EventArgs e)
+                {
+                    if (sender is ContextMenuExtension contextMenu)
+                    {
+                        var doc = AcApp.DocumentManager.MdiActiveDocument;
+                        var ed = doc.Editor;
+                        try
+                        {
+                            var acSsPrompt = ed.SelectImplied();
+                            var mVisible = true;
+                            if (acSsPrompt.Status == PromptStatus.OK)
+                            {
+                                var set = acSsPrompt.Value;
+                                var ids = set.GetObjectIds();
+                                if (acSsPrompt.Value.Count == 1)
+                                {
+                                    using (var tr = doc.TransactionManager.StartOpenCloseTransaction())
+                                    {
+                                        var entity = tr.GetObject(ids[0], OpenMode.ForRead);
+                                        if (entity is Wipeout)
+                                            mVisible = true;
+                                        else mVisible = false;
+                                    }
+                                }
+                                else mVisible = false;
+                            }
+
+                            contextMenu.MenuItems[0].Visible = mVisible;
+                            contextMenu.MenuItems[1].Visible = mVisible;
+                        }
+                        catch
+                        {
+                            //
+                        }
+                    }
                 }
             }
         }

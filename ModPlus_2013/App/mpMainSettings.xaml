@@ -247,6 +247,7 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -290,6 +291,14 @@
                               VerticalAlignment="Center"
                               Content="{Binding Source={StaticResource Lang}, XPath=h26}"
                               ToolTip="{Binding Source={StaticResource Lang}, XPath=tt16}"></CheckBox>
+                <CheckBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="2"
+                          Name="ChkWipeoutEditOCM" Checked="ChkWipeoutEditOCM_OnChecked"
+                          Unchecked="ChkWipeoutEditOCM_OnUnchecked"
+                          VerticalAlignment="Center" Width="522"
+                          ToolTip="{Binding Source={StaticResource Lang}, XPath=tt18}">
+                    <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=h53}" TextWrapping="Wrap"
+                               MaxWidth="450"></TextBlock>
+                </CheckBox>
             </Grid>
         </mah:MetroTabItem>
     </mah:MetroTabControl>
