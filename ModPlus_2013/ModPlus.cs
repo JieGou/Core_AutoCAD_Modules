@@ -1,8 +1,4 @@
-﻿#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
+﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
@@ -41,7 +36,7 @@ namespace ModPlus
                 // inint lang
                 if(!Language.Initialize()) return;
                 // Получим значение переменной "Тихая загрузка" в первую очередь
-                _quiteLoad = GetQuiteLoad();
+                _quiteLoad = ModPlusAPI.Variables.QuietLoading;
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // Файла конфигурации может не существовать при загрузке плагина!
                 // Поэтому все, что связанно с работой с файлом конфигурации должно это учитывать!
@@ -100,33 +95,6 @@ namespace ModPlus
         public void Terminate()
         {
 
-        }
-        // Значение тихой загрузки
-        private static bool GetQuiteLoad()
-        {
-            // Т.к. нужно значение получить до инициализации файла, то читать нужно напрямую
-            try
-            {
-                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus");
-                if (key != null)
-                    using (key)
-                    {
-                        var cfile = key.GetValue("ConfigFile") as string;
-                        if (!string.IsNullOrEmpty(cfile))
-                        {
-                            var sfile = XElement.Load(cfile);
-                            return
-                                bool.Parse(
-                                    // ReSharper disable once AssignNullToNotNullAttribute
-                                    sfile.Element("Settings")?.Element("MainSet")?.Attribute("ChkQuietLoading")?.Value);
-                        }
-                    }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
         }
         // проверка соответсвия версии автокада
         private static bool CheckCadVersion()
@@ -202,82 +170,60 @@ namespace ModPlus
         {
             try
             {
-                // Расположение файла конфигурации
-                var confF = UserConfigFile.FullFileName;
-                // Грузим
-                XElement configFile;
-                using (var file = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    configFile= XElement.Load(file);
-                // Делаем итерацию по значениям в файле конфигурации
-                var xElement = configFile.Element("Config");
-                var el = xElement?.Element("Functions");
-                if (el != null)
-                    foreach (var conFunc in el.Elements("function"))
+                var funtionsKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus\\Functions");
+                if (funtionsKey == null) return;
+                using (funtionsKey)
+                {
+                    foreach (var functionKeyName in funtionsKey.GetSubKeyNames())
                     {
-                        /* Так как после обновления добавится значение 
-                         * ProductFor, то нужно проверять по нем, при наличии
-                         */
-                        var productForAttr = conFunc.Attribute("ProductFor");
-                        if (productForAttr != null)
-                            if (!productForAttr.Value.Equals("AutoCAD"))
-                                continue;
-                        var confFuncNameAttr = conFunc.Attribute("Name");
-                        if (confFuncNameAttr != null)
+                        var functionKey = funtionsKey.OpenSubKey(functionKeyName);
+                        if (functionKey == null) continue;
+                        foreach (var availPrVersKeyName in functionKey.GetSubKeyNames())
                         {
-                            /* Так как значение AvailCad будет являться устаревшим, НО
-                            * пока не будет удалено, делаем двойной вариант проверки
-                            */
-                            var conFuncAvailCad = string.Empty;
-                            var confFuncAvailCadAttr = conFunc.Attribute("AvailCad");
-                            if (confFuncAvailCadAttr != null)
-                                conFuncAvailCad = confFuncAvailCadAttr.Value;
-                            var availProductExternalVersionAttr = conFunc.Attribute("AvailProductExternalVersion");
-                            if (availProductExternalVersionAttr != null)
-                                conFuncAvailCad = availProductExternalVersionAttr.Value;
-                            if (!string.IsNullOrEmpty(conFuncAvailCad))
+                            // Если версия продукта не совпадает, то пропускаю
+                            if (!availPrVersKeyName.Equals(MpVersionData.CurCadVers)) continue;
+                            var availPrVersKey = functionKey.OpenSubKey(availPrVersKeyName);
+                            if (availPrVersKey == null) continue;
+                            // беру свойства функции из реестра
+                            var file = availPrVersKey.GetValue("File") as string;
+                            var onOff = availPrVersKey.GetValue("OnOff") as string;
+                            var productFor = availPrVersKey.GetValue("ProductFor") as string;
+                            if (string.IsNullOrEmpty(onOff) || string.IsNullOrEmpty(productFor)) continue;
+                            if (!productFor.Equals("AutoCAD")) continue;
+                            var isOn = !bool.TryParse(onOff, out var b) || b; // default - true
+                            // Если "Продукт для" подходит, файл существует и функция включена - гружу
+                            if (isOn)
                             {
-                                // Проверяем по версии автокада
-                                if (conFuncAvailCad.Equals(MpVersionData.CurCadVers))
+                                if (!string.IsNullOrEmpty(file) && File.Exists(file))
                                 {
-                                    // Добавляем если только функция включена и есть физически на диске!!!
-                                    var conFuncOnOff = bool.TryParse(conFunc.Attribute("OnOff")?.Value, out bool b) && b; // false
-                                    var conFuncFileAttr = conFunc.Attribute("File");
-                                    // Т.к. атрибута File может не быть
-                                    if (conFuncOnOff)
+                                    // load
+                                    if (!_quiteLoad)
+                                        ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
+                                    var localFuncAssembly = Assembly.LoadFrom(file);
+                                    LoadFunctionsHelper.GetDataFromFunctionIntrface(localFuncAssembly);
+                                }
+                                else
+                                {
+                                    var findedFile = LoadFunctionsHelper.FindFile(functionKeyName);
+                                    if (!string.IsNullOrEmpty(findedFile) && File.Exists(findedFile))
                                     {
-                                        if (conFuncFileAttr != null)
-                                        {
-                                            if (File.Exists(conFuncFileAttr.Value))
-                                            {
-                                                if (!_quiteLoad)
-                                                    ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + confFuncNameAttr.Value);
-                                                var loadedFuncAssembly = Assembly.LoadFrom(conFuncFileAttr.Value);
-                                                LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var findedFile = LoadFunctionsHelper.FindFile(confFuncNameAttr.Value);
-                                            if (!string.IsNullOrEmpty(findedFile))
-                                                if (File.Exists(findedFile))
-                                                {
-                                                    if (!_quiteLoad)
-                                                        ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + confFuncNameAttr.Value);
-                                                    var loadedFuncAssembly = Assembly.LoadFrom(findedFile);
-                                                    LoadFunctionsHelper.GetDataFromFunctionIntrface(loadedFuncAssembly);
-                                                }
-                                        }
+                                        if (!_quiteLoad)
+                                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
+                                        var localFuncAssembly = Assembly.LoadFrom(findedFile);
+                                        LoadFunctionsHelper.GetDataFromFunctionIntrface(localFuncAssembly);
                                     }
                                 }
                             }
                         }
                     }
+                }
             }
             catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }
         }
+        
         /// <summary>
         /// Обработчик события, который проверяет, что построилась лента
         /// И когда она построилась - уже грузим свою вкладку, если надо
@@ -313,7 +259,7 @@ namespace ModPlus
                     var isOpen = Process.GetProcesses().Any(t => t.ProcessName == "mpAutoUpdater");
                     if (!isOpen)
                     {
-                            var fileToStart = Path.Combine(ModPlusAPI.Constants.CurrentDirectory, "mpAutoUpdater.exe");
+                            var fileToStart = Path.Combine(Constants.CurrentDirectory, "mpAutoUpdater.exe");
                             if (File.Exists(fileToStart))
                             {
                                 Process.Start(fileToStart);

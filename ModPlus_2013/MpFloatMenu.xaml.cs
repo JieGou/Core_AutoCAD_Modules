@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,12 +13,6 @@ using ModPlus.App;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-// AutoCad
-#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
 
 namespace ModPlus
 {
@@ -101,26 +96,7 @@ namespace ModPlus
         {
             try
             {
-                // Расположение файла конфигурации
-                var confF = UserConfigFile.FullFileName;
-                // Грузим
-                XElement configFile;
-                using (FileStream fs = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.None))
-                    configFile = XElement.Load(fs);
-                // Проверяем есть ли группа Config
-                if (configFile.Element("Config") == null)
-                {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), MessageBoxIcon.Alert);
-                    return;
-                }
-                var element = configFile.Element("Config");
-                // Проверяем есть ли подгруппа Cui
-                if (element?.Element("CUI") == null)
-                {
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err7"), MessageBoxIcon.Alert);
-                    return;
-                }
-                var confCuiXel = element.Element("CUI");
+                var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
                 // Проходим по группам
                 if (confCuiXel == null) return;
                 foreach (var group in confCuiXel.Elements("Group"))

@@ -1,11 +1,6 @@
-﻿#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
+﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 using ModPlusAPI.Interfaces;
 
 namespace ModPlus.Helpers
@@ -42,8 +36,7 @@ namespace ModPlus.Helpers
                 var interf = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
                 if (interf != null)
                 {
-                    var function = Activator.CreateInstance(type) as IModPlusFunctionInterface;
-                    if (function != null)
+                    if (Activator.CreateInstance(type) is IModPlusFunctionInterface function)
                     {
                         var lf = new LoadedFunction
                         {
@@ -108,131 +101,6 @@ namespace ModPlus.Helpers
             {
                 return e.Types.Where(t => t != null);
             }
-        }
-        /// <summary>
-        /// Проверка того, что функция в АПИ присутсвует физически
-        /// </summary>
-        /// <param name="cuiFunction">Функция в АПИ</param>
-        /// <param name="confFunctions">Функции в файле конфигурации</param>
-        /// <param name="configFunction">Возвращаем функцию в списке функций из файла конфигурации для последующего извлечения данных</param>
-        /// <param name="fileVersion">Версия файла. Это значение должно быть точнее, чем в файле конфигурации</param>
-        /// <returns></returns>
-        public static bool HasFunction(XElement cuiFunction, XContainer confFunctions, out XElement configFunction, out string fileVersion)
-        {
-            configFunction = null;
-            fileVersion = string.Empty;
-            var cuiFuncNameAttr = cuiFunction.Attribute("Name");
-            if (cuiFuncNameAttr != null)
-            {
-                var cuiFunctionName = cuiFuncNameAttr.Value;
-
-                foreach (var conFunc in confFunctions.Elements("function"))
-                {
-                    /* Так как после обновления добавится значение 
-                     * ProductFor, то нужно проверять по нем, при наличии
-                     */
-                    var productForAttr = conFunc.Attribute("ProductFor");
-                    if (productForAttr != null)
-                        if (!productForAttr.Value.Equals("AutoCAD"))
-                            continue;
-
-                    var confFuncNameAttr = conFunc.Attribute("Name");
-                    if (confFuncNameAttr != null)
-                    {
-                        /* Так как значение AvailCad будет являться устаревшим, НО
-                         * пока не будет удалено, делаем двойной вариант проверки
-                         */
-                        var conFuncAvailCad = string.Empty;
-                        var confFuncAvailCadAttr = conFunc.Attribute("AvailCad");
-                        if (confFuncAvailCadAttr != null)
-                            conFuncAvailCad = confFuncAvailCadAttr.Value;
-                        var availProductExternalVersionAttr = conFunc.Attribute("AvailProductExternalVersion");
-                        if (availProductExternalVersionAttr != null)
-                            conFuncAvailCad = availProductExternalVersionAttr.Value;
-
-                        if (!string.IsNullOrEmpty(conFuncAvailCad))
-                        {
-                            // Проверяем по названию и версии автокада
-                            if (confFuncNameAttr.Value.Equals(cuiFunctionName) &
-                                conFuncAvailCad.Equals(MpVersionData.CurCadVers))
-                            {
-                                // Добавляем если только функция включена и есть физически на диске!!!
-                                var conFuncOnOff = bool.TryParse(conFunc.Attribute("OnOff")?.Value, out bool b) && b; // false
-                                var conFuncFileAttr = conFunc.Attribute("File");
-                                // Т.к. атрибута File может не быть
-                                if (conFuncOnOff)
-                                {
-                                    if (conFuncFileAttr != null)
-                                    {
-                                        if (File.Exists(conFuncFileAttr.Value))
-                                        {
-                                            configFunction = conFunc;
-                                            fileVersion =
-                                                FileVersionInfo.GetVersionInfo(conFuncFileAttr.Value).FileVersion;
-                                            return true;
-                                        }
-                                    }
-                                    var findedFile = FindFile(confFuncNameAttr.Value);
-                                    if (!string.IsNullOrEmpty(findedFile))
-                                        if (File.Exists(findedFile))
-                                        {
-                                            configFunction = conFunc;
-                                            fileVersion = FileVersionInfo.GetVersionInfo(findedFile).FileVersion;
-                                            return true;
-                                        }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        public static string GetBigIconUriString(string functionName, string functionVersion)
-        {
-            var returnedUriString = string.Empty;
-            if (!string.IsNullOrEmpty(functionName))
-                returnedUriString = "pack://application:,,,/" + functionName + "_" + MpVersionData.CurCadVers +
-                                    ", Version=" + functionVersion +
-                                    ", Culture=neutral, PublicKeyToken=null;component/Resources/" +
-                                    functionName + "_32x32.png";
-            return returnedUriString;
-        }
-        public static string GetSmallIconUriString(string functionName, string functionVersion)
-        {
-            var returnedUriString = string.Empty;
-            if (!string.IsNullOrEmpty(functionName))
-                returnedUriString = "pack://application:,,,/" + functionName + "_" + MpVersionData.CurCadVers +
-                                    ", Version=" + functionVersion +
-                                    ", Culture=neutral, PublicKeyToken=null;component/Resources/" +
-                                    functionName + "_16x16.png";
-            return returnedUriString;
-        }
-
-        /// <summary>
-        /// Определение версии функции, путем сравнения
-        /// </summary>
-        /// <param name="fileVersion">Текстовое значение версии файла. Может быть пустым</param>
-        /// <param name="f">XElement функции из файла конфигурации. Скорее всего будет исключен со временем</param>
-        /// <returns></returns>
-        public static string GetFunctionVersion(string fileVersion, XElement f)
-        {
-            var versionFromFile = new System.Version(fileVersion);
-            var versionFromConfigAttr = f.Attribute("Version");
-            string functionVersion;
-            if (versionFromConfigAttr != null)
-            {
-                var versionFromConfig = new System.Version(versionFromConfigAttr.Value);
-                if (!string.IsNullOrEmpty(fileVersion))
-                    functionVersion = versionFromFile >= versionFromConfig
-                        ? fileVersion
-                        : versionFromConfigAttr.Value;
-                else functionVersion = versionFromConfigAttr.Value;
-            }
-            else functionVersion = fileVersion;
-
-            return functionVersion;
         }
         /// <summary>
         /// Поиск файла функции, если в файле конфигурации вдруг нет атрибута
@@ -353,7 +221,7 @@ namespace ModPlus.Helpers
             if (statTextWidth)
                 txt.Width = 150;
             var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.Children.Add(brd);
             grid.Children.Add(txt);

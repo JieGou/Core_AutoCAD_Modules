@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,12 +9,6 @@ using System.Windows.Input;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Internal;
 using ModPlusAPI;
-// AutoCad
-#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
 
 namespace ModPlus
 {

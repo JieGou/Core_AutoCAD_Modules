@@ -1,12 +1,6 @@
-﻿#if ac2010
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-#elif ac2013
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-#endif
+﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using System;
-using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using Autodesk.Windows;
 using Autodesk.AutoCAD.ApplicationServices;
 using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
@@ -97,26 +91,7 @@ namespace ModPlus.App
         {
             try
             {
-                // Расположение файла конфигурации
-                var confF = UserConfigFile.FullFileName;
-                // Грузим
-                XElement configFile;
-                using (FileStream fs = new FileStream(confF, FileMode.Open, FileAccess.Read, FileShare.None))
-                    configFile = XElement.Load(fs);
-                // Проверяем есть ли группа Config
-                if (configFile.Element("Config") == null)
-                {
-                    MessageBox.Show(Language.GetItem(LangItem, "err7"));
-                    return;
-                }
-                var element = configFile.Element("Config");
-                // Проверяем есть ли подгруппа Functions
-                if (element?.Element("Functions") == null)
-                {
-                    MessageBox.Show(Language.GetItem(LangItem, "err7"));
-                    return;
-                }
-                var confCuiXel = element.Element("CUI");
+                var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
                 // Проходим по группам
                 if (confCuiXel != null)
                     foreach (var group in confCuiXel.Elements("Group"))

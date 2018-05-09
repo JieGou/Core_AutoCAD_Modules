@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using Autodesk.AutoCAD.Internal;
 using Autodesk.AutoCAD.Runtime;
@@ -66,13 +65,13 @@ namespace ModPlus.App
         {
             // create accent color menu items for the demo
             AccentColors = ThemeManager.Accents
-                                            .Select(a => new AccentColorMenuData() { Name = a.Name, ColorBrush = a.Resources["AccentColorBrush"] as Brush })
-                                            .ToList();
+                .Select(a => new AccentColorMenuData() { Name = a.Name, ColorBrush = a.Resources["AccentColorBrush"] as Brush })
+                .ToList();
 
             // create metro theme color menu items for the demo
             AppThemes = ThemeManager.AppThemes
-                                           .Select(a => new AppThemeMenuData() { Name = a.Name, BorderColorBrush = a.Resources["BlackColorBrush"] as Brush, ColorBrush = a.Resources["WhiteColorBrush"] as Brush })
-                                           .ToList();
+                .Select(a => new AppThemeMenuData() { Name = a.Name, BorderColorBrush = a.Resources["BlackColorBrush"] as Brush, ColorBrush = a.Resources["WhiteColorBrush"] as Brush })
+                .ToList();
 
             MiColor.ItemsSource = AccentColors;
             MiTheme.ItemsSource = AppThemes;
@@ -80,15 +79,14 @@ namespace ModPlus.App
             // Устанавливаем текущие. На всякий случай "без ошибок"
             try
             {
-                _curTheme = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme");
+                _curTheme = Regestry.GetValue("Theme");
                 foreach (var item in MiTheme.Items.Cast<AppThemeMenuData>().Where(item => item.Name.Equals(_curTheme)))
                 {
                     MiTheme.SelectedIndex = MiTheme.Items.IndexOf(item);
                 }
 
-                _curColor = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor");
-                foreach (
-                    var item in MiColor.Items.Cast<AccentColorMenuData>().Where(item => item.Name.Equals(_curColor)))
+                _curColor = Regestry.GetValue("AccentColor");
+                foreach (var item in MiColor.Items.Cast<AccentColorMenuData>().Where(item => item.Name.Equals(_curColor)))
                 {
                     MiColor.SelectedIndex = MiColor.Items.IndexOf(item);
                 }
@@ -111,16 +109,16 @@ namespace ModPlus.App
             else
             {
                 TbRegistryKey.Text = key;
-                var regVariant = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "RegestryVariant");
+                var regVariant = Regestry.GetValue("RegestryVariant");
                 if (!string.IsNullOrEmpty(regVariant))
                 {
                     TbAboutRegKey.Visibility = Visibility.Visible;
                     if (regVariant.Equals("0"))
                         TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h10") + " " +
-                                             UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "HDmodel");
+                                             Regestry.GetValue("HDmodel");
                     else if (regVariant.Equals("1"))
                         TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h11") + " " +
-                                             UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.User, "gName");
+                                             Regestry.GetValue("gName");
                 }
             }
         }
@@ -130,12 +128,12 @@ namespace ModPlus.App
             //Theme
             try
             {
-                ThemeManager.ChangeAppStyle(this.Resources,
+                ThemeManager.ChangeAppStyle(Resources,
                     ThemeManager.Accents.First(
-                        x => x.Name.Equals(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor"))
+                        x => x.Name.Equals(Regestry.GetValue("AccentColor"))
                         ),
                     ThemeManager.AppThemes.First(
-                        x => x.Name.Equals(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme")))
+                        x => x.Name.Equals(Regestry.GetValue("Theme")))
                     );
                 ChangeTitleBrush();
             }
@@ -148,16 +146,16 @@ namespace ModPlus.App
         private void GetDataFromConfigFile()
         {
             // Separator
-            var separator = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Separator");
+            var separator = Regestry.GetValue("Separator");
             CbSeparatorSettings.SelectedIndex = string.IsNullOrEmpty(separator) ? 0 : int.Parse(separator);
-            // Check updates and new
-            ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b; //true
+            // mini functions
+            ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out var b) || b; //true
             ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
             ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
             ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; //true
 
             // Виды границ окна
-            var border = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType");
+            var border = Regestry.GetValue("BordersType");
             foreach (ComboBoxItem item in CbWindowsBorders.Items)
             {
                 if (item.Tag.Equals(border))
@@ -211,19 +209,18 @@ namespace ModPlus.App
         // Выбор разделителя целой и дробной части для чисел
         private void CbSeparatorSettings_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Separator",
-                ((ComboBox)sender).SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
+            Regestry.SetValue("Separator", ((ComboBox)sender).SelectedIndex.ToString(CultureInfo.InvariantCulture));
         }
         // Выбор темы
         private void MiTheme_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme", ((AppThemeMenuData)e.AddedItems[0]).Name, true);
+            Regestry.SetValue("Theme", ((AppThemeMenuData)e.AddedItems[0]).Name);
             ChangeWindowTheme();
         }
         // Выбор цвета
         private void MiColor_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor", ((AccentColorMenuData)e.AddedItems[0]).Name, true);
+            Regestry.SetValue("AccentColor", ((AccentColorMenuData)e.AddedItems[0]).Name);
             ChangeWindowTheme();
         }
         // windows borders select
@@ -232,7 +229,7 @@ namespace ModPlus.App
             var cb = sender as ComboBox;
             if (!(cb?.SelectedItem is ComboBoxItem cbi)) return;
             this.ChangeWindowBordes(cbi.Tag.ToString());
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType", cbi.Tag.ToString(), true);
+            Regestry.SetValue("BordersType", cbi.Tag.ToString());
         }
 
 
@@ -245,8 +242,7 @@ namespace ModPlus.App
                 else
                 {
                     TbEmailAdress.BorderBrush = Brushes.Red;
-                    ModPlusAPI.Windows.MessageBox.Show(
-                        ModPlusAPI.Language.GetItem(LangItem, "tt4"));
+                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "tt4"));
                     TbEmailAdress.Focus();
                     e.Cancel = true;
                 }
@@ -279,10 +275,10 @@ namespace ModPlus.App
                             !string.IsNullOrEmpty(_curFloatMenuCollapseTo.ToString()) ||
                             needRestartByLang)
                         {
-                            if (!UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme").Equals(_curTheme) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor").Equals(_curColor) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType").Equals(_curBordersType) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) |
+                            if (!Regestry.GetValue("Theme").Equals(_curTheme) |
+                                !Regestry.GetValue("AccentColor").Equals(_curColor) |
+                                !Regestry.GetValue("BordersType").Equals(_curBordersType) |
+                                !Regestry.GetValue("FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) |
                                 !ChkMpChkDrwsOnMnu.IsChecked.Value.Equals(_curDrwsOnMnu))
                             {
                                 MpMenuFunction.MpMainMenuWin.Close();
@@ -319,10 +315,10 @@ namespace ModPlus.App
                             !string.IsNullOrEmpty(_curDrawingsCollapseTo.ToString()) ||
                             needRestartByLang)
                         {
-                            if (!UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "Theme").Equals(_curTheme) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "AccentColor").Equals(_curColor) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "BordersType").Equals(_curBordersType) |
-                                !UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) |
+                            if (!Regestry.GetValue("Theme").Equals(_curTheme) |
+                                !Regestry.GetValue("AccentColor").Equals(_curColor) |
+                                !Regestry.GetValue("BordersType").Equals(_curBordersType) |
+                                !Regestry.GetValue("DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) |
                                 !ChkMpDrawingsAlone.IsChecked.Value.Equals(_curDrawingsAlone))
                             {
                                 MpDrawingsFunction.MpDrawingsWin.Close();
@@ -364,11 +360,7 @@ namespace ModPlus.App
         {
             if (!(sender is CheckBox chkBox)) return;
             var name = chkBox.Name;
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet",
-                name.Substring(5),
-                chkBox.IsChecked?.ToString(),
-                true
-                );
+            Regestry.SetValue(name.Substring(5), chkBox.IsChecked?.ToString());
             if (name.Equals("ChkMpFloatMenu"))
             {
                 ChkMpChkDrwsOnMnu.Visibility = TbFloatMenuCollapseTo.Visibility = CbFloatMenuCollapseTo.Visibility =
@@ -388,17 +380,13 @@ namespace ModPlus.App
         // Тихая загрузка
         private void ChkQuietLoading_OnChecked_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "ChkQuietLoading",
-                (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value).ToString(), true);
-            ModPlusAPI.Variables.QuietLoading = (ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value);
+            ModPlusAPI.Variables.QuietLoading = ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value;
         }
         // Сворачивать в - для плавающего меню
         private void CbFloatMenuCollapseTo_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ComboBox cb)
             {
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "FloatMenuCollapseTo",
-                    cb.SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
                 ModPlusAPI.Variables.FloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
@@ -407,8 +395,6 @@ namespace ModPlus.App
         {
             if (sender is ComboBox cb)
             {
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "MainSet", "DrawingsCollapseTo",
-                    cb.SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
                 ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
