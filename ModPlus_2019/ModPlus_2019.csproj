@@ -155,12 +155,6 @@
     <Resource Include="Resources\dwg.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\HelpBt.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\MpStampFields_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="..\ModPlus_2013\App\mpMainSettings.xaml">
       <Link>App\mpMainSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
@@ -212,6 +206,47 @@
     </Resource>
     <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16.png">
       <Link>Resources\mpShowProductIcons_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16_dark.png">
+      <Link>Resources\mpShowProductIcons_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpHideProductIcons_16x16_dark.png">
+      <Link>Resources\mpHideProductIcons_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\HelpBt.png">
+      <Link>Resources\HelpBt.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\HelpBt_dark.png">
+      <Link>Resources\HelpBt_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16.png">
+      <Link>Resources\mpStampFields_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16_dark.png">
+      <Link>Resources\mpStampFields_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\paletteCloseDrawing_16x16.png">
+      <Link>Resources\paletteCloseDrawing_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\paletteNewDrawing_16x16.png">
+      <Link>Resources\paletteNewDrawing_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\paletteOpenDrawing_16x16.png">
+      <Link>Resources\paletteOpenDrawing_16x16.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

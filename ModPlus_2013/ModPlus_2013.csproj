@@ -161,9 +161,6 @@
     <Resource Include="Resources\HelpBt.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\MpStampFields_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\dwg.png" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +175,26 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\forIcon_256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpShowProductIcons_16x16_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpHideProductIcons_16x16_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\HelpBt_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpStampFields_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpStampFields_16x16_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\paletteCloseDrawing_16x16.png" />
+    <Resource Include="Resources\paletteNewDrawing_16x16.png" />
+    <Resource Include="Resources\paletteOpenDrawing_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

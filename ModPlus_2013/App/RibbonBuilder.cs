@@ -24,6 +24,7 @@ namespace ModPlus.App
         {
             if (!IsLoaded())
             {
+                GetColorTheme();
                 CreateRibbon();
                 AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                 AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
@@ -40,6 +41,16 @@ namespace ModPlus.App
                 else loaded = false;
             }
             return loaded;
+        }
+        private static bool IsActive()
+        {
+            var ribCntrl = ComponentManager.Ribbon;
+            foreach (var tab in ribCntrl.Tabs)
+            {
+                if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
+                    return tab.IsActive;
+            }
+            return false;
         }
         public static void RemoveRibbon()
         {
@@ -62,10 +73,30 @@ namespace ModPlus.App
                 ExceptionBox.Show(exception);
             }
         }
+
+        private static bool _wasActive = false;
+
         private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
         {
             if (e.Name.Equals("WSCURRENT")) BuildRibbon();
+            if (e.Name.Equals("COLORTHEME"))
+            {
+                _wasActive = IsActive();
+                RemoveRibbon();
+                BuildRibbon();
+            }
         }
+
+        private static int _colorTheme = 1;
+
+        private static void GetColorTheme()
+        {
+            var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
+            if (int.TryParse(sv, out int i))
+                _colorTheme = i;
+            else _colorTheme = 1; // light
+        }
+
         private static void CreateRibbon()
         {
             try
@@ -80,6 +111,8 @@ namespace ModPlus.App
                 AddHelpPanel(ribTab);
                 ////////////////////////
                 ribCntrl.UpdateLayout();
+                if(_wasActive)
+                    ribTab.IsActive = true;
             }
             catch (Exception exception)
             {
@@ -151,8 +184,8 @@ namespace ModPlus.App
                                         var ribBtn = RibbonHelpers.AddButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.SmallIconUrl,
-                                            loadedFunction.BigIconUrl,
+                                            GetSmallIcon(loadedFunction), //loadedFunction.SmallIconUrl,
+                                            GetBigIcon(loadedFunction), //loadedFunction.BigIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
@@ -171,8 +204,8 @@ namespace ModPlus.App
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                     loadedSubFunction.Name,
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
-                                                    loadedSubFunction.SmallIconUrl,
-                                                    loadedSubFunction.BigIconUrl,
+                                                    GetSmallIcon(loadedSubFunction), // loadedSubFunction.SmallIconUrl,
+                                                    GetBigIcon(loadedSubFunction), // loadedSubFunction.BigIconUrl,
                                                     Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
@@ -201,8 +234,8 @@ namespace ModPlus.App
                                         var ribBtn = RibbonHelpers.AddButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.SmallIconUrl,
-                                            loadedFunction.BigIconUrl,
+                                            GetSmallIcon(loadedFunction), // loadedFunction.SmallIconUrl,
+                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
@@ -216,8 +249,8 @@ namespace ModPlus.App
                                             risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                loadedFunction.SubSmallIconsUrl[i],
-                                                loadedFunction.SubBigIconsUrl[i],
+                                                GetSmallIconForSubFunctio(loadedFunction, i), // loadedFunction.SubSmallIconsUrl[i],
+                                                GetBigIconForSubFunctio(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
@@ -232,7 +265,7 @@ namespace ModPlus.App
                                         ribRowPanel.Items.Add(RibbonHelpers.AddSmallButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.SmallIconUrl,
+                                            GetSmallIcon(loadedFunction), // loadedFunction.SmallIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage
@@ -277,7 +310,7 @@ namespace ModPlus.App
                                         var ribBtn = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
@@ -295,7 +328,7 @@ namespace ModPlus.App
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                     loadedSubFunction.Name,
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
-                                                    loadedSubFunction.BigIconUrl,
+                                                    GetBigIcon(loadedSubFunction), // loadedSubFunction.BigIconUrl,
                                                     Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
@@ -324,7 +357,7 @@ namespace ModPlus.App
                                         var ribBtn = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
@@ -339,7 +372,7 @@ namespace ModPlus.App
                                             risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                loadedFunction.SubBigIconsUrl[i],
+                                                GetBigIconForSubFunctio(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
@@ -354,7 +387,7 @@ namespace ModPlus.App
                                         ribRowPanel.Items.Add(RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Vertical,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
@@ -378,6 +411,50 @@ namespace ModPlus.App
             catch (Exception exception) { ExceptionBox.Show(exception); }
         }
 
+        private static string GetSmallIcon(LoadedFunction loadedFunction)
+        {
+            if (_colorTheme == 0) // dark
+            {
+                if (!string.IsNullOrEmpty(loadedFunction.SmallDarkIconUrl))
+                    return loadedFunction.SmallDarkIconUrl;
+            }
+
+            return loadedFunction.SmallIconUrl;
+        }
+
+        private static string GetBigIcon(LoadedFunction loadedFunction)
+        {
+            if (_colorTheme == 0) // dark
+            {
+                if (!string.IsNullOrEmpty(loadedFunction.BigDarkIconUrl))
+                    return loadedFunction.BigDarkIconUrl;
+            }
+
+            return loadedFunction.BigIconUrl;
+        }
+
+        private static string GetSmallIconForSubFunctio(LoadedFunction loadedFunction, int i)
+        {
+            if (_colorTheme == 0) // dark
+            {
+                if (!string.IsNullOrEmpty(loadedFunction.SubSmallDarkIconsUrl[i]))
+                    return loadedFunction.SubSmallDarkIconsUrl[i];
+            }
+
+            return loadedFunction.SubSmallIconsUrl[i];
+        }
+
+        private static string GetBigIconForSubFunctio(LoadedFunction loadedFunction, int i)
+        {
+            if (_colorTheme == 0) // dark
+            {
+                if (!string.IsNullOrEmpty(loadedFunction.SubBigDarkIconsUrl[i]))
+                    return loadedFunction.SubBigDarkIconsUrl[i];
+            }
+
+            return loadedFunction.SubBigIconsUrl[i];
+        }
+
         private static void AddHelpPanel(RibbonTab ribTab)
         {
             // create the panel source
@@ -398,7 +475,9 @@ namespace ModPlus.App
                 RibbonHelpers.AddBigButton(
                 "mpSettings",
                 Language.GetItem(LangItem, "h12"),
-                "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt.png",
+                _colorTheme == 1
+                    ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt.png"
+                    : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt_dark.png",
                 Language.GetItem(LangItem, "h41"),
                 Orientation.Vertical,
                 Language.GetItem(LangItem, "h42"),
@@ -407,7 +486,7 @@ namespace ModPlus.App
             ribSourcePanel.Items.Add(ribRowPanel);
             // 
             ribRowPanel = new RibbonRowPanel();
-            if (LoadFunctionsHelper.HasmpStampsFunction(out var icon))
+            if (LoadFunctionsHelper.HasmpStampsFunction(_colorTheme, out var icon))
             {
                 ribRowPanel.Items.Add(
                     RibbonHelpers.AddSmallButton(
@@ -426,7 +505,9 @@ namespace ModPlus.App
                 RibbonHelpers.AddSmallButton(
                     "mpShowProductIcons",
                     Language.GetItem(LangItem, "h46"),
-                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png",
+                    _colorTheme == 1
+                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png"
+                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h37"),
                     Language.GetItem(LangItem, "h38"),
                     "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png"
@@ -437,7 +518,9 @@ namespace ModPlus.App
                 RibbonHelpers.AddSmallButton(
                     "mpHideProductIcons",
                     Language.GetItem(LangItem, "h47"),
-                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png",
+                    _colorTheme == 1
+                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png"
+                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h39"),
                     "",
                     ""

@@ -124,7 +124,7 @@ namespace ModPlus.Windows
 
         private void FillFieldsFunction()
         {
-            BtFields.Visibility = LoadFunctionsHelper.HasmpStampsFunction(out var _) ? Visibility.Visible : Visibility.Collapsed;
+            BtFields.Visibility = LoadFunctionsHelper.HasmpStampsFunction(1, out _) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void BtSettings_OnClick(object sender, RoutedEventArgs e)

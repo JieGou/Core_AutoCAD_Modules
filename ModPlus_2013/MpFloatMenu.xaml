@@ -50,19 +50,25 @@
                            FontWeight="Bold" Margin="5">ModPlus</TextBlock>
                 <Button Grid.Column="1" MinWidth="0" Name="BtFields" 
                         BorderThickness="0" ToolTip="{Binding Source={StaticResource Lang}, XPath=h40}"
-                        Click="BtFields_OnClick"
+                        Click="BtFields_OnClick" Width="26" Height="26"
                         Padding="0" SnapsToDevicePixels="True">
-                <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
+                    <Image Source="Resources/MpStampFields_16x16.png" Stretch="Fill"
+                           Width="16" Height="16"
+                           RenderOptions.BitmapScalingMode="HighQuality"></Image>
+                <!--<Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>
                         <VisualBrush Stretch="Uniform"
                                      Visual="{StaticResource AppbarBook}"></VisualBrush>
                     </Rectangle.OpacityMask>
-                </Rectangle>
+                </Rectangle>-->
             </Button>
                 <Button MinWidth="0"  x:Name="BtMpSettings" BorderThickness="0"
                         Grid.Column="2" HorizontalAlignment="Right"
-                        Padding="2" ToolTip="{Binding Source={StaticResource Lang}, XPath=h42}"
-                        Click="BtMpSettings_OnClick">
+                        Padding="2" Click="BtMpSettings_OnClick">
+                <Button.ToolTip>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="250"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h42}"></TextBlock>
+                </Button.ToolTip>
                     <Rectangle Width="20" Height="20" Fill="{DynamicResource AccentColorBrush}">
                         <Rectangle.OpacityMask>
                             <VisualBrush Stretch="Uniform"

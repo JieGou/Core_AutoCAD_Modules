@@ -1,13 +1,18 @@
 ﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ModPlus.Properties;
 using ModPlusAPI.Interfaces;
 
 namespace ModPlus.Helpers
@@ -38,6 +43,9 @@ namespace ModPlus.Helpers
                 {
                     if (Activator.CreateInstance(type) is IModPlusFunctionInterface function)
                     {
+                        if(function.Name.Equals("mpStandards"))
+                            Debug.Print("!");
+
                         var lf = new LoadedFunction
                         {
                             Name = function.Name,
@@ -47,9 +55,11 @@ namespace ModPlus.Helpers
                             SmallIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                            ";component/Resources/" + function.Name +
                                            "_16x16.png",
+                            SmallDarkIconUrl = GetSmallDarkIcon(loadedFuncAssembly, function.Name),
                             BigIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                          ";component/Resources/" + function.Name +
                                          "_32x32.png",
+                            BigDarkIconUrl = GetBigDarkIcon(loadedFuncAssembly, function.Name),
                             AvailProductExternalVersion = MpVersionData.CurCadVers,
                             FullDescription = function.FullDescription,
                             ToolTipHelpImage = !string.IsNullOrEmpty(function.ToolTipHelpImage)
@@ -70,9 +80,11 @@ namespace ModPlus.Helpers
                                 lf.SubSmallIconsUrl.Add("pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                                         ";component/Resources/" + subFunctionsName +
                                                         "_16x16.png");
+                                lf.SubSmallDarkIconsUrl.Add(GetSmallDarkIcon(loadedFuncAssembly, subFunctionsName));
                                 lf.SubBigIconsUrl.Add("pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                                         ";component/Resources/" + subFunctionsName +
                                                         "_32x32.png");
+                                lf.SubBigDarkIconsUrl.Add(GetBigDarkIcon(loadedFuncAssembly, subFunctionsName));
                             }
                         if (function.SubHelpImages != null)
                             foreach (var helpImage in function.SubHelpImages)
@@ -90,6 +102,49 @@ namespace ModPlus.Helpers
                 }
             }
         }
+
+        private static string GetSmallDarkIcon(Assembly funcAssembly, string funcName)
+        {
+            string iconUri = string.Empty;
+            string iconName = funcName + "_16x16_dark.png";
+            if(ResourceExists(funcAssembly, iconName))
+                iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
+            return iconUri;
+        }
+        private static string GetBigDarkIcon(Assembly funcAssembly, string funcName)
+        {
+            string iconUri = string.Empty;
+            string iconName = funcName + "_32x32_dark.png";
+            if (ResourceExists(funcAssembly, iconName))
+                iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
+            return iconUri;
+        }
+
+        private static bool ResourceExists(Assembly assembly, string resourcePath)
+        {
+            return GetResourcePaths(assembly).Any(rk => rk.ToLower().Contains(resourcePath.ToLower()));
+        }
+
+        private static IEnumerable<string> GetResourcePaths(Assembly assembly)
+        {
+            var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            var resourceName = assembly.GetName().Name + ".g";
+            var resourceManager = new ResourceManager(resourceName, assembly);
+            List<string> resKeys = new List<string>();
+            try
+            {
+                var resourceSet = resourceManager.GetResourceSet(culture, true, true);
+                foreach (DictionaryEntry resource in resourceSet)
+                    resKeys.Add(resource.Key.ToString());
+            }
+            finally
+            {
+                resourceManager.ReleaseAllResources();
+            }
+
+            return resKeys;
+        }
+
         private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
         {
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
@@ -131,15 +186,18 @@ namespace ModPlus.Helpers
             return fileName;
         }
 
-        public static bool HasmpStampsFunction(out string icon)
+        public static bool HasmpStampsFunction(int colorTheme, out string icon)
         {
             icon = string.Empty;
             try
             {
                 if (LoadedFunctions.Any(x => x.Name.Equals("mpStamps")))
                 {
-                    icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
-                           ";component/Resources/MpStampFields_16x16.png";
+                    if(colorTheme == 1)
+                        icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
+                               ";component/Resources/mpStampFields_16x16.png";
+                    else icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
+                                ";component/Resources/mpStampFields_16x16_dark.png";
                     return true;
                 }
                 return false;
@@ -168,7 +226,9 @@ namespace ModPlus.Helpers
         public string LName { get; set; }
         public string AvailProductExternalVersion { get; set; }
         public string SmallIconUrl { get; set; }
+        public string SmallDarkIconUrl { get; set; }
         public string BigIconUrl { get; set; }
+        public string BigDarkIconUrl { get; set; }
         public string Description { get; set; }
         public bool CanAddToRibbon { get; set; }
         public string FullDescription { get; set; }
@@ -179,7 +239,9 @@ namespace ModPlus.Helpers
         public List<string> SubFullDescriptions { get; set; }
         public List<string> SubHelpImages { get; set; }
         public List<string> SubSmallIconsUrl { get; set; }
+        public List<string> SubSmallDarkIconsUrl { get; set; }
         public List<string> SubBigIconsUrl { get; set; }
+        public List<string> SubBigDarkIconsUrl { get; set; }
     }
 
     internal static class WPFMenuesHelper

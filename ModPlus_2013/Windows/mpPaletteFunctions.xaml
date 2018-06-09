@@ -32,7 +32,8 @@
                 Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
                 HorizontalAlignment="Right" Click="BtShowProductIcon_OnClick">
             <Image Source="../Resources/mpShowProductIcons_16x16.png" Stretch="Fill"
-                   Width="16" Height="16"></Image>
+                   Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality"></Image>
             <Button.ToolTip>
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=h37}" MaxWidth="350" Margin="2" TextWrapping="Wrap"></TextBlock>
