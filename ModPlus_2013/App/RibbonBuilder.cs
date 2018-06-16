@@ -37,8 +37,10 @@ namespace ModPlus.App
             foreach (var tab in ribCntrl.Tabs)
             {
                 if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
+                {
                     loaded = true;
-                else loaded = false;
+                    break;
+                }
             }
             return loaded;
         }
