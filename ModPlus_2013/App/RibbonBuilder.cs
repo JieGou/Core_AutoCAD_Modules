@@ -93,10 +93,17 @@ namespace ModPlus.App
 
         private static void GetColorTheme()
         {
-            var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
-            if (int.TryParse(sv, out int i))
-                _colorTheme = i;
-            else _colorTheme = 1; // light
+            try
+            {
+                var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
+                if (int.TryParse(sv, out var i))
+                    _colorTheme = i;
+                else _colorTheme = 1; // light
+            }
+            catch
+            {
+                _colorTheme = 1;
+            }
         }
 
         private static void CreateRibbon()
