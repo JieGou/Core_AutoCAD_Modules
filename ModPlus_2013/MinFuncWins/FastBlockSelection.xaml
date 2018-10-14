@@ -1,15 +1,13 @@
-﻿<mpc:BaseMetroWindow x:Class="ModPlus.MinFuncWins.FastBlockSelection" x:ClassModifier="internal"
+﻿<mps:ModPlusWindow x:Class="ModPlus.MinFuncWins.FastBlockSelection" x:ClassModifier="internal"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                      xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
+                      xmlns:mps="https://modplus.org/winfx/xaml/controls"
                       SizeToContent="WidthAndHeight" Topmost="True"
                       ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- For IntelliSense -->
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
@@ -25,10 +23,9 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <ListBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                 Width="200" Height="200" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
-                 Name="LbBlocks" SelectionMode="Single"></ListBox>
+                 Width="200" Height="200" Name="LbBlocks" SelectionMode="Single"></ListBox>
         <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
-                 mah:TextBoxHelper.Watermark="{Binding Source={StaticResource Lang}, XPath=h28}"
+                 mps:HintAssist.Hint="{Binding Source={StaticResource Lang}, XPath=h28}"
                  MaxWidth="200" MaxLength="20" Name="TbBlockName"></TextBox>
         <Button Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"
                 Content="{Binding Source={StaticResource Lang}, XPath=accept}"
@@ -37,5 +34,5 @@
                 Content="{Binding Source={StaticResource Lang}, XPath=cancel}"
                 Name="BtCancel" Click="BtCancel_OnClick"></Button>
     </Grid>
-</mpc:BaseMetroWindow>
+</mps:ModPlusWindow>
 

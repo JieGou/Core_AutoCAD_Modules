@@ -43,9 +43,6 @@ namespace ModPlus.Helpers
                 {
                     if (Activator.CreateInstance(type) is IModPlusFunctionInterface function)
                     {
-                        if(function.Name.Equals("mpStandards"))
-                            Debug.Print("!");
-
                         var lf = new LoadedFunction
                         {
                             Name = function.Name,

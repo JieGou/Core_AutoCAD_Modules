@@ -1,12 +1,13 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using Autodesk.AutoCAD.ApplicationServices;
-using System.IO;
-
-namespace ModPlus.Windows
+﻿namespace ModPlus.Windows
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using System.IO;
+
+    // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteDrawings 
     {
         // Переменные
@@ -15,23 +16,21 @@ namespace ModPlus.Windows
         internal mpPaletteDrawings()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             Loaded += MpPaletteDrawings_Loaded;
         }
 
         private void MpPaletteDrawings_Loaded(object sender, RoutedEventArgs e)
         {
             // Подключение обработчиков событий для создания и закрытия чертежей
-            AcApp.DocumentManager.DocumentCreated +=
-                DocumentManager_DocumentCreated;
-            AcApp.DocumentManager.DocumentDestroyed +=
-                DocumentManager_DocumentDestroyed;
-            AcApp.DocumentManager.DocumentActivated +=
-                DocumentManager_DocumentActivated;
-            //////////////////////////////
+            AcApp.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
+            AcApp.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
+            AcApp.DocumentManager.DocumentActivated += DocumentManager_DocumentActivated;
+
             GetDocuments();
         }
+        
         // документ стал активным
         private void DocumentManager_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
@@ -81,6 +80,7 @@ namespace ModPlus.Windows
                 //ignored
             }
         }
+        
         // Чертеж закрыт
         void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {

@@ -7,7 +7,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
         </ResourceDictionary>
@@ -30,6 +30,7 @@
         </Grid.Resources>
         <Button Grid.Row="0" Grid.Column="0" MinWidth="0" Name="BtShowProductIcon" 
                 Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
+                Style="{DynamicResource ModPlusFlatButton}" Margin="2"
                 HorizontalAlignment="Right" Click="BtShowProductIcon_OnClick">
             <Image Source="../Resources/mpShowProductIcons_16x16.png" Stretch="Fill"
                    Width="16" Height="16"
@@ -45,6 +46,7 @@
             </Button.ToolTip>
         </Button>
         <Button Grid.Row="0" Grid.Column="1" MinWidth="0" Name="BtHideProductIcon" 
+                Style="{DynamicResource ModPlusFlatButton}" Margin="2"
                 Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h39}" 
                 HorizontalAlignment="Right" Click="BtHideProductIcon_OnClick">
@@ -53,6 +55,7 @@
                    RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="2" MinWidth="0" Name="BtFields" 
+                Style="{DynamicResource ModPlusFlatButton}" Margin="2"
                 Width="26" Height="26" Padding="0" SnapsToDevicePixels="True"
                  ToolTip="{Binding Source={StaticResource Lang}, XPath=h40}" 
                 HorizontalAlignment="Right" Click="BtFields_OnClick">
@@ -61,6 +64,7 @@
                    RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="3" MinWidth="0" Name="BtSettings"
+                Style="{DynamicResource ModPlusFlatButton}" Margin="2"
                 Padding="4" Click="BtSettings_OnClick"
                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h41}"
                 HorizontalAlignment="Right">
@@ -71,9 +75,19 @@
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
-            <ScrollViewer Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
+        <ScrollViewer Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
                           VerticalScrollBarVisibility="Auto" Background="White">
-                <StackPanel CanVerticallyScroll="True" Name="FunctionsPanel"></StackPanel>
+            <ScrollViewer.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ModPlusFlatButton}">
+                    <Setter Property="Foreground" Value="{DynamicResource BlackBrush}"></Setter>
+                    <Setter Property="ToolTipService.InitialShowDelay" Value="1000"></Setter>
+                </Style>
+                <Style TargetType="{x:Type Image}">
+                    <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor"></Setter>
+                    <Setter Property="RenderOptions.EdgeMode" Value="Aliased"></Setter>
+                </Style>
+            </ScrollViewer.Resources>
+            <StackPanel CanVerticallyScroll="True" Name="FunctionsPanel"></StackPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

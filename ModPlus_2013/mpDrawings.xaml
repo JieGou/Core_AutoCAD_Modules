@@ -2,21 +2,18 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mps="https://modplus.org/winfx/xaml/controls"
         mc:Ignorable="d" ShowInTaskbar="False" ShowActivated="False"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"
+                             IsAsynchronous="False"></XmlDataProvider>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -38,22 +35,20 @@
                    Text="{Binding Source={StaticResource Lang}, XPath=h20}"></TextBlock>
 
         <!--Открытые чертежи-->
-        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" Margin="2"
-                        Name="ExpOpenDrawings">
-            <Border Margin="1,1,1,0" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}">
-                <ListBox Name="Drawings" MinWidth="100" MaxWidth="250" MaxHeight="300"
-                         SelectionChanged="Drawings_SelectionChanged">
-                    <ListBox.ItemContainerStyle>
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" Margin="2" Name="ExpOpenDrawings">
+            <ListBox Name="Drawings" MinWidth="100" MaxWidth="250" MaxHeight="300"
+                     SelectionChanged="Drawings_SelectionChanged" BorderThickness="1"
+                     mps:ListBoxAssist.ListBoxItemPadding="2">
+                <!--<ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource MetroListBoxItem}">
                             <Setter Property="Height" Value="20"></Setter>
                             <Setter Property="MinHeight" Value="20"></Setter>
                             <Setter Property="FontSize" Value="12"></Setter>
                         </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
-            </Border>
+                    </ListBox.ItemContainerStyle>-->
+            </ListBox>
             <Button Name="BtCloseDwg" Content="{Binding Source={StaticResource Lang}, XPath=close}"
-                    HorizontalAlignment="Center" Margin="2" Click="BtCloseDwg_Click"></Button>
+                    HorizontalAlignment="Center" Click="BtCloseDwg_Click"></Button>
         </StackPanel>
     </Grid>
 </Window>

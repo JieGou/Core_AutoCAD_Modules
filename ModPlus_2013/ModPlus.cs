@@ -21,6 +21,9 @@ using ModPlusAPI.Windows;
 
 namespace ModPlus
 {
+    using System.Net;
+    using System.Xml.Linq;
+
     public class ModPlus : IExtensionApplication
     {
         private const string LangItem = "AutocadDlls";
@@ -33,10 +36,13 @@ namespace ModPlus
             {
                 var sw = new Stopwatch();
                 sw.Start();
+
                 // inint lang
-                if(!Language.Initialize()) return;
+                if (!Language.Initialize()) return;
+
                 // Получим значение переменной "Тихая загрузка" в первую очередь
                 _quiteLoad = ModPlusAPI.Variables.QuietLoading;
+
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // Файла конфигурации может не существовать при загрузке плагина!
                 // Поэтому все, что связанно с работой с файлом конфигурации должно это учитывать!
@@ -51,10 +57,12 @@ namespace ModPlus
                     ed.WriteMessage("\n***************************");
                     return;
                 }
+
                 Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
                 ed.WriteMessage("\n***************************");
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p4"));
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
+
                 // Принудительная загрузка сборок
                 LoadAssms(ed);
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
@@ -63,6 +71,10 @@ namespace ModPlus
                 UserConfigFile.InitConfigFile();
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p8"));
                 LoadFunctions(ed);
+
+                // check adaptation
+                CheckAdaptation();
+
                 // Строим: ленту, меню, плавающее меню
                 // Загрузка ленты
                 Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
@@ -92,11 +104,12 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
+
         public void Terminate()
         {
-
         }
-        // проверка соответсвия версии автокада
+
+        // проверка соответствия версии автокада
         private static bool CheckCadVersion()
         {
             var cadVer = AcApp.Version;
@@ -124,6 +137,7 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
+
         // Загрузка базы данных
         private static readonly List<string> BaseFiles = new List<string>
         {
@@ -166,6 +180,7 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
+
         private static void LoadFunctions(Editor ed)
         {
             try
@@ -223,7 +238,7 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
-        
+
         /// <summary>
         /// Обработчик события, который проверяет, что построилась лента
         /// И когда она построилась - уже грузим свою вкладку, если надо
@@ -244,6 +259,7 @@ namespace ModPlus
             Autodesk.Windows.ComponentManager.ItemInitialized -=
                 ComponentManager_ItemInitialized;
         }
+
         /// <summary>
         /// Проверка загруженности модуля автообновления
         /// </summary>
@@ -259,11 +275,11 @@ namespace ModPlus
                     var isOpen = Process.GetProcesses().Any(t => t.ProcessName == "mpAutoUpdater");
                     if (!isOpen)
                     {
-                            var fileToStart = Path.Combine(Constants.CurrentDirectory, "mpAutoUpdater.exe");
-                            if (File.Exists(fileToStart))
-                            {
-                                Process.Start(fileToStart);
-                            }
+                        var fileToStart = Path.Combine(Constants.CurrentDirectory, "mpAutoUpdater.exe");
+                        if (File.Exists(fileToStart))
+                        {
+                            Process.Start(fileToStart);
+                        }
                     }
                 }
             }
@@ -272,7 +288,47 @@ namespace ModPlus
                 Statistic.SendException(exception);
             }
         }
+
+        private static void CheckAdaptation()
+        {
+            var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
+
+            // Проходим по группам
+            if (confCuiXel == null || confCuiXel.IsEmpty)
+            {
+                if (ModPlusAPI.Web.Connection.CheckForInternetConnection())
+                {
+                    // Грузим файл
+                    try
+                    {
+                        var url = "http://www.modplus.org/Downloads/StandardCUI.xml";
+                        if (string.IsNullOrEmpty(url))
+                            return;
+                        string xmlStr;
+                        using (var wc = new WebClientWithTimeout { Proxy = ModPlusAPI.Web.Proxy.GetWebProxy() })
+                            xmlStr = wc.DownloadString(url);
+                        var xmlDocument = XElement.Parse(xmlStr);
+
+                        ModPlusAPI.RegistryData.Adaptation.SaveCuiFromXElement("AutoCAD", xmlDocument);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        internal class WebClientWithTimeout : WebClient
+        {
+            protected override WebRequest GetWebRequest(Uri uri)
+            {
+                WebRequest w = base.GetWebRequest(uri);
+                w.Timeout = 3000;
+                return w;
+            }
+        }
     }
+
     /// <summary>Вспомгательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
     public static class XDataHelpersForProducts
     {
@@ -381,6 +437,7 @@ namespace ModPlus
             }
         }
     }
+
     /// <summary>Методы создания и работы с палитрой ModPlus</summary>
     public static class MpPalette
     {
@@ -414,10 +471,10 @@ namespace ModPlus
             }
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
-        
+
         private static void AddRemovePaletts()
         {
-            if(MpPaletteSet == null) return;
+            if (MpPaletteSet == null) return;
             try
             {
                 var funName = Language.GetItem(LangItem, "h19");

@@ -2,14 +2,16 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mps="https://modplus.org/winfx/xaml/controls"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"
+                             IsAsynchronous="False"></XmlDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -23,37 +25,32 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Button Grid.Column="0" MinWidth="0" Name="BtAddDrawing" Click="BtAddDrawing_OnClick"
-                Width="26" Height="26"
-                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h34}" Padding="2" SnapsToDevicePixels="True">
+                Width="26" Height="26" Style="{DynamicResource ModPlusFlatButton}" Margin="2"
+                 ToolTip="{Binding Source={StaticResource Lang}, XPath=h34}" Padding="0" SnapsToDevicePixels="True">
             <Image Source="../Resources/paletteNewDrawing_16x16.png" Stretch="Fill"
                    Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="1" MinWidth="0" Name="BtOpenDrawing"
-                Click="BtOpenDrawing_OnClick" Padding="2" Width="26" Height="26"
+                Click="BtOpenDrawing_OnClick" Padding="0" Width="26" Height="26"
+                Style="{DynamicResource ModPlusFlatButton}" Margin="2"
                  ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}" SnapsToDevicePixels="True">
             <Image Source="../Resources/paletteOpenDrawing_16x16.png" Stretch="Fill"
                    Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <Button Grid.Row="0" Grid.Column="2" SnapsToDevicePixels="True"
-                Width="26" Height="26"
-                Name="BtClose" ToolTip="{Binding Source={StaticResource Lang}, XPath=h36}" Padding="2"
-                Click="BtCloseDwg_Click" MinWidth="0">
+                Width="26" Height="26" Style="{DynamicResource ModPlusFlatButton}" Margin="2"
+                Name="BtClose" ToolTip="{Binding Source={StaticResource Lang}, XPath=h36}" Padding="0"
+                Click="BtCloseDwg_Click" MinWidth="0" HorizontalAlignment="Left">
             <Image Source="../Resources/paletteCloseDrawing_16x16.png" Stretch="Fill"
                    Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality"></Image>
         </Button>
         <ListBox Name="Drawings" Grid.Row="1" BorderThickness="1"
                  Margin="2,0,2,2" Padding="0" Grid.Column="0" Grid.ColumnSpan="3"
-                 SelectionChanged="Drawings_SelectionChanged">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MetroListBoxItem}">
-                    <Setter Property="Height" Value="20"></Setter>
-                    <Setter Property="MinHeight" Value="20"></Setter>
-                    <Setter Property="FontSize" Value="12"></Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
+                 SelectionChanged="Drawings_SelectionChanged"
+                 mps:ListBoxAssist.ListBoxItemPadding="2">
         </ListBox>
     </Grid>
 </UserControl>

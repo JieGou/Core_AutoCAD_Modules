@@ -1,16 +1,13 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Xml.Linq;
-using ModPlus.Helpers;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace ModPlus.Windows
+﻿namespace ModPlus.Windows
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using Helpers;
+    using ModPlusAPI.Windows;
+
     // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteFunctions
     {
@@ -19,8 +16,8 @@ namespace ModPlus.Windows
         internal mpPaletteFunctions()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             Loaded += MpPaletteFunctions_Loaded;
         }
 
@@ -30,6 +27,7 @@ namespace ModPlus.Windows
             FillFunctions();
 
         }
+
         // Заполнение списка функций
         private void FillFunctions()
         {

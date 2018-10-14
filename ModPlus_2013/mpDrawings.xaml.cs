@@ -19,34 +19,29 @@ namespace ModPlus
 
         internal MpDrawings()
         {
-            try
-            {
-                Top = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "top"));
-                Left = double.Parse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "left"));
-            }
-            catch (Exception)
-            {
-                Top = 220;
-                Left = 60;
-            }
+            if (double.TryParse(Regestry.GetValue("DrawingsWinTop"), out var top))
+                Top = top;
+            else Top = 180;
+
+            if (double.TryParse(Regestry.GetValue("DrawingsWinLeft"), out var left))
+                Left = left;
+            else Left = 60;
+
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(Resources, true);
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
 
             MouseEnter += Window_MouseEnter;
             MouseLeave += Window_MouseLeave;
             MouseLeftButtonDown += Window_MouseLeftButtonDown;
 
-            ////////////////////////////////////////////////////////
-
             // Подключение обработчиков событий для создания и закрытия чертежей
-            AcApp.DocumentManager.DocumentCreated +=
-                DocumentManager_DocumentCreated;
-            AcApp.DocumentManager.DocumentDestroyed +=
-                DocumentManager_DocumentDestroyed;
+            AcApp.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
+            AcApp.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
             AcApp.DocumentManager.DocumentActivated += DocumentManager_DocumentActivated;
-            //////////////////////////////
+
             GetDocuments();
+
             // Обрабатываем событие покидания мышкой окна
             OnMouseLeaving();
         }
@@ -119,9 +114,7 @@ namespace ModPlus
                 TbHeader.Visibility = Visibility.Visible;
                 ExpOpenDrawings.Visibility = Visibility.Visible;
 
-                //if (ModPlusAPI.Variables.MpChkDrwsOnMnu)
-                //{
-                    ExpOpenDrawings.Visibility = Visibility.Visible;
+                ExpOpenDrawings.Visibility = Visibility.Visible;
                     //////////////////////////////////
                     if (_docs.Count != Drawings.Items.Count)
                     {
@@ -171,8 +164,6 @@ namespace ModPlus
                     {
                         // ignored
                     }
-                //}
-                //////////////////////////////////
                 Focus();
             }
         }
@@ -284,8 +275,8 @@ namespace ModPlus
 
         static void MpDrawingsWinClosed(object sender, EventArgs e)
         {
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "top", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture), true);
-            UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "DrawingsCoordinates", "left", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture), true);
+            Regestry.SetValue("DrawingsWinTop", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture));
+            Regestry.SetValue("DrawingsWinLeft", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture));
             MpDrawingsWin = null;
         }
     }
