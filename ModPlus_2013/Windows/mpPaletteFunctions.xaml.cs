@@ -16,7 +16,7 @@
         internal mpPaletteFunctions()
         {
             InitializeComponent();
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
+            ModPlusStyle.ThemeManager.ChangeTheme(Resources, "LightBlue");
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             Loaded += MpPaletteFunctions_Loaded;
         }

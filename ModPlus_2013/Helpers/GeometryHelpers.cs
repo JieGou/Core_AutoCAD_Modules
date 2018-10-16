@@ -40,15 +40,15 @@ namespace ModPlus.Helpers
         {
             return (p1 + (p2 - p1).DivideBy((p2 - p1).Length) * distance).Convert2d(new Plane());
         }
-        /// <summary>Получение 2d точки на указанном расстоянии от условного отрезка, полуаемого точками p1 и p2</summary>
+        /// <summary>Получение 2d точки на указанном расстоянии от условного отрезка, получаемого точками p1 и p2</summary>
         /// <param name="p1">Первая точка условного отрезка</param>
-        /// <param name="p2">Вторая точка условногоотрезка</param>
+        /// <param name="p2">Вторая точка условного отрезка</param>
         /// <param name="distance">Расстояние в перпендикулярном направлении от отрезка</param>
         public static Point2d GetPerpendicularPoint2d(Point3d p1, Point3d p2, double distance)
         {
             return (p2 + (p2 - p1).GetPerpendicularVector() * distance).Convert2d(new Plane());
         }
-        /// <summary>Получение 3d точки на указанном расстоянии от условного отрезка, полуаемого точками p1 и p2</summary>
+        /// <summary>Получение 3d точки на указанном расстоянии от условного отрезка, получаемого точками p1 и p2</summary>
         /// <param name="p1">Первая точка условного отрезка</param>
         /// <param name="p2">Вторая точка условного отрезка</param>
         /// <param name="distance">Расстояние в перпендикулярном направлении от отрезка</param>
