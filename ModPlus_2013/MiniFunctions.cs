@@ -1,23 +1,24 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
-using Viewport = Autodesk.AutoCAD.DatabaseServices.Viewport;
-
+﻿// ReSharper disable InconsistentNaming
 namespace ModPlus
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
+    using Autodesk.AutoCAD.Runtime;
+    using Autodesk.AutoCAD.Windows;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
+    using Viewport = Autodesk.AutoCAD.DatabaseServices.Viewport;
+
     public class MiniFunctions
     {
         private const string LangItem = "AutocadDlls";
@@ -38,8 +39,8 @@ namespace ModPlus
             // VP to MS
             var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
-                ContextMenues.VPtoMSobjectContextMenu.Attach();
-            else ContextMenues.VPtoMSobjectContextMenu.Detach();
+                ContextMenues.VPtoMSObjectContextMenu.Attach();
+            else ContextMenues.VPtoMSObjectContextMenu.Detach();
             // wipeout vertex edit
             var wipeoutEditOCM = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; // true
             if (wipeoutEditOCM)
@@ -926,7 +927,7 @@ namespace ModPlus
                 }
             }
 
-            public static class VPtoMSobjectContextMenu
+            public static class VPtoMSObjectContextMenu
             {
                 public static ContextMenuExtension ContextMenuForVP;
                 public static ContextMenuExtension ContextMenuForCurve;
@@ -990,10 +991,9 @@ namespace ModPlus
                         var mi2 = new MenuItem(Language.GetItem(LangItem, "h55"));
                         mi2.Click += Mi2_Click;
                         ContextMenu.MenuItems.Add(mi2);
-                        ContextMenu.Popup += ContextMenu_Popup;
-
-                        RXClass rxcEnt = RXObject.GetClass(typeof(Entity));
-                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
+                        
+                        RXClass rxClass = RXObject.GetClass(typeof(Wipeout));
+                        Application.AddObjectContextMenuExtension(rxClass, ContextMenu);
                     }
                 }
 
@@ -1001,7 +1001,7 @@ namespace ModPlus
                 {
                     if (ContextMenu != null)
                     {
-                        var rxcEnt = RXObject.GetClass(typeof(Entity));
+                        var rxcEnt = RXObject.GetClass(typeof(Wipeout));
                         Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
                         ContextMenu = null;
                     }
@@ -1017,43 +1017,6 @@ namespace ModPlus
                 {
                     AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
                         "_.mpAddVertexToWipeout ", false, false, false);
-                }
-                // Обработка выпадающего меню
-                private static void ContextMenu_Popup(object sender, EventArgs e)
-                {
-                    if (sender is ContextMenuExtension contextMenu)
-                    {
-                        var doc = AcApp.DocumentManager.MdiActiveDocument;
-                        var ed = doc.Editor;
-                        try
-                        {
-                            var acSsPrompt = ed.SelectImplied();
-                            var mVisible = true;
-                            if (acSsPrompt.Status == PromptStatus.OK)
-                            {
-                                var set = acSsPrompt.Value;
-                                var ids = set.GetObjectIds();
-                                if (acSsPrompt.Value.Count == 1)
-                                {
-                                    using (var tr = doc.TransactionManager.StartOpenCloseTransaction())
-                                    {
-                                        var entity = tr.GetObject(ids[0], OpenMode.ForRead);
-                                        if (entity is Wipeout)
-                                            mVisible = true;
-                                        else mVisible = false;
-                                    }
-                                }
-                                else mVisible = false;
-                            }
-
-                            contextMenu.MenuItems[0].Visible = mVisible;
-                            contextMenu.MenuItems[1].Visible = mVisible;
-                        }
-                        catch
-                        {
-                            //
-                        }
-                    }
                 }
             }
         }

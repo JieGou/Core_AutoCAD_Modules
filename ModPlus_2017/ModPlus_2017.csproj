@@ -121,6 +121,9 @@
       <Link>mpDrawings.xaml.cs</Link>
       <DependentUpon>mpDrawings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\ModPlus_2013\Properties\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="..\ModPlus_2013\Windows\MpFloatMenu.xaml.cs">
       <Link>Windows\MpFloatMenu.xaml.cs</Link>
       <DependentUpon>MpFloatMenu.xaml</DependentUpon>

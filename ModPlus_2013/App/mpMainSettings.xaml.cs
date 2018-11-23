@@ -332,8 +332,8 @@
             {
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
-                    MiniFunctions.ContextMenues.VPtoMSobjectContextMenu.Attach();
-                else MiniFunctions.ContextMenues.VPtoMSobjectContextMenu.Detach();
+                    MiniFunctions.ContextMenues.VPtoMSObjectContextMenu.Attach();
+                else MiniFunctions.ContextMenues.VPtoMSObjectContextMenu.Detach();
             }
         }
         // wipeout edit

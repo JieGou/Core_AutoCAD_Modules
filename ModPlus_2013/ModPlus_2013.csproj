@@ -103,6 +103,7 @@
     <Compile Include="mpDrawings.xaml.cs">
       <DependentUpon>mpDrawings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Properties\AssemblyInfoCommon.cs" />
     <Compile Include="Windows\MpFloatMenu.xaml.cs">
       <DependentUpon>MpFloatMenu.xaml</DependentUpon>
     </Compile>
