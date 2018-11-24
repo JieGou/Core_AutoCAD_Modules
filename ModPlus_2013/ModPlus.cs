@@ -85,7 +85,7 @@ namespace ModPlus
                 // Загрузка окна Чертежи
                 MpDrawingsFunction.LoadMainMenu();
                 // Загрузка контекстных меню для мини-функций
-                MiniFunctions.LoadUnloadContextMenues();
+                MiniFunctions.LoadUnloadContextMenu();
                 // проверка загруженности модуля автообновления
                 CheckAutoUpdaterLoaded();
                 // Включение иконок для продуктов
@@ -243,8 +243,6 @@ namespace ModPlus
         /// Обработчик события, который проверяет, что построилась лента
         /// И когда она построилась - уже грузим свою вкладку, если надо
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
             //now one Ribbon item is initialized, but the Ribbon control
@@ -255,6 +253,7 @@ namespace ModPlus
                 RibbonBuilder.BuildRibbon();
             else
                 RibbonBuilder.RemoveRibbon();
+
             //and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -=
                 ComponentManager_ItemInitialized;

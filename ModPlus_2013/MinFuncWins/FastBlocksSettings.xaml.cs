@@ -42,8 +42,8 @@ namespace ModPlus.MinFuncWins
             var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
             {
-                MiniFunctions.ContextMenues.FastBlockContextMenu.Detach();
-                MiniFunctions.ContextMenues.FastBlockContextMenu.Attach();
+                MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
+                MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
             }
         }
 

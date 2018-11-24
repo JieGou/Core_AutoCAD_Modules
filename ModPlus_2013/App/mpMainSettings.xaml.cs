@@ -238,7 +238,7 @@
                     RibbonBuilder.RemoveRibbon();
 
                 // context menues
-                MiniFunctions.LoadUnloadContextMenues();
+                MiniFunctions.LoadUnloadContextMenu();
 
                 // перевод фокуса на автокад
                 Utils.SetFocusToDwgView();
@@ -305,8 +305,8 @@
             {
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
-                    MiniFunctions.ContextMenues.EntByBlockObjectContextMenu.Attach();
-                else MiniFunctions.ContextMenues.EntByBlockObjectContextMenu.Detach();
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
+                else MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
             }
         }
         // Частоиспользуемые блоки
@@ -316,8 +316,8 @@
             {
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
-                    MiniFunctions.ContextMenues.FastBlockContextMenu.Attach();
-                else MiniFunctions.ContextMenues.FastBlockContextMenu.Detach();
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
+                else MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
             }
         }
         private void BtFastBlocksSettings_OnClick(object sender, RoutedEventArgs e)
@@ -332,20 +332,20 @@
             {
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
-                    MiniFunctions.ContextMenues.VPtoMSObjectContextMenu.Attach();
-                else MiniFunctions.ContextMenues.VPtoMSObjectContextMenu.Detach();
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
+                else MiniFunctions.MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
             }
         }
         // wipeout edit
         private void ChkWipeoutEditOCM_OnChecked(object sender, RoutedEventArgs e)
         {
             UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", true.ToString(), true);
-            MiniFunctions.ContextMenues.WipeoutEditObjectContextMenu.Attach();
+            MiniFunctions.MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Attach();
         }
         private void ChkWipeoutEditOCM_OnUnchecked(object sender, RoutedEventArgs e)
         {
             UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", false.ToString(), true);
-            MiniFunctions.ContextMenues.WipeoutEditObjectContextMenu.Detach();
+            MiniFunctions.MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
         #endregion
 

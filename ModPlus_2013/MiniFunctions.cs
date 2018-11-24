@@ -23,29 +23,97 @@ namespace ModPlus
     {
         private const string LangItem = "AutocadDlls";
 
-        public static void LoadUnloadContextMenues()
+        public static void LoadUnloadContextMenu()
         {
-            // ent by block
             // ent by block
             var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b;
             if (entByBlockObjContMen)
-                ContextMenues.EntByBlockObjectContextMenu.Attach();
-            else ContextMenues.EntByBlockObjectContextMenu.Detach();
+                MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
+            else MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
             // Fast block
             var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
-                ContextMenues.FastBlockContextMenu.Attach();
-            else ContextMenues.FastBlockContextMenu.Detach();
+                MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
+            else MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
             // VP to MS
             var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
-                ContextMenues.VPtoMSObjectContextMenu.Attach();
-            else ContextMenues.VPtoMSObjectContextMenu.Detach();
+                MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
+            else MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
             // wipeout vertex edit
+            /*
+             * Так как не получается создать контекстное меню конкретно на класс Wipeout (возможно в поздних версиях устранили),
+             * то приходится делать через подписку на событие и создание меню у Entity
+             */
             var wipeoutEditOCM = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; // true
             if (wipeoutEditOCM)
-                ContextMenues.WipeoutEditObjectContextMenu.Attach();
-            else ContextMenues.WipeoutEditObjectContextMenu.Detach();
+            {
+                AcApp.DocumentManager.DocumentCreated += WipeoutEditOCM_Documents_DocumentCreated;
+                AcApp.DocumentManager.DocumentActivated += WipeoutEditOCM_Documents_DocumentActivated;
+
+                foreach (Document document in AcApp.DocumentManager)
+                {
+                    document.ImpliedSelectionChanged += WipeoutEditOCM_Document_ImpliedSelectionChanged;
+                }
+            }
+            else
+            {
+                AcApp.DocumentManager.DocumentCreated -= WipeoutEditOCM_Documents_DocumentCreated;
+                AcApp.DocumentManager.DocumentActivated -= WipeoutEditOCM_Documents_DocumentActivated;
+
+                foreach (Document document in AcApp.DocumentManager)
+                {
+                    document.ImpliedSelectionChanged -= WipeoutEditOCM_Document_ImpliedSelectionChanged;
+                }
+            }
+        }
+
+        private static void WipeoutEditOCM_Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
+        {
+            if (e.Document != null)
+            {
+                e.Document.ImpliedSelectionChanged -= WipeoutEditOCM_Document_ImpliedSelectionChanged;
+                e.Document.ImpliedSelectionChanged += WipeoutEditOCM_Document_ImpliedSelectionChanged;
+            }
+        }
+
+        private static void WipeoutEditOCM_Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)
+        {
+            if (e.Document != null)
+            {
+                e.Document.ImpliedSelectionChanged -= WipeoutEditOCM_Document_ImpliedSelectionChanged;
+                e.Document.ImpliedSelectionChanged += WipeoutEditOCM_Document_ImpliedSelectionChanged;
+            }
+        }
+
+        private static void WipeoutEditOCM_Document_ImpliedSelectionChanged(object sender, EventArgs e)
+        {
+            PromptSelectionResult psr = AcApp.DocumentManager.MdiActiveDocument.Editor.SelectImplied();
+            bool detach = true;
+            if (psr.Value != null && psr.Value.Count == 1)
+            {
+                using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
+                {
+                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    {
+                        foreach (SelectedObject selectedObject in psr.Value)
+                        {
+                            if (selectedObject.ObjectId == ObjectId.Null)
+                                continue;
+                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
+                            if (obj is Wipeout)
+                            {
+                                MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Attach();
+                                detach = false;
+                            }
+                        }
+
+                        tr.Commit();
+                    }
+                }
+            }
+            if (detach)
+                MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
 
         [CommandMethod("ModPlus", "mpEntByBlock", CommandFlags.UsePickSet | CommandFlags.Redraw)]
@@ -611,7 +679,7 @@ namespace ModPlus
 
         #endregion
 
-        public class ContextMenues
+        public class MiniFunctionsContextMenuExtensions
         {
             public static class EntByBlockObjectContextMenu
             {
@@ -991,19 +1059,18 @@ namespace ModPlus
                         var mi2 = new MenuItem(Language.GetItem(LangItem, "h55"));
                         mi2.Click += Mi2_Click;
                         ContextMenu.MenuItems.Add(mi2);
-                        
-                        RXClass rxClass = RXObject.GetClass(typeof(Wipeout));
-                        Application.AddObjectContextMenuExtension(rxClass, ContextMenu);
                     }
+                    var rxClass = RXObject.GetClass(typeof(Entity));
+                    Application.AddObjectContextMenuExtension(rxClass, ContextMenu);
                 }
 
                 public static void Detach()
                 {
                     if (ContextMenu != null)
                     {
-                        var rxcEnt = RXObject.GetClass(typeof(Wipeout));
+                        var rxcEnt = RXObject.GetClass(typeof(Entity));
                         Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
-                        ContextMenu = null;
+                        //ContextMenu = null;
                     }
                 }
 
