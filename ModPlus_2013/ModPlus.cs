@@ -328,7 +328,7 @@ namespace ModPlus
         }
     }
 
-    /// <summary>Вспомгательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
+    /// <summary>Вспомогательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
     public static class XDataHelpersForProducts
     {
         private const string AppName = "ModPlusProduct";
@@ -362,7 +362,9 @@ namespace ModPlus
         {
             using (var resBuf = ent.GetXDataForApplication(AppName))
             {
-                return resBuf == null ? null : NewFromResBuf(resBuf);
+                return resBuf == null 
+                    ? null 
+                    : NewFromResBuf(resBuf);
             }
         }
         private static object NewFromResBuf(ResultBuffer resBuf)
