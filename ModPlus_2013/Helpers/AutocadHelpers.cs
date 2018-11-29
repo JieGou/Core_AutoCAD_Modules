@@ -1,12 +1,14 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+
     /// <summary>Различные вспомогательные методы для работы в AutoCAD</summary>
     public static class AutocadHelpers
     {
@@ -36,6 +38,7 @@ namespace ModPlus.Helpers
             }
             return arrObjId;
         }
+
         /// <summary>ObjectId одного из стандартного блока для стрелки</summary>
         /// <returns>ObjectId стандартного блока стрелки</returns>
         public static ObjectId GetArrowObjectId(StandardArrowhead standardArrowhead)
@@ -64,6 +67,7 @@ namespace ModPlus.Helpers
             }
             return arrObjId;
         }
+
         /// <summary>Стандартные стрелки AutoCAD</summary>
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public enum StandardArrowhead
@@ -107,18 +111,22 @@ namespace ModPlus.Helpers
             /// <summary>Двойная засечка</summary>
             _ARCHTICK
         }
+        
         /// <summary>Перевод точки из пользовательской системы координат в мировую</summary>
+        [Obsolete("Лучше использовать стандартные методы AutoCAD")]
         public static Point3d UcsToWcs(Point3d pt)
         {
             var m = GetUcsMatrix(HostApplicationServices.WorkingDatabase);
             return pt.TransformBy(m);
         }
+
         private static bool IsPaperSpace(Database db)
         {
             if (db.TileMode) return false;
             var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
             return db.PaperSpaceVportId == ed.CurrentViewportObjectId;
         }
+
         private static Matrix3d GetUcsMatrix(Database db)
         {
             Point3d origin;
@@ -136,6 +144,7 @@ namespace ModPlus.Helpers
                 Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis,
                 origin, xAxis, yAxis, zAxis);
         }
+
         /// <summary>Зуммировать объекты</summary>
         /// <param name="objIds">Однострочный массив ObjectId зуммируемых объектов</param>
         public static void ZoomToEntities(ObjectId[] objIds)
@@ -152,6 +161,7 @@ namespace ModPlus.Helpers
 
             editor.SetImpliedSelection(selected);
         }
+
         /// <summary>Получение "реального" имени блока</summary>
         /// <param name="tr">Транзакция</param>
         /// <param name="bref">Вхождение блока</param>
@@ -169,6 +179,7 @@ namespace ModPlus.Helpers
             }
             return btr?.Name;
         }
+
         /// <summary>Получение аннотативного масштаба по имени из текущей базы данных (HostApplicationServices.WorkingDatabase)</summary>
         /// <param name="name">Имя масштаба</param>
         /// <returns>Аннотативный масштаб с таким именем или текущий масштаб в БД</returns>
@@ -187,6 +198,17 @@ namespace ModPlus.Helpers
                     }
             }
             return db.Cannoscale;
+        }
+
+        /// <summary>
+        /// Проверка, что редактор доступен для приема команд. Если не доступен, то будет показано сообщение
+        /// </summary>
+        public static bool IsEditorIsQuiescent(Editor editor)
+        {
+            if (editor.IsQuiescent) return true;
+
+            MessageBox.Show(Language.GetItem("AutocadDlls", "msg23"), MessageBoxIcon.Alert);
+            return false;
         }
     }
 }
