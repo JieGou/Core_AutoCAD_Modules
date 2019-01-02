@@ -23,6 +23,7 @@ namespace ModPlus
 {
     using System.Net;
     using System.Xml.Linq;
+    using ModPlusAPI.LicenseServer;
 
     public class ModPlus : IExtensionApplication
     {
@@ -94,6 +95,9 @@ namespace ModPlus
                 if (showProductsIcon)
                     MpProductIconFunctions.ShowIcon();
 
+                // start license server client
+                ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+
                 sw.Stop();
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p9") + " " + sw.ElapsedMilliseconds);
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p10"));
@@ -107,6 +111,7 @@ namespace ModPlus
 
         public void Terminate()
         {
+            ClientStarter.StopConnection();
         }
 
         // проверка соответствия версии автокада
