@@ -7,12 +7,14 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-    using Autodesk.AutoCAD.Internal;
     using Autodesk.AutoCAD.Runtime;
     using MinFuncWins;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Windows;
+    using ModPlusAPI.LicenseServer;
+    using ModPlusStyle.Controls.Dialogs;
+    using Utils = Autodesk.AutoCAD.Internal.Utils;
 
     partial class MpMainSettings
     {
@@ -30,12 +32,43 @@
         {
             InitializeComponent();
             Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
+            SetLanguageValues();
             FillThemesAndColors();
             SetAppRegistryKeyForCurrentUser();
-            GetDataFromConfigFile();
+            LoadSettingsFromConfigFileAndRegistry();
             GetDataByVars();
             Closing += MpMainSettings_Closing;
             Closed += MpMainSettings_OnClosed;
+
+            // license server
+            if (ClientStarter.IsClientWorking())
+            {
+                BtStopConnectionToLicenseServer.IsEnabled = true;
+                BtRestoreConnectionToLicenseServer.IsEnabled = false;
+                TbLocalLicenseServerIpAddress.IsEnabled = false;
+                TbLocalLicenseServerPort.IsEnabled = false;
+            }
+            else
+            {
+                BtStopConnectionToLicenseServer.IsEnabled = false;
+                BtRestoreConnectionToLicenseServer.IsEnabled = true;
+                TbLocalLicenseServerIpAddress.IsEnabled = true;
+                TbLocalLicenseServerPort.IsEnabled = true;
+            }
+        }
+
+        private void SetLanguageValues()
+        {
+            // Так как элементы окна по Серверу лицензий ссылаются на узел ModPlusAPI
+            // присваиваю им значения в коде, после установки языка
+            var li = "ModPlusAPI";
+            GroupBoxLicenseServer.Header = ModPlusAPI.Language.GetItem(li, "h16");
+            TbLocalLicenseServerIpAddressHeader.Text = ModPlusAPI.Language.GetItem(li, "h17");
+            TbLocalLicenseServerPortHeader.Text = ModPlusAPI.Language.GetItem(li, "h18");
+            BtCheckLocalLicenseServerConnection.Content = ModPlusAPI.Language.GetItem(li, "h19");
+            BtStopConnectionToLicenseServer.Content = ModPlusAPI.Language.GetItem(li, "h23");
+            BtRestoreConnectionToLicenseServer.Content = ModPlusAPI.Language.GetItem(li, "h24");
+            ChkDisableConnectionWithLicenseServer.Content = ModPlusAPI.Language.GetItem(li, "h25");
         }
 
         private void FillThemesAndColors()
@@ -53,6 +86,7 @@
             _curTheme = pluginStyle.Name;
             MiTheme.SelectedItem = pluginStyle;
         }
+        
         // Заполнение поля Ключ продукта
         private void SetAppRegistryKeyForCurrentUser()
         {
@@ -81,7 +115,7 @@
         }
 
         /// <summary>Загрузка данных из файла конфигурации которые требуется отобразить в окне</summary>
-        private void GetDataFromConfigFile()
+        private void LoadSettingsFromConfigFileAndRegistry()
         {
             // Separator
             var separator = Regestry.GetValue("Separator");
@@ -91,7 +125,12 @@
             ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
             ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
             ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; //true
+            ChkDisableConnectionWithLicenseServer.IsChecked =
+                bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DisableConnectionWithLicenseServerInAutoCAD"), out b) && b; // false
+            TbLocalLicenseServerIpAddress.Text = Regestry.GetValue("LocalLicenseServerIpAddress");
+            TbLocalLicenseServerPort.Value = int.TryParse(Regestry.GetValue("LocalLicenseServerPort"), out var i) ? i : 0;
         }
+
         /// <summary>Получение значений из глобальных переменных плагина</summary>
         private void GetDataByVars()
         {
@@ -122,7 +161,7 @@
                 // Тихая загрузка
                 ChkQuietLoading.IsChecked = ModPlusAPI.Variables.QuietLoading;
                 // email
-                TbEmailAdress.Text = ModPlusAPI.Variables.UserEmail;
+                TbEmailAddress.Text = ModPlusAPI.Variables.UserEmail;
             }
             catch (System.Exception exception)
             {
@@ -146,15 +185,15 @@
 
         private void MpMainSettings_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!string.IsNullOrEmpty(TbEmailAdress.Text))
+            if (!string.IsNullOrEmpty(TbEmailAddress.Text))
             {
-                if (IsValidEmail(TbEmailAdress.Text))
-                    TbEmailAdress.BorderBrush = FindResource("BlackBrush") as Brush;
+                if (IsValidEmail(TbEmailAddress.Text))
+                    TbEmailAddress.BorderBrush = FindResource("BlackBrush") as Brush;
                 else
                 {
-                    TbEmailAdress.BorderBrush = Brushes.Red;
+                    TbEmailAddress.BorderBrush = Brushes.Red;
                     ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "tt4"));
-                    TbEmailAdress.Focus();
+                    TbEmailAddress.Focus();
                     e.Cancel = true;
                 }
             }
@@ -239,6 +278,19 @@
 
                 // context menues
                 MiniFunctions.LoadUnloadContextMenu();
+
+                // License server
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "DisableConnectionWithLicenseServerInAutoCAD",
+                    ChkDisableConnectionWithLicenseServer.IsChecked.Value.ToString(), true);
+                Regestry.SetValue("LocalLicenseServerIpAddress", TbLocalLicenseServerIpAddress.Text);
+                Regestry.SetValue("LocalLicenseServerPort", TbLocalLicenseServerPort.Value.ToString());
+
+                if (_restartClientOnClose)
+                {
+                    // reload server
+                    ClientStarter.StopConnection();
+                    ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+                }
 
                 // перевод фокуса на автокад
                 Utils.SetFocusToDwgView();
@@ -349,7 +401,7 @@
         }
         #endregion
 
-        private void TbEmailAdress_OnLostFocus(object sender, RoutedEventArgs e)
+        private void TbEmailAddress_OnLostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb)
             {
@@ -370,6 +422,38 @@
             {
                 return false;
             }
+        }
+
+        private async void BtCheckLocalLicenseServerConnection_OnClick(object sender, RoutedEventArgs e)
+        {
+            await this.ShowMessageAsync(
+                ClientStarter.IsLicenseServerAvailable()
+                    ? ModPlusAPI.Language.GetItem("ModPlusAPI", "h21")
+                    : ModPlusAPI.Language.GetItem("ModPlusAPI", "h20"),
+                ModPlusAPI.Language.GetItem("ModPlusAPI", "h22") + " " +
+                TbLocalLicenseServerIpAddress.Text + ":" + TbLocalLicenseServerPort.Value);
+        }
+
+        private bool _restartClientOnClose = true;
+
+        private void BtStopConnectionToLicenseServer_OnClick(object sender, RoutedEventArgs e)
+        {
+            ClientStarter.StopConnection();
+            BtRestoreConnectionToLicenseServer.IsEnabled = true;
+            BtStopConnectionToLicenseServer.IsEnabled = false;
+            TbLocalLicenseServerIpAddress.IsEnabled = true;
+            TbLocalLicenseServerPort.IsEnabled = true;
+            _restartClientOnClose = false;
+        }
+
+        private void BtRestoreConnectionToLicenseServer_OnClick(object sender, RoutedEventArgs e)
+        {
+            ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+            BtRestoreConnectionToLicenseServer.IsEnabled = false;
+            BtStopConnectionToLicenseServer.IsEnabled = true;
+            TbLocalLicenseServerIpAddress.IsEnabled = false;
+            TbLocalLicenseServerPort.IsEnabled = false;
+            _restartClientOnClose = true;
         }
     }
 

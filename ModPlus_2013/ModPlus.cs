@@ -95,8 +95,12 @@ namespace ModPlus
                 if (showProductsIcon)
                     MpProductIconFunctions.ShowIcon();
 
+                var disableConnectionWithLicenseServer =
+                    bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, 
+                        "DisableConnectionWithLicenseServerInAutoCAD"), out b) && b; // false
                 // start license server client
-                ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+                if(!disableConnectionWithLicenseServer)
+                    ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
 
                 sw.Stop();
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p9") + " " + sw.ElapsedMilliseconds);
