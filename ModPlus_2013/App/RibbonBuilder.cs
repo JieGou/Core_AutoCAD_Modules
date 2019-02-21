@@ -200,6 +200,7 @@ namespace ModPlus.App
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage
                                         );
+                                        
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
                                         // Затем добавляем подфункции
@@ -393,7 +394,7 @@ namespace ModPlus.App
                                     // Иначе просто добавляем большую кнопку
                                     else
                                     {
-                                        ribRowPanel.Items.Add(RibbonHelpers.AddBigButton(
+                                        RibbonButton ribbonButton = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
@@ -401,7 +402,8 @@ namespace ModPlus.App
                                             Orientation.Vertical,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage
-                                            ));
+                                        );
+                                        ribRowPanel.Items.Add(ribbonButton);
                                     }
                                     ribSourcePanel.Items.Add(ribRowPanel);
                                 }

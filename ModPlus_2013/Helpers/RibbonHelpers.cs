@@ -67,7 +67,7 @@ namespace ModPlus.Helpers
         }
 
         /// <summary>Создание большой кнопки</summary>
-        /// <param name="fName">Навание функции (= параметр запуска функции)</param>
+        /// <param name="fName">Название функции (= параметр запуска функции)</param>
         /// <param name="lName">Локальное название функции</param>
         /// <param name="img">Иконка</param>
         /// <param name="description">Описание функции</param>
@@ -75,7 +75,14 @@ namespace ModPlus.Helpers
         /// <param name="fullDescription">Полное описание</param>
         /// <param name="helpImage">Имя файла картинки для ToolTip. Файл должен располагаться в каталоге /Resources/Help проекта</param>
         /// <returns></returns>
-        public static RibbonButton AddBigButton(string fName, string lName, string img, string description, Orientation orientation, string fullDescription, string helpImage)
+        public static RibbonButton AddBigButton(
+            string fName, 
+            string lName, 
+            string img,
+            string description,
+            Orientation orientation,
+            string fullDescription, 
+            string helpImage)
         {
             try
             {

@@ -204,6 +204,9 @@
         {
             try
             {
+                // Сохраняем в реестр почту, если изменилась
+                ModPlusAPI.Variables.UserEmail = TbEmailAddress.Text;
+
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
