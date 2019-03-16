@@ -1,21 +1,19 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Linq;
-using Autodesk.Windows;
-using Autodesk.AutoCAD.ApplicationServices;
-using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
-using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
-using RibbonSplitButton = Autodesk.Windows.RibbonSplitButton;
-using RibbonSplitButtonListStyle = Autodesk.Windows.RibbonSplitButtonListStyle;
-
-// ModPlus
-using ModPlus.Helpers;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using Orientation = System.Windows.Controls.Orientation;
-
-namespace ModPlus.App
+﻿namespace ModPlus.App
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Linq;
+    using Autodesk.Windows;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Helpers;
+    using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
+    using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
+    using RibbonSplitButton = Autodesk.Windows.RibbonSplitButton;
+    using RibbonSplitButtonListStyle = Autodesk.Windows.RibbonSplitButtonListStyle;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using Orientation = System.Windows.Controls.Orientation;
+
     internal static class RibbonBuilder
     {
         private const string LangItem = "AutocadDlls";
@@ -134,6 +132,7 @@ namespace ModPlus.App
             try
             {
                 var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
+                
                 // Проходим по группам
                 if (confCuiXel != null)
                     foreach (var group in confCuiXel.Elements("Group"))
@@ -259,8 +258,8 @@ namespace ModPlus.App
                                             risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                GetSmallIconForSubFunctio(loadedFunction, i), // loadedFunction.SubSmallIconsUrl[i],
-                                                GetBigIconForSubFunctio(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
+                                                GetSmallIconForSubFunction(loadedFunction, i), // loadedFunction.SubSmallIconsUrl[i],
+                                                GetBigIconForSubFunction(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
@@ -382,7 +381,7 @@ namespace ModPlus.App
                                             risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                GetBigIconForSubFunctio(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
+                                                GetBigIconForSubFunction(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
@@ -444,7 +443,7 @@ namespace ModPlus.App
             return loadedFunction.BigIconUrl;
         }
 
-        private static string GetSmallIconForSubFunctio(LoadedFunction loadedFunction, int i)
+        private static string GetSmallIconForSubFunction(LoadedFunction loadedFunction, int i)
         {
             if (_colorTheme == 0) // dark
             {
@@ -455,7 +454,7 @@ namespace ModPlus.App
             return loadedFunction.SubSmallIconsUrl[i];
         }
 
-        private static string GetBigIconForSubFunctio(LoadedFunction loadedFunction, int i)
+        private static string GetBigIconForSubFunction(LoadedFunction loadedFunction, int i)
         {
             if (_colorTheme == 0) // dark
             {
@@ -506,7 +505,7 @@ namespace ModPlus.App
                         icon,
                         Language.GetItem(LangItem, "h44"),
                         Language.GetItem(LangItem, "h45"),
-                        ""
+                        "", "help/mpstamps"
                         )
                     );
                 ribRowPanel.Items.Add(new RibbonRowBreak());
@@ -521,7 +520,7 @@ namespace ModPlus.App
                         : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h37"),
                     Language.GetItem(LangItem, "h38"),
-                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png"
+                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png", "help/mpsettings"
                     ));
             ribRowPanel.Items.Add(new RibbonRowBreak());
 
@@ -534,7 +533,7 @@ namespace ModPlus.App
                         : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h39"),
                     "",
-                    ""
+                    "", "help/mpsettings"
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
         }

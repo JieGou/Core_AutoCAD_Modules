@@ -17,6 +17,9 @@ using ModPlusAPI.Interfaces;
 
 namespace ModPlus.Helpers
 {
+    using System.Windows.Input;
+    using ModPlusAPI;
+
     /* Функция из файла конфигурации читаю в том виде, в каком они там сохранены
      * А вот получение локализованных значений (имя, описание, полное описание)
      * происходит при построении ленты */

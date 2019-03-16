@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ac2013</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;A2017</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ac2013</DefineConstants>
+    <DefineConstants>TRACE;A2017</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -121,8 +121,14 @@
       <Link>mpDrawings.xaml.cs</Link>
       <DependentUpon>mpDrawings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\ModPlus_2013\Properties\AssemblyInfoCommon.cs">
-      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    <Compile Include="..\ModPlus_2013\MpPalette.cs">
+      <Link>MpPalette.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2013\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2013\VersionData.cs">
+      <Link>VersionData.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2013\Windows\MpFloatMenu.xaml.cs">
       <Link>Windows\MpFloatMenu.xaml.cs</Link>
@@ -136,13 +142,14 @@
       <Link>Windows\mpPaletteFunctions.xaml.cs</Link>
       <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\ModPlus_2013\XDataHelpersForProducts.cs">
+      <Link>XDataHelpersForProducts.cs</Link>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="VersionData.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

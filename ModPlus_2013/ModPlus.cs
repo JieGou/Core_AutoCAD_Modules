@@ -2,19 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
 using ModPlus.App;
 using ModPlus.Windows;
-using System.Windows.Forms.Integration;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
@@ -23,13 +17,16 @@ namespace ModPlus
 {
     using System.Net;
     using System.Xml.Linq;
+    using Autodesk.AutoCAD.ApplicationServices;
     using ModPlusAPI.LicenseServer;
 
     public class ModPlus : IExtensionApplication
     {
         private const string LangItem = "AutocadDlls";
-
+        private static bool _dropNextHelpCall = false; // Flag to tell if the next message from AutoCAD to display it's own help should be ignored
+        private static string _currentTooltip = null; // If not null, this is the HelpTopic of the currently open tooltip. If null, no tooltip is displaying.
         private static bool _quiteLoad;
+
         // Инициализация плагина
         public void Initialize()
         {
@@ -102,6 +99,11 @@ namespace ModPlus
                 if(!disableConnectionWithLicenseServer)
                     ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
 
+                // tooltip hook
+                AcApp.PreTranslateMessage += AutoCadMessageHandler;
+                Autodesk.Windows.ComponentManager.ToolTipOpened += ComponentManager_ToolTipOpened;
+                Autodesk.Windows.ComponentManager.ToolTipClosed += ComponentManager_ToolTipClosed;
+
                 sw.Stop();
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p9") + " " + sw.ElapsedMilliseconds);
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p10"));
@@ -116,6 +118,9 @@ namespace ModPlus
         public void Terminate()
         {
             ClientStarter.StopConnection();
+            AcApp.PreTranslateMessage -= AutoCadMessageHandler;
+            Autodesk.Windows.ComponentManager.ToolTipOpened -= ComponentManager_ToolTipOpened;
+            Autodesk.Windows.ComponentManager.ToolTipClosed -= ComponentManager_ToolTipClosed;
         }
 
         // проверка соответствия версии автокада
@@ -326,6 +331,66 @@ namespace ModPlus
             }
         }
 
+        #region ToolTip Hook
+
+        public enum WndMsg
+        {
+            WM_ACAD_HELP = 0x4D,
+            WM_KEYDOWN = 0x100,
+        }
+
+        public enum WndKey
+        {
+            VK_F1 = 0x70,
+        }
+
+        void AutoCadMessageHandler(object sender, PreTranslateMessageEventArgs e)
+        {
+            if (e.Message.message == (int)WndMsg.WM_KEYDOWN)
+            {
+                if ((int)e.Message.wParam == (int)WndKey.VK_F1)
+                { 
+                    // F1 pressed
+                    if (_currentTooltip != null && _currentTooltip.Length > 8 && _currentTooltip.StartsWith("https://modplus.org/"))
+                    {
+                        // Another implementation could be to look up the help topic in an index file matching it to URLs.
+                        _dropNextHelpCall = true; // Even though we don't forward this F1 keypress, AutoCAD sends a message to itself to open the AutoCAD help file
+                        object nomutt = AcApp.GetSystemVariable("NOMUTT");
+                        string cmd = "._BROWSER " + _currentTooltip + " _NOMUTT " + nomutt + " ";
+                        AcApp.SetSystemVariable("NOMUTT", 1);
+                        AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, false);
+                        e.Handled = true;
+                    }
+                }
+            }
+            else if (e.Message.message == (int)WndMsg.WM_ACAD_HELP && _dropNextHelpCall)
+            {
+                // Seems this is the message AutoCAD generates itself to open the help file. Drop this if help was called from a ribbon tooltip.
+                _dropNextHelpCall = false; // Reset state of help calls
+                e.Handled = true; // Stop this message from being passed on to AutoCAD
+            }
+        }
+
+        // AutoCAD event handlers to detect if a tooltip is open or not
+        private static void ComponentManager_ToolTipOpened(object sender, EventArgs e)
+        {
+            Autodesk.Internal.Windows.ToolTip tt = sender as Autodesk.Internal.Windows.ToolTip;
+            if (tt == null)
+                return;
+            Autodesk.Windows.RibbonToolTip rtt = tt.Content as Autodesk.Windows.RibbonToolTip;
+            if (rtt == null)
+                _currentTooltip = tt.HelpTopic;
+            else
+                _currentTooltip = rtt.HelpTopic;
+        }
+
+        private static void ComponentManager_ToolTipClosed(object sender, EventArgs e)
+        {
+            _currentTooltip = null;
+        }
+
+        #endregion
+
         internal class WebClientWithTimeout : WebClient
         {
             protected override WebRequest GetWebRequest(Uri uri)
@@ -334,245 +399,6 @@ namespace ModPlus
                 w.Timeout = 3000;
                 return w;
             }
-        }
-    }
-
-    /// <summary>Вспомогательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
-    public static class XDataHelpersForProducts
-    {
-        private const string AppName = "ModPlusProduct";
-
-        public static bool IsModPlusProduct(this Entity ent)
-        {
-            using (var rb = ent.GetXDataForApplication(AppName))
-            {
-                return rb != null;
-            }
-        }
-        public static void SaveDataToEntity(object product, DBObject ent, Transaction tr)
-        {
-            var regTable = (RegAppTable)tr.GetObject(ent.Database.RegAppTableId, OpenMode.ForWrite);
-            if (!regTable.Has(AppName))
-            {
-                var app = new RegAppTableRecord
-                {
-                    Name = AppName
-                };
-                regTable.Add(app);
-                tr.AddNewlyCreatedDBObject(app, true);
-            }
-
-            using (var resBuf = SaveToResBuf(product))
-            {
-                ent.XData = resBuf;
-            }
-        }
-        public static object NewFromEntity(Entity ent)
-        {
-            using (var resBuf = ent.GetXDataForApplication(AppName))
-            {
-                return resBuf == null 
-                    ? null 
-                    : NewFromResBuf(resBuf);
-            }
-        }
-        private static object NewFromResBuf(ResultBuffer resBuf)
-        {
-            var bf = new BinaryFormatter { Binder = new MyBinder() };
-
-            var ms = MyUtil.ResBufToStream(resBuf);
-
-            var mbc = bf.Deserialize(ms);
-
-            return mbc;
-        }
-        private static ResultBuffer SaveToResBuf(object product)
-        {
-            var bf = new BinaryFormatter();
-            var ms = new MemoryStream();
-            bf.Serialize(ms, product);
-            ms.Position = 0;
-
-            var resBuf = MyUtil.StreamToResBuf(ms, AppName);
-
-            return resBuf;
-        }
-        sealed class MyBinder : SerializationBinder
-        {
-            public override Type BindToType(
-              string assemblyName,
-              string typeName)
-            {
-                return Type.GetType($"{typeName}, {assemblyName}");
-            }
-        }
-        class MyUtil
-        {
-            const int KMaxChunkSize = 127;
-
-            public static ResultBuffer StreamToResBuf(
-              Stream ms, string appName)
-            {
-                var resBuf = new ResultBuffer(
-                    new TypedValue(
-                        (int)DxfCode.ExtendedDataRegAppName, appName));
-                for (var i = 0; i < ms.Length; i += KMaxChunkSize)
-                {
-                    var length = (int)Math.Min(ms.Length - i, KMaxChunkSize);
-                    var datachunk = new byte[length];
-                    ms.Read(datachunk, 0, length);
-                    resBuf.Add(
-                      new TypedValue(
-                        (int)DxfCode.ExtendedDataBinaryChunk, datachunk));
-                }
-
-                return resBuf;
-            }
-
-            public static MemoryStream ResBufToStream(ResultBuffer resBuf)
-            {
-                var ms = new MemoryStream();
-                var values = resBuf.AsArray();
-
-                // Start from 1 to skip application name
-
-                for (var i = 1; i < values.Length; i++)
-                {
-                    var datachunk = (byte[])values[i].Value;
-                    ms.Write(datachunk, 0, datachunk.Length);
-                }
-                ms.Position = 0;
-
-                return ms;
-            }
-        }
-    }
-
-    /// <summary>Методы создания и работы с палитрой ModPlus</summary>
-    public static class MpPalette
-    {
-        private const string LangItem = "AutocadDlls";
-        public static PaletteSet MpPaletteSet;
-        [CommandMethod("mpPalette")]
-        public static void CreatePalette()
-        {
-            try
-            {
-                if (MpPaletteSet == null)
-                {
-                    MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
-                    MpPaletteSet.Load += _mpPaletteSet_Load;
-                    MpPaletteSet.Save += _mpPaletteSet_Save;
-                    AddRemovePaletts();
-                    MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
-                    MpPaletteSet.Style =
-                        PaletteSetStyles.ShowPropertiesMenu |
-                        PaletteSetStyles.ShowAutoHideButton |
-                        PaletteSetStyles.ShowCloseButton;
-                    MpPaletteSet.MinimumSize = new Size(100, 300);
-                    MpPaletteSet.DockEnabled = DockSides.Left | DockSides.Right;
-                    MpPaletteSet.RecalculateDockSiteLayout();
-                    MpPaletteSet.Visible = true;
-                }
-                else
-                {
-                    MpPaletteSet.Visible = true;
-                }
-            }
-            catch (System.Exception exception) { ExceptionBox.Show(exception); }
-        }
-
-        private static void AddRemovePaletts()
-        {
-            if (MpPaletteSet == null) return;
-            try
-            {
-                var funName = Language.GetItem(LangItem, "h19");
-                var drwName = Language.GetItem(LangItem, "h20");
-                // functions
-                if (ModPlusAPI.Variables.FunctionsInPalette)
-                {
-                    var hasP = false;
-                    foreach (Palette p in MpPaletteSet)
-                    {
-                        if (p.Name.Equals(funName)) hasP = true;
-                    }
-                    if (!hasP)
-                    {
-                        var palette = new mpPaletteFunctions();
-                        var host = new ElementHost
-                        {
-                            AutoSize = true,
-                            Dock = System.Windows.Forms.DockStyle.Fill,
-                            Child = palette
-                        };
-                        MpPaletteSet.Add(funName, host);
-                    }
-                }
-                else
-                {
-                    for (var i = 0; i < MpPaletteSet.Count; i++)
-                    {
-                        if (MpPaletteSet[i].Name.Equals(funName))
-                        {
-                            MpPaletteSet.Remove(i);
-                            break;
-                        }
-                    }
-                }
-                // drawings
-                if (ModPlusAPI.Variables.DrawingsInPalette)
-                {
-                    var hasP = false;
-                    foreach (Palette p in MpPaletteSet)
-                    {
-                        if (p.Name.Equals(drwName)) hasP = true;
-                    }
-                    if (!hasP)
-                    {
-                        var palette = new mpPaletteDrawings();
-                        var host = new ElementHost
-                        {
-                            AutoSize = true,
-                            Dock = System.Windows.Forms.DockStyle.Fill,
-                            Child = palette
-                        };
-                        MpPaletteSet.Add(drwName, host);
-                    }
-                }
-                else
-                {
-                    for (var i = 0; i < MpPaletteSet.Count; i++)
-                    {
-                        if (MpPaletteSet[i].Name.Equals(drwName))
-                        {
-                            MpPaletteSet.Remove(i);
-                            break;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // ignore
-            }
-        }
-
-        private static void _mpPaletteSet_Save(object sender, PalettePersistEventArgs e)
-        {
-            // ReSharper disable once UnusedVariable
-            var a = (double)e.ConfigurationSection.ReadProperty("ModPlusPalette", 22.3);
-        }
-
-        private static void _mpPaletteSet_Load(object sender, PalettePersistEventArgs e)
-        {
-            e.ConfigurationSection.WriteProperty("ModPlusPalette", 32.3);
-        }
-
-        private static Icon GetEmbeddedIcon(string sName)
-        {
-            // ReSharper disable once AssignNullToNotNullAttribute
-            return new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(sName));
         }
     }
 }

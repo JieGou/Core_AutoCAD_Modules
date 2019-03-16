@@ -198,7 +198,7 @@ namespace ModPlus
 #if ac2010
         [DllImport("acad.exe", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
-#elif ac2013
+#else
         [DllImport("accore.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
 #endif
