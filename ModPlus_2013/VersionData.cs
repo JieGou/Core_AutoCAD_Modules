@@ -24,6 +24,9 @@
 #elif A2019
         public const string CurCadVers = "2019";
         public const string CurCadInternalVersion = "23.0";
+#elif A2020
+        public const string CurCadVers = "2020";
+        public const string CurCadInternalVersion = "23.1";
 #endif
     }
 }
