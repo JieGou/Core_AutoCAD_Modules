@@ -55,6 +55,10 @@
       <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ModPlusService.Dto">
+      <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusService.Dto.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ModPlusStyle, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusStyle.dll</HintPath>
@@ -86,6 +90,9 @@
     </Compile>
     <Compile Include="..\ModPlus_2013\App\RibbonBuilder.cs">
       <Link>App\RibbonBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\ModPlus_2013\App\UserInfoCommand.cs">
+      <Link>App\UserInfoCommand.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2013\helpers\AutocadHelpers.cs">
       <Link>Helpers\AutocadHelpers.cs</Link>
@@ -258,6 +265,14 @@
     </Resource>
     <Resource Include="..\ModPlus_2013\Resources\paletteOpenDrawing_16x16.png">
       <Link>Resources\paletteOpenDrawing_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\UserInfo_32x32.png">
+      <Link>Resources\UserInfo_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\UserInfo_32x32_dark.png">
+      <Link>Resources\UserInfo_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

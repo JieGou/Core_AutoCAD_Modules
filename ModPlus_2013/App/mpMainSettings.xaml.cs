@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Media;
     using Autodesk.AutoCAD.Runtime;
     using MinFuncWins;
     using ModPlusAPI;
@@ -16,6 +15,9 @@
     using ModPlusStyle.Controls.Dialogs;
     using Utils = Autodesk.AutoCAD.Internal.Utils;
 
+    /// <summary>
+    /// Окно настроек ModPlus
+    /// </summary>
     partial class MpMainSettings
     {
         private string _curTheme = string.Empty;
@@ -24,7 +26,7 @@
         private bool _curDrawingsOnMenu;
         private bool _curRibbon;
         private bool _curDrawingsAlone;
-        private int _curFloatMenuCollapseTo = 0;
+        private int _curFloatMenuCollapseTo;
         private int _curDrawingsCollapseTo = 1;
         private const string LangItem = "AutocadDlls";
 
@@ -34,10 +36,8 @@
             Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
             SetLanguageValues();
             FillThemesAndColors();
-            SetAppRegistryKeyForCurrentUser();
             LoadSettingsFromConfigFileAndRegistry();
             GetDataByVars();
-            Closing += MpMainSettings_Closing;
             Closed += MpMainSettings_OnClosed;
 
             // license server
@@ -87,33 +87,6 @@
             MiTheme.SelectedItem = pluginStyle;
         }
         
-        // Заполнение поля Ключ продукта
-        private void SetAppRegistryKeyForCurrentUser()
-        {
-            // Ключ берем из глобальных настроек
-            var key = ModPlusAPI.Variables.RegistryKey;
-            if (string.IsNullOrEmpty(key))
-            {
-                TbAboutRegKey.Visibility = Visibility.Collapsed;
-                TbRegistryKey.Text = string.Empty;
-            }
-            else
-            {
-                TbRegistryKey.Text = key;
-                var regVariant = Regestry.GetValue("RegestryVariant");
-                if (!string.IsNullOrEmpty(regVariant))
-                {
-                    TbAboutRegKey.Visibility = Visibility.Visible;
-                    if (regVariant.Equals("0"))
-                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h10") + " " +
-                                             Regestry.GetValue("HDmodel");
-                    else if (regVariant.Equals("1"))
-                        TbAboutRegKey.Text = ModPlusAPI.Language.GetItem(LangItem, "h11") + " " +
-                                             Regestry.GetValue("gName");
-                }
-            }
-        }
-
         /// <summary>Загрузка данных из файла конфигурации которые требуется отобразить в окне</summary>
         private void LoadSettingsFromConfigFileAndRegistry()
         {
@@ -160,8 +133,6 @@
                 ChkMpPaletteDrawings.Visibility = ChkMpPaletteFunctions.Visibility = _curPalette ? Visibility.Visible : Visibility.Collapsed;
                 // Тихая загрузка
                 ChkQuietLoading.IsChecked = ModPlusAPI.Variables.QuietLoading;
-                // email
-                TbEmailAddress.Text = ModPlusAPI.Variables.UserEmail;
             }
             catch (System.Exception exception)
             {
@@ -182,31 +153,12 @@
             Regestry.SetValue("PluginStyle", theme.Name);
             ModPlusStyle.ThemeManager.ChangeTheme(this, theme);
         }
-
-        private void MpMainSettings_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(TbEmailAddress.Text))
-            {
-                if (IsValidEmail(TbEmailAddress.Text))
-                    TbEmailAddress.BorderBrush = FindResource("BlackBrush") as Brush;
-                else
-                {
-                    TbEmailAddress.BorderBrush = Brushes.Red;
-                    ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "tt4"));
-                    TbEmailAddress.Focus();
-                    e.Cancel = true;
-                }
-            }
-        }
-
+        
         [SuppressMessage("ReSharper", "PossibleInvalidOperationException")]
         private void MpMainSettings_OnClosed(object sender, EventArgs e)
         {
             try
             {
-                // Сохраняем в реестр почту, если изменилась
-                ModPlusAPI.Variables.UserEmail = TbEmailAddress.Text;
-
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
@@ -403,38 +355,16 @@
             MiniFunctions.MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
         #endregion
-
-        private void TbEmailAddress_OnLostFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox tb)
-            {
-                if (IsValidEmail(tb.Text))
-                    tb.BorderBrush = FindResource("BlackBrush") as Brush;
-                else tb.BorderBrush = Brushes.Red;
-            }
-        }
-
-        private static bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
+        
         private async void BtCheckLocalLicenseServerConnection_OnClick(object sender, RoutedEventArgs e)
         {
+            // ReSharper disable once AsyncConverter.AsyncAwaitMayBeElidedHighlighting
             await this.ShowMessageAsync(
                 ClientStarter.IsLicenseServerAvailable()
                     ? ModPlusAPI.Language.GetItem("ModPlusAPI", "h21")
                     : ModPlusAPI.Language.GetItem("ModPlusAPI", "h20"),
                 ModPlusAPI.Language.GetItem("ModPlusAPI", "h22") + " " +
-                TbLocalLicenseServerIpAddress.Text + ":" + TbLocalLicenseServerPort.Value);
+                TbLocalLicenseServerIpAddress.Text + ":" + TbLocalLicenseServerPort.Value).ConfigureAwait(true);
         }
 
         private bool _restartClientOnClose = true;
@@ -460,8 +390,14 @@
         }
     }
 
+    /// <summary>
+    /// Команда запуска окна настроек
+    /// </summary>
     public class MpMainSettingsFunction
     {
+        /// <summary>
+        /// Запуск окна настроек
+        /// </summary>
         [CommandMethod("ModPlus", "mpSettings", CommandFlags.Modal)]
         public void Main()
         {

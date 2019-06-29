@@ -16,9 +16,11 @@ using ModPlusAPI.Windows;
 namespace ModPlus
 {
     using System.Net;
+    using System.Threading.Tasks;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using ModPlusAPI.LicenseServer;
+    using ModPlusAPI.UserInfo;
 
     public class ModPlus : IExtensionApplication
     {
@@ -93,11 +95,14 @@ namespace ModPlus
                     MpProductIconFunctions.ShowIcon();
 
                 var disableConnectionWithLicenseServer =
-                    bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, 
+                    bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
                         "DisableConnectionWithLicenseServerInAutoCAD"), out b) && b; // false
                 // start license server client
-                if(!disableConnectionWithLicenseServer)
+                if (!disableConnectionWithLicenseServer)
                     ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+
+                // user info
+                AuthorizationOnStartup();
 
                 // tooltip hook
                 AcApp.PreTranslateMessage += AutoCadMessageHandler;
@@ -331,6 +336,19 @@ namespace ModPlus
             }
         }
 
+        private async void AuthorizationOnStartup()
+        {
+            await UserInfoService.GetUserInfoAsync().ConfigureAwait(false);
+            var userInfo = UserInfoService.GetUserInfoResponseFromHash();
+            if (userInfo != null)
+            {
+                if (!userInfo.IsLocalData && !await ModPlusAPI.Web.Connection.HasAllConnectionAsync().ConfigureAwait(false))
+                {
+                    ModPlusAPI.Variables.UserInfoHash = string.Empty;
+                }
+            }
+        }
+        
         #region ToolTip Hook
 
         public enum WndMsg
@@ -349,7 +367,7 @@ namespace ModPlus
             if (e.Message.message == (int)WndMsg.WM_KEYDOWN)
             {
                 if ((int)e.Message.wParam == (int)WndKey.VK_F1)
-                { 
+                {
                     // F1 pressed
                     if (_currentTooltip != null && _currentTooltip.Length > 8 && _currentTooltip.StartsWith("https://modplus.org/"))
                     {

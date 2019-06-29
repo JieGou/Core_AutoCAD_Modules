@@ -31,8 +31,8 @@
         private static bool IsLoaded()
         {
             var loaded = false;
-            var ribCntrl = ComponentManager.Ribbon;
-            foreach (var tab in ribCntrl.Tabs)
+            var ribbonControl = ComponentManager.Ribbon;
+            foreach (var tab in ribbonControl.Tabs)
             {
                 if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
                 {
@@ -44,8 +44,8 @@
         }
         private static bool IsActive()
         {
-            var ribCntrl = ComponentManager.Ribbon;
-            foreach (var tab in ribCntrl.Tabs)
+            var ribbonControl = ComponentManager.Ribbon;
+            foreach (var tab in ribbonControl.Tabs)
             {
                 if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
                     return tab.IsActive;
@@ -483,6 +483,19 @@
 
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
+                    "mpUserInfo",
+                    Language.GetItem(LangItem, "h56"),
+                    _colorTheme == 1
+                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/UserInfo_32x32.png"
+                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/UserInfo_32x32_dark.png",
+                    Language.GetItem(LangItem, "h56"),
+                    Orientation.Vertical,
+                    string.Empty,
+                    string.Empty
+                    ));
+
+            ribRowPanel.Items.Add(
+                RibbonHelpers.AddBigButton(
                 "mpSettings",
                 Language.GetItem(LangItem, "h12"),
                 _colorTheme == 1
@@ -491,9 +504,10 @@
                 Language.GetItem(LangItem, "h41"),
                 Orientation.Vertical,
                 Language.GetItem(LangItem, "h42"),
-                ""
+                string.Empty
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
+
             // 
             ribRowPanel = new RibbonRowPanel();
             if (LoadFunctionsHelper.HasmpStampsFunction(_colorTheme, out var icon))
