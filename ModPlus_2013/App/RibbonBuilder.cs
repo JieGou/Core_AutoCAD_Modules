@@ -18,16 +18,17 @@
     {
         private const string LangItem = "AutocadDlls";
 
-        public static void BuildRibbon()
+        public static void BuildRibbon(bool setActive = false)
         {
             if (!IsLoaded())
             {
                 GetColorTheme();
-                CreateRibbon();
+                CreateRibbon(setActive);
                 AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                 AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
             }
         }
+
         private static bool IsLoaded()
         {
             var loaded = false;
@@ -42,6 +43,7 @@
             }
             return loaded;
         }
+
         private static bool IsActive()
         {
             var ribbonControl = ComponentManager.Ribbon;
@@ -52,6 +54,7 @@
             }
             return false;
         }
+
         public static void RemoveRibbon()
         {
             try
@@ -104,7 +107,7 @@
             }
         }
 
-        private static void CreateRibbon()
+        private static void CreateRibbon(bool setActive = false)
         {
             try
             {
@@ -118,7 +121,7 @@
                 AddHelpPanel(ribTab);
                 ////////////////////////
                 ribCntrl.UpdateLayout();
-                if(_wasActive)
+                if(_wasActive || setActive)
                     ribTab.IsActive = true;
             }
             catch (Exception exception)

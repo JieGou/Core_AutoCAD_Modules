@@ -6,6 +6,7 @@ namespace ModPlus
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -14,15 +15,23 @@ namespace ModPlus
     using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.Windows;
+    using MinFuncWins;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using MenuItem = Autodesk.AutoCAD.Windows.MenuItem;
     using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
     using Viewport = Autodesk.AutoCAD.DatabaseServices.Viewport;
 
+    /// <summary>
+    /// Мини-функции
+    /// </summary>
     public class MiniFunctions
     {
         private const string LangItem = "AutocadDlls";
 
+        /// <summary>
+        /// Включение/отключение всех контекстных меню мини-функций в зависимости от настроек
+        /// </summary>
         public static void LoadUnloadContextMenu()
         {
             // ent by block
@@ -30,16 +39,25 @@ namespace ModPlus
             if (entByBlockObjContMen)
                 MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
             else MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
+
+            // nested ent layer
+            var nestedEntLayerObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b;
+            if (nestedEntLayerObjContMen)
+                MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Attach();
+            else MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
+
             // Fast block
             var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
                 MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
             else MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
+
             // VP to MS
             var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
                 MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
             else MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
+
             // wipeout vertex edit
             /*
              * Так как не получается создать контекстное меню конкретно на класс Wipeout (возможно в поздних версиях устранили),
@@ -65,6 +83,30 @@ namespace ModPlus
                 {
                     document.ImpliedSelectionChanged -= WipeoutEditOCM_Document_ImpliedSelectionChanged;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Отключить все контекстные меню
+        /// </summary>
+        public static void UnloadAll()
+        {
+            MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
+            MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
+            MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
+            MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
+
+            // wipeout vertex edit
+            /*
+             * Так как не получается создать контекстное меню конкретно на класс Wipeout (возможно в поздних версиях устранили),
+             * то приходится делать через подписку на событие и создание меню у Entity
+             */
+            AcApp.DocumentManager.DocumentCreated -= WipeoutEditOCM_Documents_DocumentCreated;
+            AcApp.DocumentManager.DocumentActivated -= WipeoutEditOCM_Documents_DocumentActivated;
+
+            foreach (Document document in AcApp.DocumentManager)
+            {
+                document.ImpliedSelectionChanged -= WipeoutEditOCM_Document_ImpliedSelectionChanged;
             }
         }
 
@@ -116,6 +158,11 @@ namespace ModPlus
                 MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
 
+        #region Nested entities ByBlock
+
+        /// <summary>
+        /// Задать вхождения ПоБлоку
+        /// </summary>
         [CommandMethod("ModPlus", "mpEntByBlock", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public void EntriesByBlock()
         {
@@ -193,6 +240,96 @@ namespace ModPlus
                 tr.Commit();
             }
         }
+
+        #endregion
+
+        #region Nested entities Layer
+
+        [CommandMethod("ModPlus", "mpNestedEntLayer", CommandFlags.UsePickSet | CommandFlags.Redraw)]
+        public void EntriesLayer()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            try
+            {
+                var selectedObjects = ed.SelectImplied();
+                if (selectedObjects.Value == null)
+                {
+                    var pso = new PromptSelectionOptions
+                    {
+                        MessageForAdding = "\n" + Language.GetItem(LangItem, "msg2"),
+                        MessageForRemoval = "\n",
+                        AllowSubSelections = false,
+                        AllowDuplicates = false
+                    };
+                    var psr = ed.GetSelection(pso);
+                    if (psr.Status != PromptStatus.OK) return;
+                    selectedObjects = psr;
+                }
+                if (selectedObjects.Value.Count > 0)
+                {
+                    var selectLayerWin = new SelectLayer();
+                    if (selectLayerWin.ShowDialog() == true && selectLayerWin.LbLayers.SelectedIndex != -1)
+                    {
+                        var selectedLayer = (SelectLayer.SelLayer)selectLayerWin.LbLayers.SelectedItem;
+                        using (var tr = doc.TransactionManager.StartTransaction())
+                        {
+                            foreach (SelectedObject so in selectedObjects.Value)
+                            {
+                                var selEnt = tr.GetObject(so.ObjectId, OpenMode.ForRead);
+                                if (selEnt is BlockReference)
+                                {
+                                    ChangeLayer((selEnt as BlockReference).BlockTableRecord, selectedLayer.LayerId);
+                                }
+                            }
+
+                            tr.Commit();
+                        }
+
+                        ed.Regen();
+                    }
+                }
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
+
+        private static void ChangeLayer(ObjectId objectId, ObjectId layerId)
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+
+            using (var tr = doc.TransactionManager.StartTransaction())
+            {
+                var btr = (BlockTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
+
+                foreach (var entId in btr)
+                {
+                    var ent = tr.GetObject(entId, OpenMode.ForRead) as Entity;
+
+                    if (ent != null)
+                    {
+                        var br = ent as BlockReference;
+                        if (br != null)
+                        {
+                            // recursive
+                            ChangeProperties(br.BlockTableRecord);
+                        }
+                        else
+                        {
+                            ent.UpgradeOpen();
+                            ent.SetLayerId(layerId, true);
+                            ent.DowngradeOpen();
+                        }
+                    }
+                }
+                tr.Commit();
+            }
+        }
+
+        #endregion
+
 
         #region VP to MS
 #if ac2010
@@ -414,6 +551,9 @@ namespace ModPlus
 
         #region Edit wipeout
 
+        /// <summary>
+        /// Добавить вершину маскировке
+        /// </summary>
         [CommandMethod("ModPlus", "mpAddVertexToWipeout", CommandFlags.UsePickSet)]
         public void AddVertexToWipeout()
         {
@@ -448,6 +588,10 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
+
+        /// <summary>
+        /// Удалить вершину маскировки
+        /// </summary>
         [CommandMethod("ModPlus", "mpRemoveVertexFromWipeout", CommandFlags.UsePickSet)]
         public void RemoveVertexToWipeout()
         {
@@ -483,7 +627,7 @@ namespace ModPlus
             }
         }
 
-        public static void AddVertexToCurrentWipeout(ObjectId wipeoutId)
+        private static void AddVertexToCurrentWipeout(ObjectId wipeoutId)
         {
             Document doc = AcApp.DocumentManager.MdiActiveDocument;
             var loop = true;
@@ -523,7 +667,7 @@ namespace ModPlus
             }
         }
 
-        public static void RemoveVertexFromCurrentWipeout(ObjectId wipeoutId)
+        private static void RemoveVertexFromCurrentWipeout(ObjectId wipeoutId)
         {
             Document doc = AcApp.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
@@ -578,16 +722,16 @@ namespace ModPlus
         private class AddVertexJig : DrawJig
         {
             private Point3d _prevPoint;
-            private Point3d _currPoint;
+            private Point3d _currentPoint;
             private Point3d _startPoint;
-            private Polyline _pline;
+            private Polyline _pLine;
             private int _vertex;
 
-            public PromptResult StartJig(Polyline pline)
+            public PromptResult StartJig(Polyline pLine)
             {
-                _pline = pline;
-                _prevPoint = _pline.GetPoint3dAt(0);
-                _startPoint = _pline.GetPoint3dAt(0);
+                _pLine = pLine;
+                _prevPoint = _pLine.GetPoint3dAt(0);
+                _startPoint = _pLine.GetPoint3dAt(0);
 
                 return AcApp.DocumentManager.MdiActiveDocument.Editor.Drag(this);
             }
@@ -599,7 +743,7 @@ namespace ModPlus
 
             public Point2d PickedPoint()
             {
-                return new Point2d(_currPoint.X, _currPoint.Y);
+                return new Point2d(_currentPoint.X, _currentPoint.Y);
             }
 
             protected override SamplerStatus Sampler(JigPrompts prompts)
@@ -622,11 +766,11 @@ namespace ModPlus
 
                 if (ppr.Status == PromptStatus.OK)
                 {
-                    _currPoint = ppr.Value;
+                    _currentPoint = ppr.Value;
 
                     if (CursorHasMoved())
                     {
-                        _prevPoint = _currPoint;
+                        _prevPoint = _currentPoint;
                         return SamplerStatus.OK;
                     }
                     return SamplerStatus.NoChange;
@@ -639,10 +783,10 @@ namespace ModPlus
             {
                 var mods = System.Windows.Forms.Control.ModifierKeys;
                 var control = (mods & System.Windows.Forms.Keys.Control) > 0;
-                var pt = _pline.GetClosestPointTo(_currPoint, false);
-                var param = _pline.GetParameterAtPoint(pt);
+                var pt = _pLine.GetClosestPointTo(_currentPoint, false);
+                var param = _pLine.GetParameterAtPoint(pt);
                 _vertex = Convert.ToInt32(Math.Truncate(param));
-                var maxVx = _pline.NumberOfVertices - 1;
+                var maxVx = _pLine.NumberOfVertices - 1;
                 if (control)
                 {
                     if (_vertex < maxVx)
@@ -652,19 +796,19 @@ namespace ModPlus
                 if (_vertex != maxVx)
                 {
                     // Если вершина не последня
-                    var line1 = new Line(_pline.GetPoint3dAt(_vertex), _currPoint);
+                    var line1 = new Line(_pLine.GetPoint3dAt(_vertex), _currentPoint);
                     draw.Geometry.Draw(line1);
-                    var line2 = new Line(_pline.GetPoint3dAt(_vertex + 1), _currPoint);
+                    var line2 = new Line(_pLine.GetPoint3dAt(_vertex + 1), _currentPoint);
                     draw.Geometry.Draw(line2);
                 }
                 else
                 {
-                    var line1 = new Line(_pline.GetPoint3dAt(_vertex), _currPoint);
+                    var line1 = new Line(_pLine.GetPoint3dAt(_vertex), _currentPoint);
                     draw.Geometry.Draw(line1);
-                    if (_pline.Closed)
+                    if (_pLine.Closed)
                     {
                         // Если полилиния замкнута, то рисуем отрезок к первой вершине
-                        var line2 = new Line(_pline.GetPoint3dAt(0), _currPoint);
+                        var line2 = new Line(_pLine.GetPoint3dAt(0), _currentPoint);
                         draw.Geometry.Draw(line2);
                     }
                 }
@@ -673,7 +817,7 @@ namespace ModPlus
 
             private bool CursorHasMoved()
             {
-                return _currPoint.DistanceTo(_prevPoint) > Tolerance.Global.EqualPoint;
+                return _currentPoint.DistanceTo(_prevPoint) > Tolerance.Global.EqualPoint;
             }
         }
 
@@ -684,6 +828,7 @@ namespace ModPlus
             public static class EntByBlockObjectContextMenu
             {
                 public static ContextMenuExtension ContextMenu;
+
                 public static void Attach()
                 {
                     if (ContextMenu == null)
@@ -698,6 +843,7 @@ namespace ModPlus
                         Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
                     }
                 }
+
                 public static void Detach()
                 {
                     if (ContextMenu != null)
@@ -707,10 +853,47 @@ namespace ModPlus
                         ContextMenu = null;
                     }
                 }
+
                 public static void StartFunction(object o, EventArgs e)
                 {
                     AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
                         "_.mpEntByBlock ", false, false, false);
+                }
+            }
+
+            public static class NestedEntLayerObjectContextMenu
+            {
+                public static ContextMenuExtension ContextMenu;
+
+                public static void Attach()
+                {
+                    if (ContextMenu == null)
+                    {
+                        // For Entity
+                        ContextMenu = new ContextMenuExtension();
+                        var miEnt = new MenuItem(Language.GetItem(LangItem, "h59"));
+                        miEnt.Click += StartFunction;
+                        ContextMenu.MenuItems.Add(miEnt);
+
+                        var rxcEnt = RXObject.GetClass(typeof(BlockReference));
+                        Application.AddObjectContextMenuExtension(rxcEnt, ContextMenu);
+                    }
+                }
+
+                public static void Detach()
+                {
+                    if (ContextMenu != null)
+                    {
+                        var rxcEnt = RXObject.GetClass(typeof(BlockReference));
+                        Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
+                        ContextMenu = null;
+                    }
+                }
+
+                public static void StartFunction(object o, EventArgs e)
+                {
+                    AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        "_.mpNestedEntLayer ", false, false, false);
                 }
             }
 
@@ -738,8 +921,7 @@ namespace ModPlus
                                         mi.Click += Mi_Click;
                                         ContextMenu.MenuItems.Add(mi);
                                     }
-                                    Application.AddDefaultContextMenuExtension(
-                                        ContextMenu);
+                                    Application.AddDefaultContextMenuExtension(ContextMenu);
                                 }
                             }
                         }
@@ -780,8 +962,7 @@ namespace ModPlus
                                             {
                                                 InsertBlock(
                                                     fbXml.Attribute("File").Value,
-                                                    fbXml.Attribute("BlockName").Value
-                                                    );
+                                                    fbXml.Attribute("BlockName").Value);
                                                 break;
                                             }
                                         }
@@ -799,6 +980,7 @@ namespace ModPlus
                         ExceptionBox.Show(exception);
                     }
                 }
+
                 private static void InsertBlock(string file, string blockName)
                 {
                     DocumentCollection dm = AcApp.DocumentManager;
@@ -848,7 +1030,7 @@ namespace ModPlus
 
                             tr.Commit();
                         }
-                    }// lock
+                    }
                 }
             }
 

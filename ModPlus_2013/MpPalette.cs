@@ -15,6 +15,7 @@
     {
         private const string LangItem = "AutocadDlls";
         public static PaletteSet MpPaletteSet;
+        
         [CommandMethod("mpPalette")]
         public static void CreatePalette()
         {
@@ -25,7 +26,7 @@
                     MpPaletteSet = new PaletteSet(Language.GetItem(LangItem, "h48"), "mpPalette", new Guid("A9C907EF-6281-4FA2-9B6C-E0401E41BB76"));
                     MpPaletteSet.Load += _mpPaletteSet_Load;
                     MpPaletteSet.Save += _mpPaletteSet_Save;
-                    AddRemovePaletts();
+                    AddRemovePalettes();
                     MpPaletteSet.Icon = GetEmbeddedIcon("ModPlus.Resources.mpIcon.ico");
                     MpPaletteSet.Style =
                         PaletteSetStyles.ShowPropertiesMenu |
@@ -44,7 +45,7 @@
             catch (System.Exception exception) { ExceptionBox.Show(exception); }
         }
 
-        private static void AddRemovePaletts()
+        private static void AddRemovePalettes()
         {
             if (MpPaletteSet == null) return;
             try

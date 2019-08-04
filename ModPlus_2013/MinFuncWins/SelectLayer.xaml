@@ -1,0 +1,35 @@
+﻿<mps:ModPlusWindow x:Class="ModPlus.MinFuncWins.SelectLayer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mps="https://modplus.org/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             SizeToContent="WidthAndHeight" Topmost="True"
+             MinWidth="250" MinHeight="200"
+             ResizeMode="CanResizeWithGrip">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/AutocadDlls"></XmlDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0" SelectionMode="Single" Name="LbLayers"
+                 SelectionChanged="LbLayers_OnSelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Grid.Row="1" Content="OK" Name="BtOk" IsEnabled="False"
+                Click="BtOk_OnClick"></Button>
+    </Grid>
+</mps:ModPlusWindow>

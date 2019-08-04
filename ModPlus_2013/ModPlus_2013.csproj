@@ -87,6 +87,7 @@
     <Compile Include="App\mpMainSettings.xaml.cs">
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="App\MpMainSettingsFunction.cs" />
     <Compile Include="App\MpProductsDrawableOverrule.cs" />
     <Compile Include="App\RibbonBuilder.cs" />
     <Compile Include="App\UserInfoCommand.cs" />
@@ -101,6 +102,9 @@
     </Compile>
     <Compile Include="MinFuncWins\FastBlocksSettings.xaml.cs">
       <DependentUpon>FastBlocksSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MinFuncWins\SelectLayer.xaml.cs">
+      <DependentUpon>SelectLayer.xaml</DependentUpon>
     </Compile>
     <Compile Include="MiniFunctions.cs" />
     <Compile Include="ModPlus.cs" />
@@ -137,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MinFuncWins\FastBlocksSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MinFuncWins\SelectLayer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -206,6 +214,13 @@
   <ItemGroup>
     <Resource Include="Resources\UserInfo_32x32.png" />
     <Resource Include="Resources\UserInfo_32x32_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Flags\be-BY.png" />
+    <Resource Include="Resources\Flags\de-DE.png" />
+    <Resource Include="Resources\Flags\en-US.png" />
+    <Resource Include="Resources\Flags\ru-RU.png" />
+    <Resource Include="Resources\Flags\uk-UA.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

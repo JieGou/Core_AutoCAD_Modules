@@ -1,12 +1,14 @@
 ﻿namespace ModPlus.App
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using Autodesk.AutoCAD.Runtime;
+    using System.Windows.Documents;
+    using System.Windows.Media.Imaging;
     using MinFuncWins;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -27,6 +29,7 @@
         private bool _curRibbon;
         private bool _curDrawingsAlone;
         private int _curFloatMenuCollapseTo;
+        private Language.LangItem _curLangItem;
         private int _curDrawingsCollapseTo = 1;
         private const string LangItem = "AutocadDlls";
 
@@ -34,6 +37,7 @@
         {
             InitializeComponent();
             Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
+            FillAndSetLanguages();
             SetLanguageValues();
             FillThemesAndColors();
             LoadSettingsFromConfigFileAndRegistry();
@@ -55,6 +59,14 @@
                 TbLocalLicenseServerIpAddress.IsEnabled = true;
                 TbLocalLicenseServerPort.IsEnabled = true;
             }
+        }
+
+        private void FillAndSetLanguages()
+        {
+            var languagesByFiles = ModPlusAPI.Language.GetLanguagesByFiles();
+            CbLanguages.ItemsSource = languagesByFiles;
+            CbLanguages.SelectedItem = languagesByFiles.FirstOrDefault(li => li.Name == ModPlusAPI.Language.CurrentLanguageName);
+            _curLangItem = (Language.LangItem)CbLanguages.SelectedItem;
         }
 
         private void SetLanguageValues()
@@ -86,7 +98,7 @@
             _curTheme = pluginStyle.Name;
             MiTheme.SelectedItem = pluginStyle;
         }
-        
+
         /// <summary>Загрузка данных из файла конфигурации которые требуется отобразить в окне</summary>
         private void LoadSettingsFromConfigFileAndRegistry()
         {
@@ -95,6 +107,7 @@
             CbSeparatorSettings.SelectedIndex = string.IsNullOrEmpty(separator) ? 0 : int.Parse(separator);
             // mini functions
             ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out var b) || b; //true
+            ChkNestedEntLayer.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b; //true
             ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
             ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
             ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; //true
@@ -110,31 +123,31 @@
             try
             {
                 // Адаптация
-                ChkMpFloatMenu.IsChecked = _curFloatMenu = ModPlusAPI.Variables.FloatMenu;
-                ChkMpPalette.IsChecked = _curPalette = ModPlusAPI.Variables.Palette;
+                ChkMpFloatMenu.IsChecked = _curFloatMenu = Variables.FloatMenu;
+                ChkMpPalette.IsChecked = _curPalette = Variables.Palette;
                 // palette by visibility
-                if (ModPlusAPI.Variables.Palette && !MpPalette.MpPaletteSet.Visible)
+                if (Variables.Palette && !MpPalette.MpPaletteSet.Visible)
                 {
                     ChkMpPalette.IsChecked = _curPalette = false;
-                    ModPlusAPI.Variables.Palette = false; //
+                    Variables.Palette = false; //
                 }
-                ChkMpPaletteFunctions.IsChecked = ModPlusAPI.Variables.FunctionsInPalette;
-                ChkMpPaletteDrawings.IsChecked = ModPlusAPI.Variables.DrawingsInPalette;
-                ChkMpRibbon.IsChecked = _curRibbon = ModPlusAPI.Variables.Ribbon;
-                ChkMpChkDrwsOnMnu.IsChecked = _curDrawingsOnMenu = ModPlusAPI.Variables.DrawingsInFloatMenu;
-                ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = ModPlusAPI.Variables.DrawingsFloatMenu;
+                ChkMpPaletteFunctions.IsChecked = Variables.FunctionsInPalette;
+                ChkMpPaletteDrawings.IsChecked = Variables.DrawingsInPalette;
+                ChkMpRibbon.IsChecked = _curRibbon = Variables.Ribbon;
+                ChkMpChkDrwsOnMnu.IsChecked = _curDrawingsOnMenu = Variables.DrawingsInFloatMenu;
+                ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = Variables.DrawingsFloatMenu;
                 // Выбор в выпадающих списках (сворачивать в)
-                CbFloatMenuCollapseTo.SelectedIndex = _curFloatMenuCollapseTo = ModPlusAPI.Variables.FloatMenuCollapseTo;
-                CbDrawingsCollapseTo.SelectedIndex = _curDrawingsCollapseTo = ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo;
+                CbFloatMenuCollapseTo.SelectedIndex = _curFloatMenuCollapseTo = Variables.FloatMenuCollapseTo;
+                CbDrawingsCollapseTo.SelectedIndex = _curDrawingsCollapseTo = Variables.DrawingsFloatMenuCollapseTo;
                 // Видимость в зависимости от галочек
                 ChkMpChkDrwsOnMnu.Visibility = CbFloatMenuCollapseTo.Visibility =
                         TbFloatMenuCollapseTo.Visibility = _curFloatMenu ? Visibility.Visible : Visibility.Collapsed;
                 CbDrawingsCollapseTo.Visibility = TbDrawingsCollapseTo.Visibility = _curDrawingsAlone ? Visibility.Visible : Visibility.Collapsed;
                 ChkMpPaletteDrawings.Visibility = ChkMpPaletteFunctions.Visibility = _curPalette ? Visibility.Visible : Visibility.Collapsed;
                 // Тихая загрузка
-                ChkQuietLoading.IsChecked = ModPlusAPI.Variables.QuietLoading;
+                ChkQuietLoading.IsChecked = Variables.QuietLoading;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 ExceptionBox.Show(exception);
             }
@@ -153,12 +166,14 @@
             Regestry.SetValue("PluginStyle", theme.Name);
             ModPlusStyle.ThemeManager.ChangeTheme(this, theme);
         }
-        
+
         [SuppressMessage("ReSharper", "PossibleInvalidOperationException")]
         private void MpMainSettings_OnClosed(object sender, EventArgs e)
         {
             try
             {
+                var isDifferentLanguage = IsDifferentLanguage();
+
                 // Если отключили плавающее меню
                 if (!ChkMpFloatMenu.IsChecked.Value)
                 {
@@ -172,16 +187,13 @@
                     if (MpMenuFunction.MpMainMenuWin != null)
                     {
                         // Перегружаем плавающее меню, если изменилась тема, вкл/выкл открытые чертежи, сворачивать в
-                        if (!string.IsNullOrEmpty(_curTheme) &
-                            !string.IsNullOrEmpty(_curFloatMenuCollapseTo.ToString()))
+                        if (!Regestry.GetValue("PluginStyle").Equals(_curTheme) ||
+                            !Regestry.GetValue("FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) ||
+                            !ChkMpChkDrwsOnMnu.IsChecked.Value.Equals(_curDrawingsOnMenu) ||
+                            isDifferentLanguage)
                         {
-                            if (!Regestry.GetValue("PluginStyle").Equals(_curTheme) |
-                                !Regestry.GetValue("FloatMenuCollapseTo").Equals(_curFloatMenuCollapseTo.ToString()) |
-                                !ChkMpChkDrwsOnMnu.IsChecked.Value.Equals(_curDrawingsOnMenu))
-                            {
-                                MpMenuFunction.MpMainMenuWin.Close();
-                                MpMenuFunction.LoadMainMenu();
-                            }
+                            MpMenuFunction.MpMainMenuWin.Close();
+                            MpMenuFunction.LoadMainMenu();
                         }
                     }
                     else MpMenuFunction.LoadMainMenu();
@@ -209,29 +221,39 @@
                     if (MpDrawingsFunction.MpDrawingsWin != null)
                     {
                         // Перегружаем плавающее меню, если изменилась тема, вкл/выкл открытые чертежи, границы, сворачивать в
-                        if (!string.IsNullOrEmpty(_curTheme) &
-                            !string.IsNullOrEmpty(_curDrawingsCollapseTo.ToString()))
+                        if (!Regestry.GetValue("PluginStyle").Equals(_curTheme) ||
+                            !Regestry.GetValue("DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) ||
+                            !ChkMpDrawingsAlone.IsChecked.Value.Equals(_curDrawingsAlone) ||
+                            isDifferentLanguage)
                         {
-                            if (!Regestry.GetValue("PluginStyle").Equals(_curTheme) |
-                                !Regestry.GetValue("DrawingsCollapseTo").Equals(_curDrawingsCollapseTo.ToString()) |
-                                !ChkMpDrawingsAlone.IsChecked.Value.Equals(_curDrawingsAlone))
-                            {
-                                MpDrawingsFunction.MpDrawingsWin.Close();
-                                MpDrawingsFunction.LoadMainMenu();
-                            }
+                            MpDrawingsFunction.MpDrawingsWin.Close();
+                            MpDrawingsFunction.LoadMainMenu();
                         }
                     }
                     else MpDrawingsFunction.LoadMainMenu();
                 }
 
                 // Ribbon
-                if(ChkMpRibbon.IsChecked.Value && !_curRibbon)
+                // Если включили и была выключена
+                if (ChkMpRibbon.IsChecked.Value && !_curRibbon)
                     RibbonBuilder.BuildRibbon();
 
-                if(!ChkMpRibbon.IsChecked.Value && _curRibbon)
+                // Если включили и была включена, но сменился язык
+                if (ChkMpRibbon.IsChecked.Value && _curRibbon && isDifferentLanguage)
+                {
+                    RibbonBuilder.RemoveRibbon();
+                    RibbonBuilder.BuildRibbon(true);
+                }
+
+                // Если выключили и была включена
+                if (!ChkMpRibbon.IsChecked.Value && _curRibbon)
                     RibbonBuilder.RemoveRibbon();
 
-                // context menues
+                // context menu
+                // если сменился язык, то все выгружаю
+                if (isDifferentLanguage)
+                    MiniFunctions.UnloadAll();
+
                 MiniFunctions.LoadUnloadContextMenu();
 
                 // License server
@@ -250,12 +272,21 @@
                 // перевод фокуса на автокад
                 Utils.SetFocusToDwgView();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 ExceptionBox.Show(ex);
             }
 
         }
+
+        private bool IsDifferentLanguage()
+        {
+            if (((Language.LangItem)CbLanguages.SelectedItem).Name != _curLangItem.Name)
+                return true;
+
+            return false;
+        }
+
         /// <summary> Сохранение в файл конфигурации значений вкл/выкл для меню
         ///  Имена должны начинаться с ChkMp!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</summary>
         private void Menues_OnChecked_Unchecked(object sender, RoutedEventArgs e)
@@ -283,7 +314,7 @@
         // Тихая загрузка
         private void ChkQuietLoading_OnChecked_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            ModPlusAPI.Variables.QuietLoading = ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value;
+            Variables.QuietLoading = ChkQuietLoading.IsChecked != null && ChkQuietLoading.IsChecked.Value;
         }
 
         // Сворачивать в - для плавающего меню
@@ -291,7 +322,7 @@
         {
             if (sender is ComboBox cb)
             {
-                ModPlusAPI.Variables.FloatMenuCollapseTo = cb.SelectedIndex;
+                Variables.FloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
 
@@ -299,7 +330,7 @@
         {
             if (sender is ComboBox cb)
             {
-                ModPlusAPI.Variables.DrawingsFloatMenuCollapseTo = cb.SelectedIndex;
+                Variables.DrawingsFloatMenuCollapseTo = cb.SelectedIndex;
             }
         }
 
@@ -316,6 +347,18 @@
                 else MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
             }
         }
+
+        private void ChkNestedEntLayer_OnChecked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chk)
+            {
+                UserConfigFile.SetValue("NestedEntLayerOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
+                if (chk.IsChecked != null && chk.IsChecked.Value)
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Attach();
+                else MiniFunctions.MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
+            }
+        }
+
         // Частоиспользуемые блоки
         private void ChkFastBlocks_OnChecked(object sender, RoutedEventArgs e)
         {
@@ -355,7 +398,7 @@
             MiniFunctions.MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
         #endregion
-        
+
         private async void BtCheckLocalLicenseServerConnection_OnClick(object sender, RoutedEventArgs e)
         {
             // ReSharper disable once AsyncConverter.AsyncAwaitMayBeElidedHighlighting
@@ -388,27 +431,42 @@
             TbLocalLicenseServerPort.IsEnabled = false;
             _restartClientOnClose = true;
         }
-    }
 
-    /// <summary>
-    /// Команда запуска окна настроек
-    /// </summary>
-    public class MpMainSettingsFunction
-    {
-        /// <summary>
-        /// Запуск окна настроек
-        /// </summary>
-        [CommandMethod("ModPlus", "mpSettings", CommandFlags.Modal)]
-        public void Main()
+        private void MiniFunctionsHelpHyperlink_OnClick(object sender, RoutedEventArgs e)
         {
-            try
+            if (sender is Hyperlink hyperlink)
             {
-                var win = new MpMainSettings();
-                win.ShowDialog();
+                var s = ModPlusAPI.Language.RusWebLanguages.Contains(ModPlusAPI.Language.CurrentLanguageName) ? "ru" : "en";
+                Process.Start($"https://modplus.org/{s}/help/mini-functions/{hyperlink.NavigateUri}");
             }
-            catch (System.Exception exception)
+        }
+
+        private void CbLanguages_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // fill image
+            if (e.AddedItems[0] is Language.LangItem li)
             {
-                ExceptionBox.Show(exception);
+                ModPlusAPI.Language.SetCurrentLanguage(li.Name);
+                this.SetLanguageProviderForModPlusWindow();
+                SetLanguageValues();
+                if (TbMessageAboutLanguage != null && _curLangItem != null)
+                {
+                    TbMessageAboutLanguage.Visibility = li.Name == _curLangItem.Name
+                          ? Visibility.Collapsed
+                          : Visibility.Visible;
+                }
+                try
+                {
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.UriSource = new Uri($"pack://application:,,,/ModPlus_{MpVersionData.CurCadVers};component/Resources/Flags/{li.Name}.png");
+                    bi.EndInit();
+                    LanguageImage.Source = bi;
+                }
+                catch
+                {
+                    LanguageImage.Source = null;
+                }
             }
         }
     }
