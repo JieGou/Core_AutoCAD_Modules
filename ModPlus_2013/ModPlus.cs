@@ -167,31 +167,24 @@ namespace ModPlus
         {
             try
             {
-                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus");
-                using (key)
+                var directory = Path.Combine(Constants.CurrentDirectory, "Data");
+                if (Directory.Exists(directory))
                 {
-                    if (key != null)
+                    foreach (var baseFile in BaseFiles)
                     {
-                        var directory = Path.Combine(key.GetValue("TopDir").ToString(), "Data");
-                        if (Directory.Exists(directory))
+                        var file = Path.Combine(directory, baseFile);
+                        if (File.Exists(file))
                         {
-                            foreach (var baseFile in BaseFiles)
-                            {
-                                var file = Path.Combine(directory, baseFile);
-                                if (File.Exists(file))
-                                {
-                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
-                                    Assembly.LoadFrom(file);
-                                }
-                                else
-                                    if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
-                            }
+                            if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
+                            Assembly.LoadFrom(file);
                         }
                         else
-                        {
-                            if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
-                        }
+                            if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
                     }
+                }
+                else
+                {
+                    if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
                 }
             }
             catch (System.Exception exception)
@@ -348,7 +341,7 @@ namespace ModPlus
                 }
             }
         }
-        
+
         #region ToolTip Hook
 
         public enum WndMsg

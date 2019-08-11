@@ -107,7 +107,7 @@ namespace ModPlus.Helpers
         {
             string iconUri = string.Empty;
             string iconName = funcName + "_16x16_dark.png";
-            if(ResourceExists(funcAssembly, iconName))
+            if (ResourceExists(funcAssembly, iconName))
                 iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
             return iconUri;
         }
@@ -165,22 +165,18 @@ namespace ModPlus.Helpers
         public static string FindFile(string functionName)
         {
             var fileName = string.Empty;
-            var regKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus");
-            using (regKey)
+
+            var funcDir = Path.Combine(Constants.CurrentDirectory, "Functions", functionName);
+            if (Directory.Exists(funcDir))
             {
-                if (regKey != null)
+                foreach (var file in Directory.GetFiles(funcDir, "*.dll", SearchOption.TopDirectoryOnly))
                 {
-                    var funcDir = Path.Combine(regKey.GetValue("TopDir").ToString(), "Functions", functionName);
-                    if (Directory.Exists(funcDir))
-                        foreach (var file in Directory.GetFiles(funcDir, "*.dll", SearchOption.TopDirectoryOnly))
-                        {
-                            var fileInfo = new FileInfo(file);
-                            if (fileInfo.Name.Equals(functionName + "_" + MpVersionData.CurCadVers + ".dll"))
-                            {
-                                fileName = file;
-                                break;
-                            }
-                        }
+                    var fileInfo = new FileInfo(file);
+                    if (fileInfo.Name.Equals(functionName + "_" + MpVersionData.CurCadVers + ".dll"))
+                    {
+                        fileName = file;
+                        break;
+                    }
                 }
             }
             return fileName;
@@ -193,7 +189,7 @@ namespace ModPlus.Helpers
             {
                 if (LoadedFunctions.Any(x => x.Name.Equals("mpStamps")))
                 {
-                    if(colorTheme == 1)
+                    if (colorTheme == 1)
                         icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
                                ";component/Resources/mpStampFields_16x16.png";
                     else icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
