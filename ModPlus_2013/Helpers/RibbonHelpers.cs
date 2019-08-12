@@ -255,7 +255,8 @@ namespace ModPlus.Helpers
             string description, 
             Orientation orientation,
             string fullDescription,
-            string helpImage/*,string helpLink*/)
+            string helpImage,
+            string helpLink = null)
         {
             try
             {
@@ -266,18 +267,18 @@ namespace ModPlus.Helpers
                     Command = fName,
                     IsProgressive = true
                 };
-                //if (string.IsNullOrEmpty(helpLink))
+                if (string.IsNullOrEmpty(helpLink))
                 {
                     tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
                         ? $"https://modplus.org/ru/help/{fName.ToLower()}"
                         : $"https://modplus.org/en/help/{fName.ToLower()}";
                 }
-                //else
-                //{
-                //    tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                //        ? $"https://modplus.org/ru/{helpLink.ToLower()}"
-                //        : $"https://modplus.org/en/{helpLink.ToLower()}";
-                //}
+                else
+                {
+                    tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
+                        ? $"https://modplus.org/ru/{helpLink.ToLower()}"
+                        : $"https://modplus.org/en/{helpLink.ToLower()}";
+                }
                 if (!string.IsNullOrEmpty(fullDescription))
                     tt.ExpandedContent = fullDescription;
                 try

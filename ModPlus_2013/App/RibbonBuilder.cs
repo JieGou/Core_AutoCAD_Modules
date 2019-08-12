@@ -121,7 +121,7 @@
                 AddHelpPanel(ribTab);
                 ////////////////////////
                 ribCntrl.UpdateLayout();
-                if(_wasActive || setActive)
+                if (_wasActive || setActive)
                     ribTab.IsActive = true;
             }
             catch (Exception exception)
@@ -135,9 +135,10 @@
             try
             {
                 var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
-                
+
                 // Проходим по группам
                 if (confCuiXel != null)
+                {
                     foreach (var group in confCuiXel.Elements("Group"))
                     {
                         if (group.Attribute("GroupName") == null) continue;
@@ -202,7 +203,7 @@
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage
                                         );
-                                        
+
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
                                         // Затем добавляем подфункции
@@ -420,6 +421,7 @@
                         if (!hasFunctions)
                             ribTab.Panels.Remove(ribPanel);
                     }
+                }
             }
             catch (Exception exception) { ExceptionBox.Show(exception); }
         }
@@ -494,7 +496,8 @@
                     Language.GetItem(LangItem, "h56"),
                     Orientation.Vertical,
                     string.Empty,
-                    string.Empty
+                    string.Empty,
+                    "help/userinfo"
                     ));
 
             ribRowPanel.Items.Add(

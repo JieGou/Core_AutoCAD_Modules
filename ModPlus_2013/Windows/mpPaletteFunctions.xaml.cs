@@ -148,5 +148,11 @@
             if (AcApp.DocumentManager.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSHOWPRODUCTICONS ", false, false, false);
         }
+
+        private void BtUserInfo_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (AcApp.DocumentManager.Count > 0)
+                AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPUSERINFO ", false, false, false);
+        }
     }
 }

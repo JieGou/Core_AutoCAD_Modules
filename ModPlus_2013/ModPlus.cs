@@ -64,7 +64,7 @@ namespace ModPlus
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
 
                 // Принудительная загрузка сборок
-                LoadAssms(ed);
+                LoadAssemblies(ed);
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
                 LoadBaseAssemblies(ed);
                 if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p7"));
@@ -137,7 +137,7 @@ namespace ModPlus
 
         // Принудительная загрузка сборок
         // необходимых для работы
-        private static void LoadAssms(Editor ed)
+        private static void LoadAssemblies(Editor ed)
         {
             try
             {
