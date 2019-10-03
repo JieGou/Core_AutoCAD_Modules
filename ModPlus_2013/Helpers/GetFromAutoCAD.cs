@@ -136,6 +136,7 @@ namespace ModPlus.Helpers
         /// <param name="count">Количество примитивов</param>
         /// <param name="lens">Сумма длин для каждого примитива</param>
         /// <param name="objectIds">Список ObjectId выбранных примитивов</param>
+        [Obsolete]
         public static void GetLenFromEntities(
             out double sumLen,
             out List<string> entities,
