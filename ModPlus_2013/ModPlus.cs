@@ -300,14 +300,14 @@ namespace ModPlus
             }
         }
 
-        private static void CheckAdaptation()
+        private static async void CheckAdaptation()
         {
             var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
 
             // Проходим по группам
             if (confCuiXel == null || confCuiXel.IsEmpty)
             {
-                if (ModPlusAPI.Web.Connection.CheckForInternetConnection())
+                if (await ModPlusAPI.Web.Connection.HasAllConnectionAsync(3))
                 {
                     // Грузим файл
                     try
@@ -337,7 +337,7 @@ namespace ModPlus
                 var userInfo = UserInfoService.GetUserInfoResponseFromHash();
                 if (userInfo != null)
                 {
-                    if (!userInfo.IsLocalData && !await ModPlusAPI.Web.Connection.HasAllConnectionAsync().ConfigureAwait(false))
+                    if (!userInfo.IsLocalData && !await ModPlusAPI.Web.Connection.HasAllConnectionAsync(3).ConfigureAwait(false))
                     {
                         ModPlusAPI.Variables.UserInfoHash = string.Empty;
                     }
