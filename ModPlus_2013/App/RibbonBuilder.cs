@@ -510,7 +510,8 @@
                 Language.GetItem(LangItem, "h41"),
                 Orientation.Vertical,
                 Language.GetItem(LangItem, "h42"),
-                string.Empty
+                string.Empty,
+                "help/mpsettings"
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
 
