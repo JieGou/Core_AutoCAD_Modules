@@ -437,7 +437,7 @@
             if (sender is Hyperlink hyperlink)
             {
                 var s = ModPlusAPI.Language.RusWebLanguages.Contains(ModPlusAPI.Language.CurrentLanguageName) ? "ru" : "en";
-                Process.Start($"https://modplus.org/{s}/help/mini-functions/{hyperlink.NavigateUri}");
+                Process.Start($"https://modplus.org/{s}/help/mini-plugins/{hyperlink.NavigateUri}");
             }
         }
 
