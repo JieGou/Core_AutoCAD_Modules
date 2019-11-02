@@ -29,8 +29,8 @@ namespace ModPlus.Helpers
                     Command = fName,
                     IsProgressive = true,
                     HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                        ? $"https://modplus.org/ru/help/{fName.ToLower()}"
-                        : $"https://modplus.org/en/help/{fName.ToLower()}"
+                        ? $"https://modplus.org/ru/autocadplugins/{fName.ToLower()}"
+                        : $"https://modplus.org/en/autocadplugins/{fName.ToLower()}"
                 };
 
                 return GetSmallRibbonButton(fName, lName, img, fullDescription, helpImage, tt);
@@ -64,8 +64,8 @@ namespace ModPlus.Helpers
                 if (string.IsNullOrEmpty(helpLink))
                 {
                     tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                        ? $"https://modplus.org/ru/help/{fName.ToLower()}"
-                        : $"https://modplus.org/en/help/{fName.ToLower()}";
+                        ? $"https://modplus.org/ru/autocadplugins/{fName.ToLower()}"
+                        : $"https://modplus.org/en/autocadplugins/{fName.ToLower()}";
                 }
                 else
                 {
@@ -147,8 +147,8 @@ namespace ModPlus.Helpers
                     Command = fName,
                     IsProgressive = true,
                     HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                        ? $"https://modplus.org/ru/help/{fName.ToLower()}"
-                        : $"https://modplus.org/en/help/{fName.ToLower()}"
+                        ? $"https://modplus.org/ru/autocadplugins/{fName.ToLower()}"
+                        : $"https://modplus.org/en/autocadplugins/{fName.ToLower()}"
                 };
                 return GetBigButton(fName, lName, img, orientation, fullDescription, helpImage, tt);
             }
@@ -190,8 +190,8 @@ namespace ModPlus.Helpers
                 if (string.IsNullOrEmpty(helpLink))
                 {
                     tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                        ? $"https://modplus.org/ru/help/{fName.ToLower()}"
-                        : $"https://modplus.org/en/help/{fName.ToLower()}";
+                        ? $"https://modplus.org/ru/autocadplugins/{fName.ToLower()}"
+                        : $"https://modplus.org/en/autocadplugins/{fName.ToLower()}";
                 }
                 else
                 {
@@ -270,8 +270,8 @@ namespace ModPlus.Helpers
                 if (string.IsNullOrEmpty(helpLink))
                 {
                     tt.HelpTopic = Language.RusWebLanguages.Contains(Language.CurrentLanguageName)
-                        ? $"https://modplus.org/ru/help/{fName.ToLower()}"
-                        : $"https://modplus.org/en/help/{fName.ToLower()}";
+                        ? $"https://modplus.org/ru/autocadplugins/{fName.ToLower()}"
+                        : $"https://modplus.org/en/autocadplugins/{fName.ToLower()}";
                 }
                 else
                 {

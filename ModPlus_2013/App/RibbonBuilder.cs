@@ -525,7 +525,7 @@
                         icon,
                         Language.GetItem(LangItem, "h44"),
                         Language.GetItem(LangItem, "h45"),
-                        "", "help/mpstamps"
+                        "", "autocadplugins/mpstamps"
                         )
                     );
                 ribRowPanel.Items.Add(new RibbonRowBreak());
