@@ -1,20 +1,21 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
-    /// <summary>Методы получения различных данных из AutoCAD</summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+
+    /// <summary>
+    /// Методы получения различных данных из AutoCAD
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
     public static class GetFromAutoCAD
     {
-        private const string _langItem = "AutocadDlls";
+        private const string LangItem = "AutocadDlls";
 
         /// <summary>Получения расстояния между двумя указанными точками в виде double</summary>
         /// <param name="showError">Отображать окно ошибки (Exception) в случае возникновения</param>
@@ -26,7 +27,7 @@ namespace ModPlus.Helpers
                 using (AcApp.DocumentManager.MdiActiveDocument.LockDocument())
                 {
                     var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
-                    var pdo = new PromptDistanceOptions("\n" + Language.GetItem(_langItem, "msg10"));
+                    var pdo = new PromptDistanceOptions("\n" + Language.GetItem(LangItem, "msg10"));
                     var pdr = ed.GetDistance(pdo);
                     return pdr.Status != PromptStatus.OK ? double.NaN : pdr.Value;
                 }
@@ -39,6 +40,7 @@ namespace ModPlus.Helpers
             }
 
         }
+
         /// <summary>Получение суммы длин выбранных примитивов: отрезки, полилинии, дуги, сплайны, эллипсы</summary>
         /// <param name="sumLen">Сумма длин выбранных примитивов</param>
         public static void GetLenFromEntities(out double sumLen)
@@ -52,31 +54,35 @@ namespace ModPlus.Helpers
             try
             {
                 var selRes = ed.SelectImplied();
+
                 // Если сначала ничего не выбрано, просим выбрать:
                 if (selRes.Status == PromptStatus.Error)
                 {
                     var selOpts = new PromptSelectionOptions
                     {
-                        MessageForAdding = "\n" + Language.GetItem(_langItem, "msg1")
+                        MessageForAdding = "\n" + Language.GetItem(LangItem, "msg1")
                     };
                     TypedValue[] values =
                     {
-                        new TypedValue((int) DxfCode.Operator, "<OR"),
-                        new TypedValue((int) DxfCode.Start, "LINE"),
-                        new TypedValue((int) DxfCode.Start, "POLYLINE"),
-                        new TypedValue((int) DxfCode.Start, "LWPOLYLINE"),
-                        new TypedValue((int) DxfCode.Start, "CIRCLE"),
-                        new TypedValue((int) DxfCode.Start, "ARC"),
-                        new TypedValue((int) DxfCode.Start, "SPLINE"),
-                        new TypedValue((int) DxfCode.Start, "ELLIPSE"),
-                        new TypedValue((int) DxfCode.Operator, "OR>")
+                        new TypedValue((int)DxfCode.Operator, "<OR"),
+                        new TypedValue((int)DxfCode.Start, "LINE"),
+                        new TypedValue((int)DxfCode.Start, "POLYLINE"),
+                        new TypedValue((int)DxfCode.Start, "LWPOLYLINE"),
+                        new TypedValue((int)DxfCode.Start, "CIRCLE"),
+                        new TypedValue((int)DxfCode.Start, "ARC"),
+                        new TypedValue((int)DxfCode.Start, "SPLINE"),
+                        new TypedValue((int)DxfCode.Start, "ELLIPSE"),
+                        new TypedValue((int)DxfCode.Operator, "OR>")
                     };
-                    var sfilter = new SelectionFilter(values);
-                    selRes = ed.GetSelection(selOpts, sfilter);
+                    var selectionFilter = new SelectionFilter(values);
+                    selRes = ed.GetSelection(selOpts, selectionFilter);
                 }
-                else ed.SetImpliedSelection(new ObjectId[0]);
+                else
+                {
+                    ed.SetImpliedSelection(new ObjectId[0]);
+                }
 
-                if (selRes.Status == PromptStatus.OK)// Если выбраны объекты, тогда дальше
+                if (selRes.Status == PromptStatus.OK)
                 {
                     using (var tr = doc.TransactionManager.StartTransaction())
                     {
@@ -111,8 +117,10 @@ namespace ModPlus.Helpers
                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                 }
+
                                 ent.Dispose();
                             }
+
                             // Общая сумма длин
                             sumLen += lens.Sum();
                             tr.Commit();
@@ -130,6 +138,7 @@ namespace ModPlus.Helpers
                 ExceptionBox.Show(ex);
             }
         }
+
         /// <summary>Получение суммы длин выбранных примитивов: отрезки, полилинии, дуги, сплайны, эллипсы</summary>
         /// <param name="sumLen">Сумма длин всех примитивов</param>
         /// <param name="entities">Поддерживаемые примитивы</param>
@@ -146,11 +155,14 @@ namespace ModPlus.Helpers
         {
             // Поддерживаемые примитивы
             entities = new List<string> { "Line", "Circle", "Polyline", "Arc", "Spline", "Ellipse" };
+
             // Выбранное количество
             count = new List<int> { 0, 0, 0, 0, 0, 0 };
+
             // Сумма длин
             sumLen = 0.0;
             lens = new List<double> { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
             // Список ObjectId
             objectIds = new List<List<ObjectId>>
             {
@@ -167,32 +179,36 @@ namespace ModPlus.Helpers
             try
             {
                 var selRes = ed.SelectImplied();
+
                 // Если сначала ничего не выбрано, просим выбрать:
                 if (selRes.Status == PromptStatus.Error)
                 {
                     var selOpts = new PromptSelectionOptions
                     {
                         MessageForAdding =
-                            "\n" + Language.GetItem(_langItem, "msg1")
+                            "\n" + Language.GetItem(LangItem, "msg1")
                     };
                     TypedValue[] values =
                     {
-                        new TypedValue((int) DxfCode.Operator, "<OR"),
-                        new TypedValue((int) DxfCode.Start, "LINE"),
-                        new TypedValue((int) DxfCode.Start, "POLYLINE"),
-                        new TypedValue((int) DxfCode.Start, "LWPOLYLINE"),
-                        new TypedValue((int) DxfCode.Start, "CIRCLE"),
-                        new TypedValue((int) DxfCode.Start, "ARC"),
-                        new TypedValue((int) DxfCode.Start, "SPLINE"),
-                        new TypedValue((int) DxfCode.Start, "ELLIPSE"),
-                        new TypedValue((int) DxfCode.Operator, "OR>")
+                        new TypedValue((int)DxfCode.Operator, "<OR"),
+                        new TypedValue((int)DxfCode.Start, "LINE"),
+                        new TypedValue((int)DxfCode.Start, "POLYLINE"),
+                        new TypedValue((int)DxfCode.Start, "LWPOLYLINE"),
+                        new TypedValue((int)DxfCode.Start, "CIRCLE"),
+                        new TypedValue((int)DxfCode.Start, "ARC"),
+                        new TypedValue((int)DxfCode.Start, "SPLINE"),
+                        new TypedValue((int)DxfCode.Start, "ELLIPSE"),
+                        new TypedValue((int)DxfCode.Operator, "OR>")
                     };
-                    var sfilter = new SelectionFilter(values);
-                    selRes = ed.GetSelection(selOpts, sfilter);
+                    var selectionFilter = new SelectionFilter(values);
+                    selRes = ed.GetSelection(selOpts, selectionFilter);
                 }
-                else ed.SetImpliedSelection(new ObjectId[0]);
+                else
+                {
+                    ed.SetImpliedSelection(new ObjectId[0]);
+                }
 
-                if (selRes.Status == PromptStatus.OK)// Если выбраны объекты, тогда дальше
+                if (selRes.Status == PromptStatus.OK)
                 {
                     using (var tr = doc.TransactionManager.StartTransaction())
                     {
@@ -239,8 +255,10 @@ namespace ModPlus.Helpers
                                         ((Curve)ent).GetDistanceAtParameter(((Curve)ent).StartParam);
                                         break;
                                 }
+
                                 ent.Dispose();
                             }
+
                             // Общая сумма длин
                             sumLen += lens.Sum();
                             tr.Commit();

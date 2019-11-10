@@ -1,24 +1,19 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using ModPlus.Properties;
-using ModPlusAPI.Interfaces;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
-    using System.Windows.Input;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Resources;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
     using ModPlusAPI;
+    using ModPlusAPI.Interfaces;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     /* Функция из файла конфигурации читаю в том виде, в каком они там сохранены
      * А вот получение локализованных значений (имя, описание, полное описание)
@@ -31,18 +26,19 @@ namespace ModPlus.Helpers
         /// Список загруженных файлов в виде специального класса для последующего использования при построения ленты и меню
         /// </summary>
         public static List<LoadedFunction> LoadedFunctions = new List<LoadedFunction>();
+
         /// <summary>
         /// Чтение данных из интерфейса функции
         /// </summary>
         /// <param name="loadedFuncAssembly"></param>
-        public static void GetDataFromFunctionIntrface(Assembly loadedFuncAssembly)
+        public static void GetDataFromFunctionInterface(Assembly loadedFuncAssembly)
         {
             // Есть два интерфейса - старый и новый. Нужно учесть оба
             var types = GetLoadableTypes(loadedFuncAssembly);
             foreach (var type in types)
             {
-                var interf = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
-                if (interf != null)
+                var modplusInterface = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
+                if (modplusInterface != null)
                 {
                     if (Activator.CreateInstance(type) is IModPlusFunctionInterface function)
                     {
@@ -60,7 +56,7 @@ namespace ModPlus.Helpers
                                          ";component/Resources/" + function.Name +
                                          "_32x32.png",
                             BigDarkIconUrl = GetBigDarkIcon(loadedFuncAssembly, function.Name),
-                            AvailProductExternalVersion = MpVersionData.CurCadVers,
+                            AvailProductExternalVersion = VersionData.CurrentCadVersion,
                             FullDescription = function.FullDescription,
                             ToolTipHelpImage = !string.IsNullOrEmpty(function.ToolTipHelpImage)
                             ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName + ";component/Resources/Help/" + function.ToolTipHelpImage
@@ -75,6 +71,7 @@ namespace ModPlus.Helpers
                         };
 
                         if (function.SubFunctionsNames != null)
+                        {
                             foreach (var subFunctionsName in function.SubFunctionsNames)
                             {
                                 lf.SubSmallIconsUrl.Add("pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
@@ -86,18 +83,23 @@ namespace ModPlus.Helpers
                                                         "_32x32.png");
                                 lf.SubBigDarkIconsUrl.Add(GetBigDarkIcon(loadedFuncAssembly, subFunctionsName));
                             }
+                        }
+
                         if (function.SubHelpImages != null)
+                        {
                             foreach (var helpImage in function.SubHelpImages)
                             {
                                 lf.SubHelpImages.Add(
                                     !string.IsNullOrEmpty(helpImage)
                                     ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
                                     ";component/Resources/Help/" + helpImage
-                                    : string.Empty
-                                    );
+                                    : string.Empty);
                             }
+                        }
+
                         LoadedFunctions.Add(lf);
                     }
+
                     break;
                 }
             }
@@ -105,16 +107,17 @@ namespace ModPlus.Helpers
 
         private static string GetSmallDarkIcon(Assembly funcAssembly, string funcName)
         {
-            string iconUri = string.Empty;
-            string iconName = funcName + "_16x16_dark.png";
+            var iconUri = string.Empty;
+            var iconName = funcName + "_16x16_dark.png";
             if (ResourceExists(funcAssembly, iconName))
                 iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
             return iconUri;
         }
+
         private static string GetBigDarkIcon(Assembly funcAssembly, string funcName)
         {
-            string iconUri = string.Empty;
-            string iconName = funcName + "_32x32_dark.png";
+            var iconUri = string.Empty;
+            var iconName = funcName + "_32x32_dark.png";
             if (ResourceExists(funcAssembly, iconName))
                 iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
             return iconUri;
@@ -130,7 +133,7 @@ namespace ModPlus.Helpers
             var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
             var resourceName = assembly.GetName().Name + ".g";
             var resourceManager = new ResourceManager(resourceName, assembly);
-            List<string> resKeys = new List<string>();
+            var resKeys = new List<string>();
             try
             {
                 var resourceSet = resourceManager.GetResourceSet(culture, true, true);
@@ -147,7 +150,8 @@ namespace ModPlus.Helpers
 
         private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
         {
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
             try
             {
                 return assembly.GetTypes();
@@ -157,6 +161,7 @@ namespace ModPlus.Helpers
                 return e.Types.Where(t => t != null);
             }
         }
+
         /// <summary>
         /// Поиск файла функции, если в файле конфигурации вдруг нет атрибута
         /// </summary>
@@ -172,17 +177,18 @@ namespace ModPlus.Helpers
                 foreach (var file in Directory.GetFiles(funcDir, "*.dll", SearchOption.TopDirectoryOnly))
                 {
                     var fileInfo = new FileInfo(file);
-                    if (fileInfo.Name.Equals(functionName + "_" + MpVersionData.CurCadVers + ".dll"))
+                    if (fileInfo.Name.Equals(functionName + "_" + VersionData.CurrentCadVersion + ".dll"))
                     {
                         fileName = file;
                         break;
                     }
                 }
             }
+
             return fileName;
         }
 
-        public static bool HasmpStampsFunction(int colorTheme, out string icon)
+        public static bool HasStampsPlugin(int colorTheme, out string icon)
         {
             icon = string.Empty;
             try
@@ -190,12 +196,19 @@ namespace ModPlus.Helpers
                 if (LoadedFunctions.Any(x => x.Name.Equals("mpStamps")))
                 {
                     if (colorTheme == 1)
-                        icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
+                    {
+                        icon = "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion +
                                ";component/Resources/mpStampFields_16x16.png";
-                    else icon = "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers +
+                    }
+                    else
+                    {
+                        icon = "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion +
                                 ";component/Resources/mpStampFields_16x16_dark.png";
+                    }
+
                     return true;
                 }
+
                 return false;
             }
             catch
@@ -203,7 +216,8 @@ namespace ModPlus.Helpers
                 return false;
             }
         }
-        public static bool HasmpStampsFunction()
+
+        public static bool HasStampsPlugin()
         {
             try
             {
@@ -219,24 +233,43 @@ namespace ModPlus.Helpers
     internal class LoadedFunction
     {
         public string Name { get; set; }
+
         public string LName { get; set; }
+
         public string AvailProductExternalVersion { get; set; }
+
         public string SmallIconUrl { get; set; }
+
         public string SmallDarkIconUrl { get; set; }
+
         public string BigIconUrl { get; set; }
+
         public string BigDarkIconUrl { get; set; }
+
         public string Description { get; set; }
+
         public bool CanAddToRibbon { get; set; }
+
         public string FullDescription { get; set; }
+
         public string ToolTipHelpImage { get; set; }
+
         public List<string> SubFunctionsNames { get; set; }
+
         public List<string> SubFunctionsLNames { get; set; }
+
         public List<string> SubDescriptions { get; set; }
+
         public List<string> SubFullDescriptions { get; set; }
+
         public List<string> SubHelpImages { get; set; }
+
         public List<string> SubSmallIconsUrl { get; set; }
+
         public List<string> SubSmallDarkIconsUrl { get; set; }
+
         public List<string> SubBigIconsUrl { get; set; }
+
         public List<string> SubBigDarkIconsUrl { get; set; }
     }
 
@@ -269,6 +302,7 @@ namespace ModPlus.Helpers
             {
                 // ignored
             }
+
             var txt = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
@@ -303,7 +337,7 @@ namespace ModPlus.Helpers
         private static ToolTip AddTooltip(string description, string fullDescription, string imgUri)
         {
             var tt = new ToolTip();
-            var stck = new StackPanel
+            var stackPanel = new StackPanel
             {
                 Orientation = Orientation.Vertical
             };
@@ -317,7 +351,7 @@ namespace ModPlus.Helpers
                 Text = description,
                 Margin = new Thickness(2)
             };
-            stck.Children.Add(txtDescription);
+            stackPanel.Children.Add(txtDescription);
             var txtFullDescription = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
@@ -328,7 +362,7 @@ namespace ModPlus.Helpers
                 Margin = new Thickness(2)
             };
             if (!string.IsNullOrEmpty(fullDescription))
-                stck.Children.Add(txtFullDescription);
+                stackPanel.Children.Add(txtFullDescription);
             try
             {
                 if (!string.IsNullOrEmpty(imgUri))
@@ -339,7 +373,7 @@ namespace ModPlus.Helpers
                         Stretch = Stretch.Uniform,
                         MaxWidth = 350
                     };
-                    stck.Children.Add(img);
+                    stackPanel.Children.Add(img);
                 }
             }
             catch
@@ -347,9 +381,10 @@ namespace ModPlus.Helpers
                 // ignored
             }
 
-            tt.Content = stck;
+            tt.Content = stackPanel;
             return tt;
         }
+
         // Обработка запуска функций        
         private static void CommandButtonClick(object sender, RoutedEventArgs e)
         {

@@ -105,12 +105,13 @@
             // Separator
             var separator = Regestry.GetValue("Separator");
             CbSeparatorSettings.SelectedIndex = string.IsNullOrEmpty(separator) ? 0 : int.Parse(separator);
+
             // mini functions
-            ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out var b) || b; //true
-            ChkNestedEntLayer.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b; //true
-            ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; //true
-            ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; //true
-            ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; //true
+            ChkEntByBlock.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out var b) || b; // true
+            ChkNestedEntLayer.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b; // true
+            ChkFastBlocks.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b; // true
+            ChkVPtoMS.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b; // true
+            ChkWipeoutEditOCM.IsChecked = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; // true
             ChkDisableConnectionWithLicenseServer.IsChecked =
                 bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "DisableConnectionWithLicenseServerInAutoCAD"), out b) && b; // false
             TbLocalLicenseServerIpAddress.Text = Regestry.GetValue("LocalLicenseServerIpAddress");
@@ -125,25 +126,30 @@
                 // Адаптация
                 ChkMpFloatMenu.IsChecked = _curFloatMenu = Variables.FloatMenu;
                 ChkMpPalette.IsChecked = _curPalette = Variables.Palette;
+
                 // palette by visibility
                 if (Variables.Palette && !MpPalette.MpPaletteSet.Visible)
                 {
                     ChkMpPalette.IsChecked = _curPalette = false;
                     Variables.Palette = false; //
                 }
+
                 ChkMpPaletteFunctions.IsChecked = Variables.FunctionsInPalette;
                 ChkMpPaletteDrawings.IsChecked = Variables.DrawingsInPalette;
                 ChkMpRibbon.IsChecked = _curRibbon = Variables.Ribbon;
                 ChkMpChkDrwsOnMnu.IsChecked = _curDrawingsOnMenu = Variables.DrawingsInFloatMenu;
                 ChkMpDrawingsAlone.IsChecked = _curDrawingsAlone = Variables.DrawingsFloatMenu;
+
                 // Выбор в выпадающих списках (сворачивать в)
                 CbFloatMenuCollapseTo.SelectedIndex = _curFloatMenuCollapseTo = Variables.FloatMenuCollapseTo;
                 CbDrawingsCollapseTo.SelectedIndex = _curDrawingsCollapseTo = Variables.DrawingsFloatMenuCollapseTo;
+
                 // Видимость в зависимости от галочек
                 ChkMpChkDrwsOnMnu.Visibility = CbFloatMenuCollapseTo.Visibility =
                         TbFloatMenuCollapseTo.Visibility = _curFloatMenu ? Visibility.Visible : Visibility.Collapsed;
                 CbDrawingsCollapseTo.Visibility = TbDrawingsCollapseTo.Visibility = _curDrawingsAlone ? Visibility.Visible : Visibility.Collapsed;
                 ChkMpPaletteDrawings.Visibility = ChkMpPaletteFunctions.Visibility = _curPalette ? Visibility.Visible : Visibility.Collapsed;
+
                 // Тихая загрузка
                 ChkQuietLoading.IsChecked = Variables.QuietLoading;
             }
@@ -196,7 +202,10 @@
                             MpMenuFunction.LoadMainMenu();
                         }
                     }
-                    else MpMenuFunction.LoadMainMenu();
+                    else
+                    {
+                        MpMenuFunction.LoadMainMenu();
+                    }
                 }
 
                 // если отключили палитру
@@ -230,7 +239,10 @@
                             MpDrawingsFunction.LoadMainMenu();
                         }
                     }
-                    else MpDrawingsFunction.LoadMainMenu();
+                    else
+                    {
+                        MpDrawingsFunction.LoadMainMenu();
+                    }
                 }
 
                 // Ribbon
@@ -291,7 +303,8 @@
         ///  Имена должны начинаться с ChkMp!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</summary>
         private void Menues_OnChecked_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (!(sender is CheckBox chkBox)) return;
+            if (!(sender is CheckBox chkBox))
+                return;
             var name = chkBox.Name;
             Regestry.SetValue(name.Substring(5), chkBox.IsChecked?.ToString());
             if (name.Equals("ChkMpFloatMenu"))
@@ -299,11 +312,13 @@
                 ChkMpChkDrwsOnMnu.Visibility = TbFloatMenuCollapseTo.Visibility = CbFloatMenuCollapseTo.Visibility =
                     chkBox.IsChecked != null && chkBox.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
             }
+
             if (name.Equals("ChkMpDrawingsAlone"))
             {
                 TbDrawingsCollapseTo.Visibility = CbDrawingsCollapseTo.Visibility =
                     chkBox.IsChecked != null && chkBox.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
             }
+
             if (name.Equals("ChkMpPalette"))
             {
                 ChkMpPaletteDrawings.Visibility = ChkMpPaletteFunctions.Visibility =
@@ -344,7 +359,8 @@
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
-                else MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
+                else
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
             }
         }
 
@@ -355,7 +371,8 @@
                 UserConfigFile.SetValue("NestedEntLayerOCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Attach();
-                else MiniFunctions.MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
+                else
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
             }
         }
 
@@ -367,14 +384,17 @@
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
-                else MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
+                else
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
             }
         }
+
         private void BtFastBlocksSettings_OnClick(object sender, RoutedEventArgs e)
         {
             var win = new FastBlocksSettings();
             win.ShowDialog();
         }
+
         // Границы ВЭ в модель
         private void ChkVPtoMS_OnChecked(object sender, RoutedEventArgs e)
         {
@@ -383,15 +403,18 @@
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS", (chk.IsChecked != null && chk.IsChecked.Value).ToString(), true);
                 if (chk.IsChecked != null && chk.IsChecked.Value)
                     MiniFunctions.MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
-                else MiniFunctions.MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
+                else
+                    MiniFunctions.MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
             }
         }
+
         // wipeout edit
         private void ChkWipeoutEditOCM_OnChecked(object sender, RoutedEventArgs e)
         {
             UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", true.ToString(), true);
             MiniFunctions.MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Attach();
         }
+
         private void ChkWipeoutEditOCM_OnUnchecked(object sender, RoutedEventArgs e)
         {
             UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM", false.ToString(), true);
@@ -455,11 +478,12 @@
                           ? Visibility.Collapsed
                           : Visibility.Visible;
                 }
+
                 try
                 {
                     BitmapImage bi = new BitmapImage();
                     bi.BeginInit();
-                    bi.UriSource = new Uri($"pack://application:,,,/ModPlus_{MpVersionData.CurCadVers};component/Resources/Flags/{li.Name}.png");
+                    bi.UriSource = new Uri($"pack://application:,,,/ModPlus_{VersionData.CurrentCadVersion};component/Resources/Flags/{li.Name}.png");
                     bi.EndInit();
                     LanguageImage.Source = bi;
                 }

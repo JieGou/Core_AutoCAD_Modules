@@ -1,26 +1,24 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using ModPlus.App;
-using ModPlus.Windows;
-using ModPlus.Helpers;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace ModPlus
+﻿namespace ModPlus
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
     using System.Net;
-    using System.Threading.Tasks;
+    using System.Reflection;
     using System.Xml.Linq;
+    using App;
     using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Runtime;
+    using Helpers;
+    using ModPlusAPI;
     using ModPlusAPI.LicenseServer;
     using ModPlusAPI.UserInfo;
+    using ModPlusAPI.Windows;
+    using Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     public class ModPlus : IExtensionApplication
     {
@@ -38,15 +36,16 @@ namespace ModPlus
                 sw.Start();
 
                 // inint lang
-                if (!Language.Initialize()) return;
+                if (!Language.Initialize())
+                    return;
 
                 // Получим значение переменной "Тихая загрузка" в первую очередь
                 _quiteLoad = ModPlusAPI.Variables.QuietLoading;
 
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // Файла конфигурации может не существовать при загрузке плагина!
                 // Поэтому все, что связанно с работой с файлом конфигурации должно это учитывать!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 var ed = AcApp.DocumentManager.MdiActiveDocument.Editor;
                 if (!CheckCadVersion())
                 {
@@ -58,18 +57,22 @@ namespace ModPlus
                     return;
                 }
 
-                Statistic.SendPluginStarting("AutoCAD", MpVersionData.CurCadVers);
+                Statistic.SendPluginStarting("AutoCAD", VersionData.CurrentCadVersion);
                 ed.WriteMessage("\n***************************");
                 ed.WriteMessage("\n" + Language.GetItem(LangItem, "p4"));
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
+                if (!_quiteLoad)
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
 
                 // Принудительная загрузка сборок
                 LoadAssemblies(ed);
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
+                if (!_quiteLoad)
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
                 LoadBaseAssemblies(ed);
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p7"));
+                if (!_quiteLoad)
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p7"));
                 UserConfigFile.InitConfigFile();
-                if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p8"));
+                if (!_quiteLoad)
+                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p8"));
                 LoadFunctions(ed);
 
                 // check adaptation
@@ -80,23 +83,34 @@ namespace ModPlus
                 Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
                 if (ModPlusAPI.Variables.Palette)
                     MpPalette.CreatePalette();
+
                 // Загрузка основного меню (с проверкой значения из файла настроек)
                 MpMenuFunction.LoadMainMenu();
+
                 // Загрузка окна Чертежи
                 MpDrawingsFunction.LoadMainMenu();
+
                 // Загрузка контекстных меню для мини-функций
                 MiniFunctions.LoadUnloadContextMenu();
+
                 // проверка загруженности модуля автообновления
                 CheckAutoUpdaterLoaded();
+
                 // Включение иконок для продуктов
-                var showProductsIcon = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
-                    "mpProductInsert", "ShowIcon"), out var b) && b; //false
+                var showProductsIcon = 
+                    bool.TryParse(
+                        UserConfigFile.GetValue(
+                            UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),
+                        out var b) && b; // false
                 if (showProductsIcon)
                     MpProductIconFunctions.ShowIcon();
 
                 var disableConnectionWithLicenseServer =
-                    bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
-                        "DisableConnectionWithLicenseServerInAutoCAD"), out b) && b; // false
+                    bool.TryParse(
+                        UserConfigFile.GetValue(
+                            UserConfigFile.ConfigFileZone.Settings, "DisableConnectionWithLicenseServerInAutoCAD"),
+                        out b) && b; // false
+
                 // start license server client
                 if (!disableConnectionWithLicenseServer)
                     ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
@@ -132,7 +146,7 @@ namespace ModPlus
         private static bool CheckCadVersion()
         {
             var cadVer = AcApp.Version;
-            return (cadVer.Major + "." + cadVer.Minor).Equals(MpVersionData.CurCadInternalVersion);
+            return (cadVer.Major + "." + cadVer.Minor).Equals(VersionData.CurrentCadInternalVersion);
         }
 
         // Принудительная загрузка сборок
@@ -146,7 +160,8 @@ namespace ModPlus
                     var extDll = Path.Combine(Constants.ExtensionsDirectory, fileName);
                     if (File.Exists(extDll))
                     {
-                        if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p11") + " " + fileName);
+                        if (!_quiteLoad)
+                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p11") + " " + fileName);
                         Assembly.LoadFrom(extDll);
                     }
                 }
@@ -175,16 +190,21 @@ namespace ModPlus
                         var file = Path.Combine(directory, baseFile);
                         if (File.Exists(file))
                         {
-                            if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
+                            if (!_quiteLoad)
+                                ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
                             Assembly.LoadFrom(file);
                         }
                         else
-                            if (!_quiteLoad) ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
+                            if (!_quiteLoad)
+                        {
+                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
+                        }
                     }
                 }
                 else
                 {
-                    if (!_quiteLoad) ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
+                    if (!_quiteLoad)
+                        ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
                 }
             }
             catch (System.Exception exception)
@@ -198,26 +218,34 @@ namespace ModPlus
             try
             {
                 var funtionsKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus\\Functions");
-                if (funtionsKey == null) return;
+                if (funtionsKey == null)
+                    return;
                 using (funtionsKey)
                 {
                     foreach (var functionKeyName in funtionsKey.GetSubKeyNames())
                     {
                         var functionKey = funtionsKey.OpenSubKey(functionKeyName);
-                        if (functionKey == null) continue;
+                        if (functionKey == null)
+                            continue;
                         foreach (var availPrVersKeyName in functionKey.GetSubKeyNames())
                         {
                             // Если версия продукта не совпадает, то пропускаю
-                            if (!availPrVersKeyName.Equals(MpVersionData.CurCadVers)) continue;
+                            if (!availPrVersKeyName.Equals(VersionData.CurrentCadVersion))
+                                continue;
                             var availPrVersKey = functionKey.OpenSubKey(availPrVersKeyName);
-                            if (availPrVersKey == null) continue;
+                            if (availPrVersKey == null)
+                                continue;
+
                             // беру свойства функции из реестра
                             var file = availPrVersKey.GetValue("File") as string;
                             var onOff = availPrVersKey.GetValue("OnOff") as string;
                             var productFor = availPrVersKey.GetValue("ProductFor") as string;
-                            if (string.IsNullOrEmpty(onOff) || string.IsNullOrEmpty(productFor)) continue;
-                            if (!productFor.Equals("AutoCAD")) continue;
+                            if (string.IsNullOrEmpty(onOff) || string.IsNullOrEmpty(productFor))
+                                continue;
+                            if (!productFor.Equals("AutoCAD"))
+                                continue;
                             var isOn = !bool.TryParse(onOff, out var b) || b; // default - true
+
                             // Если "Продукт для" подходит, файл существует и функция включена - гружу
                             if (isOn)
                             {
@@ -227,7 +255,7 @@ namespace ModPlus
                                     if (!_quiteLoad)
                                         ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
                                     var localFuncAssembly = Assembly.LoadFrom(file);
-                                    LoadFunctionsHelper.GetDataFromFunctionIntrface(localFuncAssembly);
+                                    LoadFunctionsHelper.GetDataFromFunctionInterface(localFuncAssembly);
                                 }
                                 else
                                 {
@@ -237,7 +265,7 @@ namespace ModPlus
                                         if (!_quiteLoad)
                                             ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
                                         var localFuncAssembly = Assembly.LoadFrom(findedFile);
-                                        LoadFunctionsHelper.GetDataFromFunctionIntrface(localFuncAssembly);
+                                        LoadFunctionsHelper.GetDataFromFunctionInterface(localFuncAssembly);
                                     }
                                 }
                             }
@@ -257,16 +285,18 @@ namespace ModPlus
         /// </summary>
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
-            //now one Ribbon item is initialized, but the Ribbon control
-            //may not be available yet, so check if before
-            if (Autodesk.Windows.ComponentManager.Ribbon == null) return;
-            //ok, create Ribbon
+            // now one Ribbon item is initialized, but the Ribbon control
+            // may not be available yet, so check if before
+            if (Autodesk.Windows.ComponentManager.Ribbon == null)
+                return;
+
+            // ok, create Ribbon
             if (ModPlusAPI.Variables.Ribbon)
                 RibbonBuilder.BuildRibbon();
             else
                 RibbonBuilder.RemoveRibbon();
 
-            //and remove the event handler
+            // and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -=
                 ComponentManager_ItemInitialized;
         }
@@ -324,6 +354,7 @@ namespace ModPlus
                     }
                     catch
                     {
+                        // ignore
                     }
                 }
             }
@@ -362,7 +393,7 @@ namespace ModPlus
             VK_F1 = 0x70,
         }
 
-        void AutoCadMessageHandler(object sender, PreTranslateMessageEventArgs e)
+        private void AutoCadMessageHandler(object sender, PreTranslateMessageEventArgs e)
         {
             if (e.Message.message == (int)WndMsg.WM_KEYDOWN)
             {
@@ -393,9 +424,12 @@ namespace ModPlus
         private static void ComponentManager_ToolTipOpened(object sender, EventArgs e)
         {
             Autodesk.Internal.Windows.ToolTip tt = sender as Autodesk.Internal.Windows.ToolTip;
+            
             if (tt == null)
                 return;
+
             Autodesk.Windows.RibbonToolTip rtt = tt.Content as Autodesk.Windows.RibbonToolTip;
+            
             if (rtt == null)
                 _currentTooltip = tt.HelpTopic;
             else
@@ -420,4 +454,3 @@ namespace ModPlus
         }
     }
 }
-

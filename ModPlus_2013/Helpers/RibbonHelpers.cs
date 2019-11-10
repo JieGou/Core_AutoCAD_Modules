@@ -1,13 +1,15 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Linq;
-using Autodesk.Windows;
-using System.Windows.Controls;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
+    using System;
+    using System.Linq;
+    using System.Windows.Controls;
+    using Autodesk.Windows;
     using ModPlusAPI;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
+    /// <summary>
+    /// Utils for Ribbon creation
+    /// </summary>
     public static class RibbonHelpers
     {
         /// <summary>Создание маленькой кнопки</summary>
@@ -199,6 +201,7 @@ namespace ModPlus.Helpers
                         ? $"https://modplus.org/ru/{helpLink.ToLower()}"
                         : $"https://modplus.org/en/{helpLink.ToLower()}";
                 }
+
                 return GetBigButton(fName, lName, img, orientation, fullDescription, helpImage, tt);
             }
             catch (Exception)
@@ -236,8 +239,10 @@ namespace ModPlus.Helpers
             try
             {
                 if (!string.IsNullOrEmpty(img))
+                {
                     ribBtn.LargeImage =
                         new System.Windows.Media.Imaging.BitmapImage(new Uri(img, UriKind.RelativeOrAbsolute));
+                }
             }
             catch
             {
@@ -279,6 +284,7 @@ namespace ModPlus.Helpers
                         ? $"https://modplus.org/ru/{helpLink.ToLower()}"
                         : $"https://modplus.org/en/{helpLink.ToLower()}";
                 }
+
                 if (!string.IsNullOrEmpty(fullDescription))
                     tt.ExpandedContent = fullDescription;
                 try
@@ -290,6 +296,7 @@ namespace ModPlus.Helpers
                 {
                     // ignored
                 }
+
                 var ribBtn = new RibbonButton
                 {
                     CommandParameter = tt.Command = fName,
@@ -313,6 +320,7 @@ namespace ModPlus.Helpers
                 {
                     // ignored
                 }
+
                 return ribBtn;
             }
             catch (Exception)
@@ -320,12 +328,14 @@ namespace ModPlus.Helpers
                 return null;
             }
         }
+
         public class RibbonCommandHandler : System.Windows.Input.ICommand
         {
             public bool CanExecute(object parameter)
             {
                 return true;
             }
+
 #pragma warning disable 67
             public event EventHandler CanExecuteChanged;
 #pragma warning restore 67
@@ -344,12 +354,15 @@ namespace ModPlus.Helpers
 
         private static string ConvertLName(string lName)
         {
-            if (!lName.Contains(" ")) return lName;
-            if (lName.Length <= 8) return lName;
+            if (!lName.Contains(" "))
+                return lName;
+            if (lName.Length <= 8)
+                return lName;
             if (lName.Count(x => x == ' ') == 1)
             {
                 return lName.Split(' ')[0] + Environment.NewLine + lName.Split(' ')[1];
             }
+
             var center = lName.Length * 0.5;
             var nearestDelta = lName.Select((c, i) => new { index = i, value = c }).Where(w => w.value == ' ')
                 .OrderBy(x => Math.Abs(x.index - center)).First().index;

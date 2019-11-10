@@ -1,18 +1,16 @@
 ﻿namespace ModPlus.Windows
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using Helpers;
     using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteFunctions
     {
-        private const string LangItem = "AutocadDlls";
-
         internal mpPaletteFunctions()
         {
             InitializeComponent();
@@ -25,7 +23,6 @@
         {
             FillFieldsFunction();
             FillFunctions();
-
         }
 
         // Заполнение списка функций
@@ -34,8 +31,10 @@
             try
             {
                 var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
+
                 // Проходим по группам
-                if (confCuiXel == null) return;
+                if (confCuiXel == null)
+                    return;
 
                 foreach (var group in confCuiXel.Elements("Group"))
                 {
@@ -47,15 +46,18 @@
                     };
                     var grid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
                     var index = 0;
+
                     // Проходим по функциям группы
                     foreach (var func in group.Elements("Function"))
                     {
                         var funcNameAttr = func.Attribute("Name")?.Value;
-                        if (string.IsNullOrEmpty(funcNameAttr)) continue;
+                        if (string.IsNullOrEmpty(funcNameAttr))
+                            continue;
 
                         var loadedFunction =
                             LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
-                        if (loadedFunction == null) continue;
+                        if (loadedFunction == null)
+                            continue;
                         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                         var btn = WPFMenuesHelper.AddButton(this,
                             loadedFunction.Name,
@@ -74,7 +76,8 @@
                         {
                             for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                             {
-                                btn = WPFMenuesHelper.AddButton(this,
+                                btn = WPFMenuesHelper.AddButton(
+                                    this,
                                     loadedFunction.SubFunctionsNames[i],
                                     ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                     loadedFunction.SubBigIconsUrl[i],
@@ -91,11 +94,14 @@
                         foreach (var subFunc in func.Elements("SubFunction"))
                         {
                             var subFuncNameAttr = subFunc.Attribute("Name")?.Value;
-                            if (string.IsNullOrEmpty(subFuncNameAttr)) continue;
+                            if (string.IsNullOrEmpty(subFuncNameAttr))
+                                continue;
                             var loadedSubFunction =
                                 LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
-                            if (loadedSubFunction == null) continue;
-                            btn = WPFMenuesHelper.AddButton(this,
+                            if (loadedSubFunction == null)
+                                continue;
+                            btn = WPFMenuesHelper.AddButton(
+                                this,
                                 loadedSubFunction.Name,
                                 ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
                                 loadedSubFunction.BigIconUrl,
@@ -108,7 +114,9 @@
                             index++;
                         }
                     }
+
                     exp.Content = grid;
+
                     // Добавляем группу, если заполнились функции!
                     if (grid.Children.Count > 0)
                         FunctionsPanel.Children.Add(exp);
@@ -122,7 +130,7 @@
 
         private void FillFieldsFunction()
         {
-            BtFields.Visibility = LoadFunctionsHelper.HasmpStampsFunction(1, out _) ? Visibility.Visible : Visibility.Collapsed;
+            BtFields.Visibility = LoadFunctionsHelper.HasStampsPlugin(1, out _) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void BtSettings_OnClick(object sender, RoutedEventArgs e)
@@ -130,6 +138,7 @@
             if (AcApp.DocumentManager.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSETTINGS ", false, false, false);
         }
+
         // start fields function
         private void BtFields_OnClick(object sender, RoutedEventArgs e)
         {

@@ -1,19 +1,22 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
-    /// <summary>Функции вставки/добавления в автокад</summary>
+    using System;
+    using System.Collections.Generic;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+
+    /// <summary>
+    /// Функции вставки/добавления в автокад
+    /// </summary>
     public class InsertToAutoCad
     {
         private const string LangItem = "AutocadDlls";
+
         /// <summary>Вставить строкове значение в ячейку таблицы автокада</summary>
         /// <param name="firstStr">Первая строка. Замена разделителя действует только для неё</param>
         /// <param name="secondString">Вторая строка. Необязательно. Замена разделителя не действует</param>
@@ -34,6 +37,7 @@ namespace ModPlus.Helpers
                     {
                         return;
                     }
+
                     var tr = db.TransactionManager.StartTransaction();
                     using (tr)
                     {
@@ -47,35 +51,43 @@ namespace ModPlus.Helpers
                             while (end == false)
                             {
                                 var ppr = ed.GetPoint(ppo);
-                                if (ppr.Status != PromptStatus.OK) return;
+                                if (ppr.Status != PromptStatus.OK)
+                                    return;
                                 try
                                 {
-                                    TableHitTestInfo tblhittestinfo =
+                                    TableHitTestInfo tableHitTestInfo =
                                         tbl.HitTest(ppr.Value, vector);
-                                    if (tblhittestinfo.Type == TableHitTestType.Cell)
+                                    if (tableHitTestInfo.Type == TableHitTestType.Cell)
                                     {
-                                        var cell = new Cell(tbl, tblhittestinfo.Row, tblhittestinfo.Column);
+                                        var cell = new Cell(tbl, tableHitTestInfo.Row, tableHitTestInfo.Column);
                                         if (useSeparator)
+                                        {
                                             cell.TextString =
                                                 ModPlusAPI.IO.String.ReplaceSeparator(firstStr) + secondString;
-                                        else cell.TextString = firstStr + secondString;
+                                        }
+                                        else
+                                        {
+                                            cell.TextString = firstStr + secondString;
+                                        }
+
                                         end = true;
                                     }
-                                } // try
+                                }
                                 catch
                                 {
                                     MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                                 }
-                            } // while
+                            }
+
                             tr.Commit();
-                        } //try
+                        }
                         catch (Exception ex)
                         {
                             ExceptionBox.Show(ex);
                         }
-                    } //using tr
-                } //using lock
-            } //try
+                    }
+                }
+            }
             catch (Exception ex)
             {
                 ExceptionBox.Show(ex);
@@ -91,8 +103,8 @@ namespace ModPlus.Helpers
             var ed = doc.Editor;
             using (doc.LockDocument())
             {
-                var options = new PromptEntityOptions("\n"+ Language.GetItem(LangItem, "msg11"));
-                options.SetRejectMessage("\n"+ Language.GetItem(LangItem, "msg13"));
+                var options = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg11"));
+                options.SetRejectMessage("\n" + Language.GetItem(LangItem, "msg13"));
                 options.AddAllowedClass(typeof(Table), false);
                 var entity = ed.GetEntity(options);
                 if (entity.Status == PromptStatus.OK)
@@ -107,21 +119,23 @@ namespace ModPlus.Helpers
                         while (end == false)
                         {
                             var ppr = ed.GetPoint(ppo);
-                            if (ppr.Status != PromptStatus.OK) return;
+                            if (ppr.Status != PromptStatus.OK)
+                                return;
                             try
                             {
-                                var tblhittestinfo = table.HitTest(ppr.Value, vector);
-                                if (tblhittestinfo.Type == TableHitTestType.Cell)
+                                var tableHitTestInfo = table.HitTest(ppr.Value, vector);
+                                if (tableHitTestInfo.Type == TableHitTestType.Cell)
                                 {
-                                    selectedRow = tblhittestinfo.Row;
+                                    selectedRow = tableHitTestInfo.Row;
                                     end = true;
                                 }
-                            } // try
+                            }
                             catch
                             {
                                 MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                             }
-                        } // while
+                        }
+
                         TableHelpers.AddSpecificationItemToTableRow(table, selectedRow, specificationItemForTable);
                         tr.Commit();
                     }
@@ -168,37 +182,39 @@ namespace ModPlus.Helpers
                             {
                                 startRow = 3;
                             }
-                            int firstEmptyRow;
-                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out firstEmptyRow);
+
+                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out var firstEmptyRow);
                             TableHelpers.FillTableRows(table, firstEmptyRow, specificationItemsForTable);
                         }
                         else
                         {
-                            var ppo = new PromptPointOptions("\n"+ Language.GetItem(LangItem, "msg15"));
+                            var ppo = new PromptPointOptions("\n" + Language.GetItem(LangItem, "msg15"));
                             var end = false;
                             var vector = new Vector3d(0.0, 0.0, 1.0);
                             while (end == false)
                             {
                                 var ppr = ed.GetPoint(ppo);
-                                if (ppr.Status != PromptStatus.OK) return;
+                                if (ppr.Status != PromptStatus.OK)
+                                    return;
                                 try
                                 {
-                                    var tblhittestinfo = table.HitTest(ppr.Value, vector);
-                                    if (tblhittestinfo.Type == TableHitTestType.Cell)
+                                    var tableHitTestInfo = table.HitTest(ppr.Value, vector);
+                                    if (tableHitTestInfo.Type == TableHitTestType.Cell)
                                     {
-                                        startRow = tblhittestinfo.Row;
+                                        startRow = tableHitTestInfo.Row;
                                         end = true;
                                     }
-                                } // try
+                                }
                                 catch
                                 {
                                     MessageBox.Show(Language.GetItem(LangItem, "msg14"));
                                 }
-                            } // while
-                            int firstEmptyRow;
-                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out firstEmptyRow);
+                            }
+
+                            TableHelpers.CheckAndAddRowCount(table, startRow, specificationItemsForTable.Count, out _);
                             TableHelpers.FillTableRows(table, startRow, specificationItemsForTable);
                         }
+
                         tr.Commit();
                     }
                 }
@@ -238,16 +254,22 @@ namespace ModPlus.Helpers
                 Count = count;
                 Note = note;
             }
+
             /// <summary>Позиция</summary>
             public string Position { get; set; }
+
             /// <summary>Обозначение</summary>
             public string Designation { get; set; }
+
             /// <summary>Наименование</summary>
             public string Name { get; set; }
+
             /// <summary>Масса</summary>
             public string Mass { get; set; }
+
             /// <summary>Количество</summary>
             public string Count { get; set; }
+
             /// <summary>Примечание</summary>
             public string Note { get; set; }
         }
@@ -267,11 +289,11 @@ namespace ModPlus.Helpers
                     using (tr)
                     {
                         var btr = (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite, false);
-                        var dtxt = new DBText();
-                        dtxt.SetDatabaseDefaults();
-                        dtxt.TextString = text;
-                        dtxt.TransformBy(ed.CurrentUserCoordinateSystem);
-                        var jig = new DTextJig(dtxt);
+                        var dbText = new DBText();
+                        dbText.SetDatabaseDefaults();
+                        dbText.TextString = text;
+                        dbText.TransformBy(ed.CurrentUserCoordinateSystem);
+                        var jig = new DTextJig(dbText);
                         var pr = ed.Drag(jig);
                         if (pr.Status == PromptStatus.OK)
                         {
@@ -280,6 +302,7 @@ namespace ModPlus.Helpers
                             tr.AddNewlyCreatedDBObject(ent, true);
                             doc.TransactionManager.QueueForGraphicsFlush();
                         }
+
                         tr.Commit();
                     }
                 }
@@ -300,13 +323,16 @@ namespace ModPlus.Helpers
             var db = HostApplicationServices.WorkingDatabase;
             using (doc.LockDocument())
             {
-                var ppo = new PromptPointOptions("\n"+ Language.GetItem(LangItem, "msg16")) { AllowNone = true };
+                var ppo = new PromptPointOptions("\n" + Language.GetItem(LangItem, "msg16")) { AllowNone = true };
                 var ppr = ed.GetPoint(ppo);
-                if (ppr.Status != PromptStatus.OK) return;
+                if (ppr.Status != PromptStatus.OK)
+                    return;
+
                 // arrowHead
                 var arrowHead = "_NONE";
                 if (standardArrowhead != AutocadHelpers.StandardArrowhead.closedFilled)
                     arrowHead = standardArrowhead.ToString();
+
                 // Создаем текст
                 var jig = new MLeaderJig
                 {
@@ -319,22 +345,25 @@ namespace ModPlus.Helpers
                 {
                     using (var tr = doc.TransactionManager.StartTransaction())
                     {
-                        var btr = (BlockTableRecord)
-                            tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite);
+                        var btr = (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite);
 
                         btr.AppendEntity(jig.MLeader());
                         tr.AddNewlyCreatedDBObject(jig.MLeader(), true);
                         tr.Commit();
                     }
                 }
+
                 doc.TransactionManager.QueueForGraphicsFlush();
             }
         }
+
         #region Jigs
 
         private class DTextJig : EntityJig
         {
-            Point3d _mCenterPt, _mActualPoint;
+            private Point3d _mCenterPt;
+            private Point3d _mActualPoint;
+
             public DTextJig(DBText dbtxt)
                 : base(dbtxt)
             {
@@ -345,18 +374,20 @@ namespace ModPlus.Helpers
             {
                 var jigOpts = new JigPromptPointOptions
                 {
-                    UserInputControls = (UserInputControls.Accept3dCoordinates |
-                                         UserInputControls.NoZeroResponseAccepted |
-                                         UserInputControls.AcceptOtherInputString |
-                                         UserInputControls.NoNegativeResponseAccepted),
-                    Message = "\n"+ Language.GetItem(LangItem, "msg8")
+                    UserInputControls = 
+                        UserInputControls.Accept3dCoordinates |
+                        UserInputControls.NoZeroResponseAccepted |
+                        UserInputControls.AcceptOtherInputString |
+                        UserInputControls.NoNegativeResponseAccepted,
+                    Message = "\n" + Language.GetItem(LangItem, "msg8")
                 };
-                var dres = prompts.AcquirePoint(jigOpts);
-                if (_mActualPoint == dres.Value)
+                var acquirePoint = prompts.AcquirePoint(jigOpts);
+                if (_mActualPoint == acquirePoint.Value)
                 {
                     return SamplerStatus.NoChange;
                 }
-                _mActualPoint = dres.Value;
+
+                _mActualPoint = acquirePoint.Value;
                 return SamplerStatus.OK;
             }
 
@@ -371,6 +402,7 @@ namespace ModPlus.Helpers
                 {
                     return false;
                 }
+
                 return true;
             }
 
@@ -403,23 +435,27 @@ namespace ModPlus.Helpers
                     UseBasePoint = true,
                     UserInputControls = UserInputControls.Accept3dCoordinates |
                                         UserInputControls.GovernedByUCSDetect,
-                    Message = "\n"+ Language.GetItem(LangItem, "msg8")
+                    Message = "\n" + Language.GetItem(LangItem, "msg8")
                 };
 
                 var res = prompts.AcquirePoint(jpo);
                 _secondPoint = res.Value;
-                if (res.Status != PromptStatus.OK) return SamplerStatus.Cancel;
+                if (res.Status != PromptStatus.OK)
+                    return SamplerStatus.Cancel;
                 if (CursorHasMoved())
                 {
                     _prevPoint = _secondPoint;
                     return SamplerStatus.OK;
                 }
+
                 return SamplerStatus.NoChange;
             }
+
             private bool CursorHasMoved()
             {
                 return _secondPoint.DistanceTo(_prevPoint) > 1e-6;
             }
+
             protected override bool WorldDraw(WorldDraw draw)
             {
                 var wg = draw.Geometry;
@@ -456,6 +492,7 @@ namespace ModPlus.Helpers
 
                     draw.Geometry.Draw(_mleader);
                 }
+
                 return true;
             }
         }
@@ -465,17 +502,20 @@ namespace ModPlus.Helpers
     internal static class TableHelpers
     {
         private const string LangItem = "AutocadDlls";
+
         public static bool CheckColumnsCount(int columns, int need)
         {
             return columns == need || MessageBox.ShowYesNo(
                        Language.GetItem(LangItem, "msg17"),
                        MessageBoxIcon.Question);
         }
+
         public static void CheckAndAddRowCount(Table table, int startRow, int sItemsCount, out int firstEmptyRow)
         {
             var rows = table.Rows.Count;
             var firstRow = startRow;
             firstEmptyRow = startRow; // Первая пустая строка
+
             // Пробегаем по всем ячейкам и проверяем "чистоту" таблицы
             var empty = true;
             var stopLoop = false;
@@ -490,15 +530,19 @@ namespace ModPlus.Helpers
                         break;
                     }
                 }
-                if (stopLoop) break;
+
+                if (stopLoop)
+                    break;
             }
+
             // Если не пустая
             if (!empty)
             {
-                if (!MessageBox.ShowYesNo(Language.GetItem(LangItem, "msg18"),
+                if (!MessageBox.ShowYesNo(
+                    Language.GetItem(LangItem, "msg18"),
                     MessageBoxIcon.Question))
                 {
-                    // Если "Нет", тогда ищем последуюю пустую строку
+                    // Если "Нет", тогда ищем последнюю пустую строку
                     // Если последняя строка не пуста, то добавляем 
                     // еще строчку, иначе...
                     var findEmpty = true;
@@ -506,7 +550,7 @@ namespace ModPlus.Helpers
                     {
                         if (!string.IsNullOrEmpty(table.Cells[rows - 1, j].TextString))
                         {
-                            //table.InsertRows(rows, 8, 1);
+                            // table.InsertRows(rows, 8, 1);
                             table.InsertRowsAndInherit(rows, rows - 1, 1);
                             rows++;
                             firstRow = rows - 1; // Так как таблица не обновляется
@@ -514,6 +558,7 @@ namespace ModPlus.Helpers
                             break;
                         }
                     }
+
                     if (findEmpty)
                     {
                         // идем по таблице в обратном порядке.
@@ -529,6 +574,7 @@ namespace ModPlus.Helpers
                                 {
                                     firstRow = i;
                                     k++;
+
                                     // Если счетчик k равен количеству колонок
                                     // значит вся строка пустая и можно тормозить цикл
                                     if (k == table.Columns.Count)
@@ -543,12 +589,16 @@ namespace ModPlus.Helpers
                                     break;
                                 }
                             }
-                            if (stopLoop) break;
+
+                            if (stopLoop)
+                                break;
                         }
+
                         // Разбиваем ячейки
                         ////////////////////////////////////////
                     }
                 }
+
                 // Если "да", то очищаем таблицу
                 else
                 {
@@ -560,13 +610,16 @@ namespace ModPlus.Helpers
                             table.Cells[i, j].IsMergeAllEnabled = false;
                         }
                     }
+
                     // Разбиваем ячейки
-                    //table.UnmergeCells(
+                    // table.UnmergeCells(
                 }
             }
+
             // Если в таблице мало строк
             if (sItemsCount > rows - firstRow)
-                table.InsertRowsAndInherit(firstRow, firstRow, (sItemsCount - (rows - firstRow) + 1));
+                table.InsertRowsAndInherit(firstRow, firstRow, sItemsCount - (rows - firstRow) + 1);
+
             // После всех манипуляций ищем первую пустую строчку
             for (var j = 0; j < rows; j++)
             {
@@ -587,6 +640,7 @@ namespace ModPlus.Helpers
                 AddSpecificationItemToTableRow(table, firstRow + i, specificationItemsForTable[i]);
             }
         }
+
         public static void AddSpecificationItemToTableRow(
             Table table, int rowNum, InsertToAutoCad.SpecificationItemForTable specificationItemForTable)
         {
@@ -601,88 +655,114 @@ namespace ModPlus.Helpers
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Обозначение
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+
                         // Масса
                         table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
                     }
                 }
+
                 if (table.TableStyleName.Equals("Mp_GOST_P_21.1101_F8"))
                 {
                     // Позиция
                     table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                     // Обозначение
                     table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+
                     // Наименование
                     table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                     // Количество
                     table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+
                     // Масса
                     table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
                 }
+
                 if (table.TableStyleName.Equals("Mp_GOST_21.501_F7"))
                 {
                     if (CheckColumnsCount(table.Columns.Count, 4))
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Count;
+
                         // Масса
                         table.Cells[rowNum, table.Columns.Count - 1].TextString = specificationItemForTable.Mass.Trim();
                     }
                 }
+
                 if (table.TableStyleName.Equals("Mp_GOST_21.501_F8"))
                 {
                     if (CheckColumnsCount(table.Columns.Count, 6))
                     {
                         // Позиция
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Position.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+
                         // Масса
                         table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
                     }
                 }
+
                 if (table.TableStyleName.Equals("Mp_GOST_2.106_F1"))
                 {
                     if (CheckColumnsCount(table.Columns.Count, 7))
                     {
                         // Позиция
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Position.Trim();
+
                         // Обозначение
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Designation.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 4].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 5].TextString = specificationItemForTable.Count;
                     }
                 }
+
                 if (table.TableStyleName.Equals("Mp_GOST_2.106_F1a"))
                 {
                     if (CheckColumnsCount(table.Columns.Count, 5))
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Обозначение
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
                     }
                 }
             }
+
+            // Если таблица не из плагина
             else
-                // Если таблица не из плагина
             {
                 if (MessageBox.ShowYesNo(Language.GetItem(LangItem, "msg19"), MessageBoxIcon.Question))
                 {
@@ -690,34 +770,46 @@ namespace ModPlus.Helpers
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Count;
+
                         // Масса
                         table.Cells[rowNum, table.Columns.Count - 1].TextString = specificationItemForTable.Mass.Trim();
                     }
+
                     if (table.Columns.Count == 5)
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Обозначение
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
                     }
+
                     if (table.Columns.Count >= 6)
                     {
                         // Позиция
                         table.Cells[rowNum, 0].TextString = specificationItemForTable.Position.Trim();
+
                         // Обозначение
                         table.Cells[rowNum, 1].TextString = specificationItemForTable.Designation.Trim();
+
                         // Наименование
                         table.Cells[rowNum, 2].TextString = specificationItemForTable.Name.Trim();
+
                         // Количество
                         table.Cells[rowNum, 3].TextString = specificationItemForTable.Count;
+
                         // Масса
                         table.Cells[rowNum, table.Columns.Count - 2].TextString = specificationItemForTable.Mass.Trim();
                     }

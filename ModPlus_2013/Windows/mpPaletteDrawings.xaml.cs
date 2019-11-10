@@ -77,22 +77,24 @@
             }
             catch
             {
-                //ignored
+                // ignored
             }
         }
         
         // Чертеж закрыт
-        void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
+        private void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {
             GetDocuments();
             CheckUnused();
         }
+
         // Документ создан/открыт
-        void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
+        private void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
         {
             GetDocuments();
             CheckUnused();
         }
+
         // Выбор чертежа в списке открытых
         private void Drawings_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -111,6 +113,7 @@
                     {
                         _docs.MdiActiveDocument = doc;
                     }
+
                     break;
                 }
             }
@@ -119,6 +122,7 @@
                 // ignored
             }
         }
+
         // Нажатие кнопки закрытия чертежа
         private void BtCloseDwg_Click(object sender, RoutedEventArgs e)
         {
@@ -134,6 +138,7 @@
                             AcApp.DocumentManager.
                                 MdiActiveDocument.SendStringToExecute("_CLOSE ", true, false, false);
                         }
+
                         break;
                     }
                 }
@@ -146,7 +151,7 @@
 
         private void BtAddDrawing_OnClick(object sender, RoutedEventArgs e)
         {
-            if(_docs.Count > 0)
+            if (_docs.Count > 0)
                 AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_NEW ", true, false, false);
         }
 

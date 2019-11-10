@@ -1,11 +1,13 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using Autodesk.AutoCAD.DatabaseServices;
-using ModPlusAPI.Windows;
-
-namespace ModPlus.Helpers
+﻿namespace ModPlus.Helpers
 {
-    /// <summary>Вспомогательные методы для работы с расширенными данными (XData)</summary>
+    using System;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+
+    /// <summary>
+    /// Вспомогательные методы для работы с расширенными данными (XData)
+    /// </summary>
     public static class XDataHelpers
     {
         /// <summary>Добавление (регистрация) имени приложения</summary>
@@ -19,13 +21,15 @@ namespace ModPlus.Helpers
                 if (!rat.Has(regAppName))
                 {
                     rat.UpgradeOpen();
-                    var ratr = new RegAppTableRecord { Name = regAppName };
-                    rat.Add(ratr);
-                    tr.AddNewlyCreatedDBObject(ratr, true);
+                    var tableRecord = new RegAppTableRecord { Name = regAppName };
+                    rat.Add(tableRecord);
+                    tr.AddNewlyCreatedDBObject(tableRecord, true);
                 }
+
                 tr.Commit();
             }
         }
+
         /// <summary>Добавление текстовых расширенных данных в именованный словарь</summary>
         /// <param name="dictionaryName">Словарь</param>
         /// <param name="value">Добавляемое значение</param>
@@ -46,7 +50,7 @@ namespace ModPlus.Helpers
                                 Data = new ResultBuffer(new TypedValue(Convert.ToInt32(DxfCode.Text), value))
                             };
 
-                            var dict =(DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, false);
+                            var dict = (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, false);
                             dict.SetAt(dictionaryName, rec);
                             tr.AddNewlyCreatedDBObject(rec, true);
                             tr.Commit();
@@ -59,9 +63,10 @@ namespace ModPlus.Helpers
                 }
             }
         }
+
         /// <summary>Получение текстовых расширенных данных из указанного именованного словаря</summary>
         /// <param name="dictionaryName">Словарь</param>
-        /// <returns>Строковое значение. В случае ошибки или отсутсвия словаря возвращается string.Empty</returns>
+        /// <returns>Строковое значение. В случае ошибки или отсутствия словаря возвращается string.Empty</returns>
         public static string GetStringXData(string dictionaryName)
         {
             var doc = AcApp.DocumentManager.MdiActiveDocument;
@@ -74,15 +79,17 @@ namespace ModPlus.Helpers
                     {
                         using (var tr = db.TransactionManager.StartTransaction())
                         {
-                            var dict =(DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, true);
+                            var dict = (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, OpenMode.ForWrite, true);
                             var id = dict.GetAt(dictionaryName);
                             var rec = tr.GetObject(id, OpenMode.ForWrite, true) as Xrecord;
                             var value = string.Empty;
                             if (rec != null)
+                            {
                                 foreach (var rb in rec.Data.AsArray())
                                 {
                                     value = rb.Value.ToString();
                                 }
+                            }
 
                             tr.Commit();
                             return value;
@@ -94,8 +101,10 @@ namespace ModPlus.Helpers
                     return string.Empty;
                 }
             }
+
             return string.Empty;
         }
+
         /// <summary>Проверка наличия именованного словаря расширенных данных по имени</summary>
         /// <param name="dictionaryName">Словарь</param>
         /// <returns>True - словарь существует, False - словарь отсутствует или произошла ошибка</returns>
@@ -117,19 +126,22 @@ namespace ModPlus.Helpers
                                 tr.Commit();
                                 return true;
                             }
+
                             tr.Commit();
                             return false;
                         }
                     }
-                } // try
+                }
                 catch (Exception ex)
                 {
                     ExceptionBox.Show(ex);
                     return false;
                 }
             }
+
             return false;
         }
+
         /// <summary>Удаление значения расширенных данных из именованного словаря. Поиск словаря происходит по указанному значению</summary>
         /// <param name="value">Удаляемое значение</param>
         public static void DeleteStringXData(string value)
@@ -162,6 +174,7 @@ namespace ModPlus.Helpers
                                 }
                             }
                         }
+
                         tr.Commit();
                     }
                 }

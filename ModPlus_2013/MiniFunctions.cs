@@ -38,25 +38,29 @@ namespace ModPlus
             var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b;
             if (entByBlockObjContMen)
                 MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
-            else MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
+            else
+                MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
 
             // nested ent layer
             var nestedEntLayerObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b;
             if (nestedEntLayerObjContMen)
                 MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Attach();
-            else MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
+            else
+                MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
 
             // Fast block
             var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
                 MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
-            else MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
+            else
+                MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
 
             // VP to MS
             var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
                 MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
-            else MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
+            else
+                MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Detach();
 
             // wipeout vertex edit
             /*
@@ -154,6 +158,7 @@ namespace ModPlus
                     }
                 }
             }
+
             if (detach)
                 MiniFunctionsContextMenuExtensions.WipeoutEditObjectContextMenu.Detach();
         }
@@ -181,9 +186,11 @@ namespace ModPlus
                         AllowDuplicates = false
                     };
                     var psr = ed.GetSelection(pso);
-                    if (psr.Status != PromptStatus.OK) return;
+                    if (psr.Status != PromptStatus.OK)
+                        return;
                     selectedObjects = psr;
                 }
+
                 if (selectedObjects.Value.Count > 0)
                 {
                     using (var tr = doc.TransactionManager.StartTransaction())
@@ -196,8 +203,10 @@ namespace ModPlus
                                 ChangeProperties((selEnt as BlockReference).BlockTableRecord);
                             }
                         }
+
                         tr.Commit();
                     }
+
                     ed.Regen();
                 }
             }
@@ -237,6 +246,7 @@ namespace ModPlus
                         }
                     }
                 }
+
                 tr.Commit();
             }
         }
@@ -263,9 +273,11 @@ namespace ModPlus
                         AllowDuplicates = false
                     };
                     var psr = ed.GetSelection(pso);
-                    if (psr.Status != PromptStatus.OK) return;
+                    if (psr.Status != PromptStatus.OK)
+                        return;
                     selectedObjects = psr;
                 }
+
                 if (selectedObjects.Value.Count > 0)
                 {
                     var selectLayerWin = new SelectLayer();
@@ -324,13 +336,13 @@ namespace ModPlus
                         }
                     }
                 }
+
                 tr.Commit();
             }
         }
 
         #endregion
-
-
+        
         #region VP to MS
 #if ac2010
         [DllImport("acad.exe", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
@@ -338,6 +350,7 @@ namespace ModPlus
 #else
         [DllImport("accore.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
+
 #endif
         [CommandMethod("ModPlus", "mpVPtoMS", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public void VPtoMS()
@@ -359,6 +372,7 @@ namespace ModPlus
                                 continue;
                             objectId = selectedObject.ObjectId;
                         }
+
                         tr.Dispose();
                     }
                 }
@@ -382,10 +396,13 @@ namespace ModPlus
                     peo.AddAllowedClass(typeof(Polyline2d), true);
                     peo.AddAllowedClass(typeof(Curve), true);
                     var per = ed.GetEntity(peo);
-                    if (per.Status != PromptStatus.OK) return;
+                    if (per.Status != PromptStatus.OK)
+                        return;
                     objectId = per.ObjectId;
                 }
-                if (objectId == ObjectId.Null) return;
+
+                if (objectId == ObjectId.Null)
+                    return;
                 using (var tr = doc.TransactionManager.StartTransaction())
                 {
                     Viewport viewport;
@@ -403,7 +420,8 @@ namespace ModPlus
                             var clipVp = tr.GetObject(vpid, OpenMode.ForRead);
                             if (clipVp is Viewport)
                                 viewport = clipVp as Viewport;
-                            else return;
+                            else
+                                return;
                         }
                         else
                         {
@@ -411,23 +429,32 @@ namespace ModPlus
                             return;
                         }
                     }
+
                     // Переключаемся в пространство листа
                     ed.SwitchToPaperSpace();
+
                     // Номер текущего видового экрана
                     var vpNumber = (short)viewport.Number;
+
                     // Получаем точки границ текущего ВЭ
                     var psVpPnts = VPcontuorPoints(viewport, tr);
+
                     // Если есть точки, продолжаем
-                    if (psVpPnts.Count == 0) return;
+                    if (psVpPnts.Count == 0)
+                        return;
+
                     // Обновляем вид
                     ed.UpdateScreen();
+
                     // Переходим внутрь активного ВЭ
                     ed.SwitchToModelSpace();
+
                     // Проверяем состояние ВЭ
                     if (viewport.Number > 0)
                     {
                         // Переключаемся в обрабатываемый ВЭ                                            
                         AcApp.SetSystemVariable("CVPORT", vpNumber);
+
                         // Переводим в модель граничные точки текущего ВЭ
                         var msVpPnts = ConvertVPcontuorPointsToMSpoints(psVpPnts);
 
@@ -436,7 +463,9 @@ namespace ModPlus
                         {
                             pline.AddVertexAt(i, new Point2d(msVpPnts[i].X, msVpPnts[i].Y), 0.0, 0.0, 0.0);
                         }
+
                         pline.Closed = true;
+
                         // свойства
                         pline.Layer = "0";
 
@@ -445,11 +474,13 @@ namespace ModPlus
                         btr?.AppendEntity(pline);
                         tr.AddNewlyCreatedDBObject(pline, true);
                     }
+
                     // now switch back to PS
                     ed.SwitchToPaperSpace();
 
                     tr.Commit();
                 }
+
                 // clear selection
                 ed.SetImpliedSelection(new ObjectId[0]);
             }
@@ -458,15 +489,18 @@ namespace ModPlus
                 ExceptionBox.Show(exception);
             }
         }
+
         private Point3dCollection VPcontuorPoints(Viewport viewport, Transaction tr)
         {
             // Коллекция для точек видового экрана
             Point3dCollection psVpPnts = new Point3dCollection();
+
             // Если видовой экран стандартный прямоугольный
             if (!viewport.NonRectClipOn)
             {
                 // Получаем его точки
                 viewport.GetGripPoints(psVpPnts, new IntegerCollection(), new IntegerCollection());
+
                 // Выстраиваем точки в правильном порядке, по умолчанию они крест-накрест
                 Point3d tmp = psVpPnts[2];
                 psVpPnts[2] = psVpPnts[1];
@@ -482,7 +516,8 @@ namespace ModPlus
                     if (ent is Polyline)
                     {
                         Polyline pline = ent as Polyline;
-                        for (int i = 0; i < pline.NumberOfVertices; i++) psVpPnts.Add(pline.GetPoint3dAt(i));
+                        for (int i = 0; i < pline.NumberOfVertices; i++)
+                            psVpPnts.Add(pline.GetPoint3dAt(i));
                     }
                     else if (ent is Polyline2d)
                     {
@@ -491,7 +526,8 @@ namespace ModPlus
                         {
                             using (Vertex2d vert = tr.GetObject(vertId, OpenMode.ForRead) as Vertex2d)
                             {
-                                if (!psVpPnts.Contains(vert.Position)) psVpPnts.Add(vert.Position);
+                                if (!psVpPnts.Contains(vert.Position))
+                                    psVpPnts.Add(vert.Position);
                             }
                         }
 
@@ -519,12 +555,14 @@ namespace ModPlus
                     }
                 }
             }
+
             return psVpPnts;
         }
 
         private Point3dCollection ConvertVPcontuorPointsToMSpoints(Point3dCollection psVpPnts)
         {
             Point3dCollection msVpPnts = new Point3dCollection();
+
             // Преобразование точки из PS в MS
             ResultBuffer rbPSDCS = new ResultBuffer(new TypedValue(5003, 3));
             ResultBuffer rbDCS = new ResultBuffer(new TypedValue(5003, 2));
@@ -537,13 +575,17 @@ namespace ModPlus
                 // в DCS пространства Модели текущего Видового Экрана RTSHORT=2
                 acedTrans(pnt.ToArray(), rbPSDCS.UnmanagedObject, rbDCS.UnmanagedObject, 0,
                     retPoint);
+
                 // Преобразуем из DCS пространства Модели текущего Видового Экрана RTSHORT=2
                 // в WCS RTSHORT=0
                 acedTrans(retPoint, rbDCS.UnmanagedObject, rbWCS.UnmanagedObject, 0, retPoint);
+
                 // Добавляем точку в коллекцию
                 Point3d newPt = new Point3d(retPoint);
-                if (!msVpPnts.Contains(newPt)) msVpPnts.Add(newPt);
+                if (!msVpPnts.Contains(newPt))
+                    msVpPnts.Add(newPt);
             }
+
             return msVpPnts;
         }
 
@@ -572,7 +614,8 @@ namespace ModPlus
                     peo.AddAllowedClass(typeof(Wipeout), true);
 
                     var ent = ed.GetEntity(peo);
-                    if (ent.Status != PromptStatus.OK) return;
+                    if (ent.Status != PromptStatus.OK)
+                        return;
 
                     selectedId = ent.ObjectId;
                 }
@@ -580,6 +623,7 @@ namespace ModPlus
                 {
                     selectedId = selectedObjects.Value[0].ObjectId;
                 }
+
                 if (selectedId != ObjectId.Null)
                     AddVertexToCurrentWipeout(selectedId);
             }
@@ -610,7 +654,8 @@ namespace ModPlus
                     peo.AddAllowedClass(typeof(Wipeout), true);
 
                     var ent = ed.GetEntity(peo);
-                    if (ent.Status != PromptStatus.OK) return;
+                    if (ent.Status != PromptStatus.OK)
+                        return;
 
                     selectedId = ent.ObjectId;
                 }
@@ -618,6 +663,7 @@ namespace ModPlus
                 {
                     selectedId = selectedObjects.Value[0].ObjectId;
                 }
+
                 if (selectedId != ObjectId.Null)
                     RemoveVertexFromCurrentWipeout(selectedId);
             }
@@ -647,9 +693,13 @@ namespace ModPlus
                             {
                                 polyline.AddVertexAt(i, new Point2d(points3D[i].X, points3D[i].Y), 0.0, 0.0, 0.0);
                             }
+
                             var jig = new AddVertexJig();
                             var jres = jig.StartJig(polyline);
-                            if (jres.Status != PromptStatus.OK) loop = false;
+                            if (jres.Status != PromptStatus.OK)
+                            {
+                                loop = false;
+                            }
                             else
                             {
                                 polyline.AddVertexAt(jig.Vertex() + 1, jig.PickedPoint(), 0.0, 0.0, 0.0);
@@ -658,9 +708,11 @@ namespace ModPlus
                                 {
                                     new2DPoints.Add(polyline.GetPoint2dAt(i));
                                 }
+
                                 wipeout.SetFrom(new2DPoints, polyline.Normal);
                             }
                         }
+
                         tr.Commit();
                     }
                 }
@@ -690,9 +742,12 @@ namespace ModPlus
                                 {
                                     polyline.AddVertexAt(i, new Point2d(points3D[i].X, points3D[i].Y), 0.0, 0.0, 0.0);
                                 }
+
                                 var pickedPt = ed.GetPoint("\n" + Language.GetItem(LangItem, "msg22") + ":");
                                 if (pickedPt.Status != PromptStatus.OK)
+                                {
                                     loop = false;
+                                }
                                 else
                                 {
                                     var pt = polyline.GetClosestPointTo(pickedPt.Value, false);
@@ -704,6 +759,7 @@ namespace ModPlus
                                     {
                                         new2DPoints.Add(polyline.GetPoint2dAt(i));
                                     }
+
                                     wipeout.SetFrom(new2DPoints, polyline.Normal);
                                 }
                             }
@@ -713,6 +769,7 @@ namespace ModPlus
                                 loop = false;
                             }
                         }
+
                         tr.Commit();
                     }
                 }
@@ -773,6 +830,7 @@ namespace ModPlus
                         _prevPoint = _currentPoint;
                         return SamplerStatus.OK;
                     }
+
                     return SamplerStatus.NoChange;
                 }
 
@@ -812,6 +870,7 @@ namespace ModPlus
                         draw.Geometry.Draw(line2);
                     }
                 }
+
                 return true;
             }
 
@@ -921,6 +980,7 @@ namespace ModPlus
                                         mi.Click += Mi_Click;
                                         ContextMenu.MenuItems.Add(mi);
                                     }
+
                                     Application.AddDefaultContextMenuExtension(ContextMenu);
                                 }
                             }
@@ -987,8 +1047,10 @@ namespace ModPlus
                     Editor ed = dm.MdiActiveDocument.Editor;
                     Database destDb = dm.MdiActiveDocument.Database;
                     Database sourceDb = new Database(false, true);
+
                     // Read the DWG into a side database
-                    sourceDb.ReadDwgFile(file, FileShare.Read, true, "");
+                    sourceDb.ReadDwgFile(file, FileShare.Read, true, string.Empty);
+
                     // Create a variable to store the list of block identifiers
                     ObjectIdCollection blockIds = new ObjectIdCollection();
                     using (dm.MdiActiveDocument.LockDocument())
@@ -997,19 +1059,23 @@ namespace ModPlus
                         {
                             // Open the block table
                             BlockTable bt = (BlockTable)sourceT.GetObject(sourceDb.BlockTableId, OpenMode.ForRead, false);
+
                             // Check each block in the block table
                             foreach (ObjectId btrId in bt)
                             {
                                 BlockTableRecord btr = (BlockTableRecord)sourceT.GetObject(btrId, OpenMode.ForRead, false);
+
                                 // Only add named & non-layout blocks to the copy list
                                 if (btr.Name.Equals(blockName))
                                 {
                                     blockIds.Add(btrId);
                                     break;
                                 }
+
                                 btr.Dispose();
                             }
                         }
+
                         // Copy blocks from source to destination database
                         IdMapping mapping = new IdMapping();
                         sourceDb.WblockCloneObjects(blockIds,
@@ -1018,6 +1084,7 @@ namespace ModPlus
                                                     DuplicateRecordCloning.Replace,
                                                     false);
                         sourceDb.Dispose();
+
                         // Вставка
 
                         using (var tr = destDb.TransactionManager.StartTransaction())
@@ -1071,11 +1138,16 @@ namespace ModPlus
                                 return id;
                             }
                         }
-                        else return id;
+                        else
+                        {
+                            return id;
+                        }
                     }
+
                     blkref.Erase();
                     return ObjectId.Null;
                 }
+
                 internal class BlockRefJig : EntityJig
                 {
                     Point3d m_Position, m_BasePoint;
@@ -1093,6 +1165,7 @@ namespace ModPlus
                         m_Ucs = ed.CurrentUserCoordinateSystem;
                         Update();
                     }
+
                     protected override SamplerStatus Sampler(JigPrompts prompts)
                     {
                         switch (m_PromptCounter)
@@ -1112,12 +1185,16 @@ namespace ModPlus
                                         m_BasePoint = m_Position;
                                     }
                                     else
+                                    {
                                         return SamplerStatus.NoChange;
+                                    }
+
                                     if (res.Status == PromptStatus.Cancel)
                                         return SamplerStatus.Cancel;
 
                                     return SamplerStatus.OK;
                                 }
+
                             case 1:
                                 {
                                     JigPromptAngleOptions jigOpts = new JigPromptAngleOptions("\n" + Language.GetItem(LangItem, "msg9"));
@@ -1140,10 +1217,12 @@ namespace ModPlus
 
                                     return SamplerStatus.OK;
                                 }
+
                             default:
                                 return SamplerStatus.NoChange;
                         }
                     }
+
                     protected override bool Update()
                     {
                         try
@@ -1165,8 +1244,10 @@ namespace ModPlus
                         {
                             return false;
                         }
+
                         return true;
                     }
+
                     public void SetPromptCounter(int i)
                     {
                         if (i == 0 || i == 1)
@@ -1181,6 +1262,7 @@ namespace ModPlus
             {
                 public static ContextMenuExtension ContextMenuForVP;
                 public static ContextMenuExtension ContextMenuForCurve;
+
                 public static void Attach()
                 {
                     if (ContextMenuForVP == null)
@@ -1193,6 +1275,7 @@ namespace ModPlus
                         var rxcEnt = RXObject.GetClass(typeof(Viewport));
                         Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
                     }
+
                     if (ContextMenuForCurve == null)
                     {
                         ContextMenuForCurve = new ContextMenuExtension();
@@ -1204,6 +1287,7 @@ namespace ModPlus
                         Application.AddObjectContextMenuExtension(rxcEnt, ContextMenuForCurve);
                     }
                 }
+
                 public static void Detach()
                 {
                     if (ContextMenuForVP != null)
@@ -1212,6 +1296,7 @@ namespace ModPlus
                         Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenuForVP);
                         ContextMenuForVP = null;
                     }
+
                     if (ContextMenuForCurve != null)
                     {
                         var rxcEnt = RXObject.GetClass(typeof(Curve));
@@ -1219,6 +1304,7 @@ namespace ModPlus
                         ContextMenuForCurve = null;
                     }
                 }
+
                 public static void StartFunction(object o, EventArgs e)
                 {
                     AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
@@ -1242,6 +1328,7 @@ namespace ModPlus
                         mi2.Click += Mi2_Click;
                         ContextMenu.MenuItems.Add(mi2);
                     }
+
                     var rxClass = RXObject.GetClass(typeof(Entity));
                     Application.AddObjectContextMenuExtension(rxClass, ContextMenu);
                 }
@@ -1252,7 +1339,8 @@ namespace ModPlus
                     {
                         var rxcEnt = RXObject.GetClass(typeof(Entity));
                         Application.RemoveObjectContextMenuExtension(rxcEnt, ContextMenu);
-                        //ContextMenu = null;
+
+                        // ContextMenu = null;
                     }
                 }
 

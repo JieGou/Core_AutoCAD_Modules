@@ -6,7 +6,9 @@
     using System.Runtime.Serialization.Formatters.Binary;
     using Autodesk.AutoCAD.DatabaseServices;
 
-    /// <summary>Вспомогательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"</summary>
+    /// <summary>
+    /// Вспомогательные методы работы с расширенными данными для функций из раздела "Продукты ModPlus"
+    /// </summary>
     public static class XDataHelpersForProducts
     {
         private const string AppName = "ModPlusProduct";
@@ -18,6 +20,7 @@
                 return rb != null;
             }
         }
+
         public static void SaveDataToEntity(object product, DBObject ent, Transaction tr)
         {
             var regTable = (RegAppTable)tr.GetObject(ent.Database.RegAppTableId, OpenMode.ForWrite);
@@ -36,6 +39,7 @@
                 ent.XData = resBuf;
             }
         }
+
         public static object NewFromEntity(Entity ent)
         {
             using (var resBuf = ent.GetXDataForApplication(AppName))
@@ -45,6 +49,7 @@
                     : NewFromResBuf(resBuf);
             }
         }
+
         private static object NewFromResBuf(ResultBuffer resBuf)
         {
             var bf = new BinaryFormatter { Binder = new MyBinder() };
@@ -55,6 +60,7 @@
 
             return mbc;
         }
+
         private static ResultBuffer SaveToResBuf(object product)
         {
             var bf = new BinaryFormatter();
@@ -66,7 +72,8 @@
 
             return resBuf;
         }
-        sealed class MyBinder : SerializationBinder
+
+        public sealed class MyBinder : SerializationBinder
         {
             public override Type BindToType(
                 string assemblyName,
@@ -75,7 +82,8 @@
                 return Type.GetType($"{typeName}, {assemblyName}");
             }
         }
-        class MyUtil
+
+        public class MyUtil
         {
             const int KMaxChunkSize = 127;
 
@@ -110,6 +118,7 @@
                     var datachunk = (byte[])values[i].Value;
                     ms.Write(datachunk, 0, datachunk.Length);
                 }
+
                 ms.Position = 0;
 
                 return ms;

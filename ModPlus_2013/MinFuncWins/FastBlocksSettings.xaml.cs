@@ -1,31 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Windows;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using Visibility = System.Windows.Visibility;
-
-namespace ModPlus.MinFuncWins
+﻿namespace ModPlus.MinFuncWins
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Windows;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using Visibility = System.Windows.Visibility;
+
     public partial class FastBlocksSettings
     {
         private static string _langItem = "AutocadDlls";
+        private List<FastBlock> _fastBlocks;
 
         private class FastBlock
         {
             public string Name { get; set; }
+
             public string File { get; set; }
+
             public string BlockName { get; set; }
+
             public Visibility FileAsBlockVisibility { get; set; }
         }
-
-        private List<FastBlock> _fastBlocks;
 
         public FastBlocksSettings()
         {
@@ -53,6 +55,7 @@ namespace ModPlus.MinFuncWins
             LoadFromSettingsFile();
             LwFastBlocks.ItemsSource = _fastBlocks;
         }
+
         // save to settings file
         private void SaveToSettingsFile()
         {
@@ -70,7 +73,11 @@ namespace ModPlus.MinFuncWins
                             fastBlocksXml = new XElement("mpFastBlocks");
                             settingsXml.Add(fastBlocksXml);
                         }
-                        else fastBlocksXml.RemoveAll(); // cleanUp
+                        else
+                        {
+                            fastBlocksXml.RemoveAll(); // cleanUp
+                        }
+
                         // add
                         foreach (var fb in _fastBlocks)
                         {
@@ -81,6 +88,7 @@ namespace ModPlus.MinFuncWins
                             fastBlocksXml.Add(fbXml);
                         }
                     }
+
                     // Save
                     configXml.Save(UserConfigFile.FullFileName);
                 }
@@ -90,6 +98,7 @@ namespace ModPlus.MinFuncWins
                 ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err4"), MessageBoxIcon.Close);
             }
         }
+
         // load from settings file
         private void LoadFromSettingsFile()
         {
@@ -105,9 +114,9 @@ namespace ModPlus.MinFuncWins
                     {
                         var fb = new FastBlock
                         {
-                            Name = fbXml.Attribute("Name").Value,
-                            BlockName = fbXml.Attribute("BlockName").Value,
-                            File = fbXml.Attribute("File").Value
+                            Name = fbXml.Attribute("Name")?.Value,
+                            BlockName = fbXml.Attribute("BlockName")?.Value,
+                            File = fbXml.Attribute("File")?.Value
                         };
                         _fastBlocks.Add(fb);
                     }
@@ -118,10 +127,13 @@ namespace ModPlus.MinFuncWins
                 ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(_langItem, "err4"), MessageBoxIcon.Close);
             }
         }
+
         private void LwFastBlocks_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is ListView lw) BtRemoveBlock.IsEnabled = lw.SelectedIndex != -1;
+            if (sender is ListView lw)
+                BtRemoveBlock.IsEnabled = lw.SelectedIndex != -1;
         }
+
         // remove item from list
         private void BtRemoveBlock_OnClick(object sender, RoutedEventArgs e)
         {
@@ -131,14 +143,17 @@ namespace ModPlus.MinFuncWins
                 {
                     var selectedItem = LwFastBlocks.SelectedItem as FastBlock;
                     _fastBlocks.Remove(selectedItem);
+
                     // save
                     SaveToSettingsFile();
+
                     // reload
                     LwFastBlocks.ItemsSource = null;
                     LwFastBlocks.ItemsSource = _fastBlocks;
                 }
             }
         }
+
         // add item
         private void BtAddNewBlock_OnClick(object sender, RoutedEventArgs e)
         {
@@ -146,13 +161,13 @@ namespace ModPlus.MinFuncWins
             {
                 if (_fastBlocks.Count < 10)
                 {
-                    var ofd = new OpenFileDialog(ModPlusAPI.Language.GetItem(_langItem, "err6"), "", "dwg", "",
+                    var ofd = new OpenFileDialog(ModPlusAPI.Language.GetItem(_langItem, "err6"), string.Empty, "dwg", string.Empty,
                         OpenFileDialog.OpenFileDialogFlags.NoFtpSites | OpenFileDialog.OpenFileDialogFlags.NoUrls);
                     Topmost = false;
                     if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         var db = new Database(false, true);
-                        db.ReadDwgFile(ofd.Filename, FileShare.Read, true, "");
+                        db.ReadDwgFile(ofd.Filename, FileShare.Read, true, string.Empty);
                         var blocks = new List<string>();
                         using (var tr = db.TransactionManager.StartTransaction())
                         {
@@ -163,6 +178,7 @@ namespace ModPlus.MinFuncWins
                                             where !btRecord.IsLayout & !btRecord.IsAnonymous
                                             select btRecord.Name);
                         }
+
                         var validateNames = _fastBlocks.Select(fastBlock => fastBlock.Name).ToList();
                         var fbs = new FastBlockSelection(validateNames)
                         {
@@ -177,13 +193,16 @@ namespace ModPlus.MinFuncWins
                                 BlockName = fbs.LbBlocks.SelectedItem.ToString()
                             };
                             _fastBlocks.Add(fb);
+
                             // save
                             SaveToSettingsFile();
+
                             // reload
                             LwFastBlocks.ItemsSource = null;
                             LwFastBlocks.ItemsSource = _fastBlocks;
                         }
                     }
+
                     Topmost = true;
                 }
                 else

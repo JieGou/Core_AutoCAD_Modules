@@ -1,32 +1,34 @@
 ﻿namespace ModPlus
 {
-    // Данные, зависящие от версии
-    internal class MpVersionData
+    /// <summary>
+    /// Данные, зависящие от версии
+    /// </summary>
+    internal class VersionData
     {
 #if A2013
-        public const string CurCadVers = "2013";
-        public const string CurCadInternalVersion = "19.0";
+        public const string CurrentCadVersion = "2013";
+        public const string CurrentCadInternalVersion = "19.0";
 #elif A2014
-        public const string CurCadVers = "2014";
-        public const string CurCadInternalVersion = "19.1";
+        public const string CurrentCadVersion = "2014";
+        public const string CurrentCadInternalVersion = "19.1";
 #elif A2015
-        public const string CurCadVers = "2015";
-        public const string CurCadInternalVersion = "20.0";
+        public const string CurrentCadVersion = "2015";
+        public const string CurrentCadInternalVersion = "20.0";
 #elif A2016
-        public const string CurCadVers = "2016";
-        public const string CurCadInternalVersion = "20.1";
+        public const string CurrentCadVersion = "2016";
+        public const string CurrentCadInternalVersion = "20.1";
 #elif A2017
-        public const string CurCadVers = "2017";
-        public const string CurCadInternalVersion = "21.0";
+        public const string CurrentCadVersion = "2017";
+        public const string CurrentCadInternalVersion = "21.0";
 #elif A2018
-        public const string CurCadVers = "2018";
-        public const string CurCadInternalVersion = "22.0";
+        public const string CurrentCadVersion = "2018";
+        public const string CurrentCadInternalVersion = "22.0";
 #elif A2019
-        public const string CurCadVers = "2019";
-        public const string CurCadInternalVersion = "23.0";
+        public const string CurrentCadVersion = "2019";
+        public const string CurrentCadInternalVersion = "23.0";
 #elif A2020
-        public const string CurCadVers = "2020";
-        public const string CurCadInternalVersion = "23.1";
+        public const string CurrentCadVersion = "2020";
+        public const string CurrentCadInternalVersion = "23.1";
 #endif
     }
 }

@@ -1,16 +1,18 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-using Autodesk.AutoCAD.Runtime;
-using ModPlusAPI;
-#pragma warning disable 1591
+﻿#pragma warning disable 1591
 
 namespace ModPlus.App
 {
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
+    using Autodesk.AutoCAD.Runtime;
+    using ModPlusAPI;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+
     public class MpProductsDrawableOverrule : DrawableOverrule
     {
         public static MpProductsDrawableOverrule MpProductsDrawableOverruleInstance;
+
         public static MpProductsDrawableOverrule Instance()
         {
             return MpProductsDrawableOverruleInstance ?? (MpProductsDrawableOverruleInstance = new MpProductsDrawableOverrule());
@@ -27,29 +29,28 @@ namespace ModPlus.App
                     {
                         if (ent.IsModPlusProduct())
                         {
-                            double height = (double) AcApp.GetSystemVariable("VIEWSIZE");
+                            double height = (double)AcApp.GetSystemVariable("VIEWSIZE");
                             var scale = height / 1500;
                             var offset = 20;
                             var plane = ent.GetPlane();
 
                             Matrix3d ucs = AcApp.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
                             var extents = ent.GeometricExtents;
-                            //var pt = extents.MaxPoint;
                             var pt = extents.MaxPoint.TransformBy(ucs.Inverse());
                             Point3dCollection points = new Point3dCollection();
-                            points.Add(new Point3d(pt.X + (offset + 00) * scale, pt.Y + (offset + 00) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 00) * scale, pt.Y + (offset + 10) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 10) * scale, pt.Y + (offset + 10) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 10) * scale, pt.Y + (offset + 30) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 00) * scale, pt.Y + (offset + 30) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 00) * scale, pt.Y + (offset + 40) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 30) * scale, pt.Y + (offset + 40) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 30) * scale, pt.Y + (offset + 30) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 20) * scale, pt.Y + (offset + 30) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 20) * scale, pt.Y + (offset + 10) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 30) * scale, pt.Y + (offset + 10) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 30) * scale, pt.Y + (offset + 00) * scale, plane.PointOnPlane.Z));
-                            points.Add(new Point3d(pt.X + (offset + 00) * scale, pt.Y + (offset + 00) * scale, plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 00) * scale), pt.Y + ((offset + 00) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 00) * scale), pt.Y + ((offset + 10) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 10) * scale), pt.Y + ((offset + 10) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 10) * scale), pt.Y + ((offset + 30) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 00) * scale), pt.Y + ((offset + 30) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 00) * scale), pt.Y + ((offset + 40) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 30) * scale), pt.Y + ((offset + 40) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 30) * scale), pt.Y + ((offset + 30) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 20) * scale), pt.Y + ((offset + 30) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 20) * scale), pt.Y + ((offset + 10) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 30) * scale), pt.Y + ((offset + 10) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 30) * scale), pt.Y + ((offset + 00) * scale), plane.PointOnPlane.Z));
+                            points.Add(new Point3d(pt.X + ((offset + 00) * scale), pt.Y + ((offset + 00) * scale), plane.PointOnPlane.Z));
 
                             short backupColor = wd.SubEntityTraits.Color;
                             FillType backupFillType = wd.SubEntityTraits.FillType;
@@ -57,6 +58,7 @@ namespace ModPlus.App
                             wd.SubEntityTraits.Color = 150;
                             wd.Geometry.Polygon(points);
                             wd.SubEntityTraits.FillType = FillType.FillNever;
+                            
                             // restore
                             wd.SubEntityTraits.Color = backupColor;
                             wd.SubEntityTraits.FillType = backupFillType;
@@ -69,6 +71,7 @@ namespace ModPlus.App
                     }
                 }
             }
+
             return base.WorldDraw(drawable, wd);
         }
     }
@@ -88,6 +91,7 @@ namespace ModPlus.App
                 AcApp.DocumentManager.MdiActiveDocument.Editor.Regen();
             }
         }
+
         /// <summary>Отключить идентификационные иконки для примитивов, имеющих расширенные данные продуктов ModPlus</summary>
         [CommandMethod("mpHideProductIcons")]
         public void HideIcon()

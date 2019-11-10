@@ -1,22 +1,24 @@
 ﻿namespace ModPlus.App
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.Linq;
-    using Autodesk.Windows;
     using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.Windows;
     using Helpers;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using Orientation = System.Windows.Controls.Orientation;
     using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
     using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
     using RibbonSplitButton = Autodesk.Windows.RibbonSplitButton;
     using RibbonSplitButtonListStyle = Autodesk.Windows.RibbonSplitButtonListStyle;
-    using ModPlusAPI;
-    using ModPlusAPI.Windows;
-    using Orientation = System.Windows.Controls.Orientation;
 
     internal static class RibbonBuilder
     {
         private const string LangItem = "AutocadDlls";
+        private static bool _wasActive;
+        private static int _colorTheme = 1;
 
         public static void BuildRibbon(bool setActive = false)
         {
@@ -41,6 +43,7 @@
                     break;
                 }
             }
+
             return loaded;
         }
 
@@ -52,6 +55,7 @@
                 if (tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus"))
                     return tab.IsActive;
             }
+
             return false;
         }
 
@@ -61,11 +65,11 @@
             {
                 if (IsLoaded())
                 {
-                    var ribCntrl = ComponentManager.Ribbon;
-                    foreach (var tab in ribCntrl.Tabs.Where(
+                    var ribbonControl = ComponentManager.Ribbon;
+                    foreach (var tab in ribbonControl.Tabs.Where(
                         tab => tab.Id.Equals("ModPlus_ID") && tab.Title.Equals("ModPlus")))
                     {
-                        ribCntrl.Tabs.Remove(tab);
+                        ribbonControl.Tabs.Remove(tab);
                         AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                         break;
                     }
@@ -77,11 +81,10 @@
             }
         }
 
-        private static bool _wasActive = false;
-
         private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
         {
-            if (e.Name.Equals("WSCURRENT")) BuildRibbon();
+            if (e.Name.Equals("WSCURRENT"))
+                BuildRibbon();
             if (e.Name.Equals("COLORTHEME"))
             {
                 _wasActive = IsActive();
@@ -90,8 +93,6 @@
             }
         }
 
-        private static int _colorTheme = 1;
-
         private static void GetColorTheme()
         {
             try
@@ -99,7 +100,8 @@
                 var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
                 if (int.TryParse(sv, out var i))
                     _colorTheme = i;
-                else _colorTheme = 1; // light
+                else 
+                    _colorTheme = 1; // light
             }
             catch
             {
@@ -112,14 +114,17 @@
             try
             {
                 var ribCntrl = ComponentManager.Ribbon;
+
                 // add the tab
                 var ribTab = new RibbonTab { Title = "ModPlus", Id = "ModPlus_ID" };
                 ribCntrl.Tabs.Add(ribTab);
+
                 // add content
                 AddPanels(ribTab);
+
                 // add help panel
                 AddHelpPanel(ribTab);
-                ////////////////////////
+
                 ribCntrl.UpdateLayout();
                 if (_wasActive || setActive)
                     ribTab.IsActive = true;
@@ -141,12 +146,15 @@
                 {
                     foreach (var group in confCuiXel.Elements("Group"))
                     {
-                        if (group.Attribute("GroupName") == null) continue;
+                        if (group.Attribute("GroupName") == null)
+                            continue;
+
                         // create the panel source
                         var ribSourcePanel = new RibbonPanelSource
                         {
                             Title = Language.TryGetCuiLocalGroupName(group.Attribute("GroupName")?.Value)
                         };
+
                         // now the panel
                         var ribPanel = new RibbonPanel
                         {
@@ -154,29 +162,38 @@
                         };
                         ribTab.Panels.Add(ribPanel);
                         var ribRowPanel = new RibbonRowPanel();
+
                         // Вводим спец.счетчик, который потребуется для разбивки по строкам
                         var nr = 0;
                         var hasFunctions = false;
+
                         // Если последняя функция в группе была 32х32
                         var lastWasBig = false;
+
                         // Проходим по функциям группы
                         foreach (var func in group.Elements("Function"))
                         {
                             var fNameAttr = func.Attribute("Name")?.Value;
-                            if (string.IsNullOrEmpty(fNameAttr)) continue;
+                            if (string.IsNullOrEmpty(fNameAttr))
+                                continue;
                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(fNameAttr)))
                             {
                                 var loadedFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(fNameAttr));
-                                if (loadedFunction == null) continue;
+                                if (loadedFunction == null)
+                                    continue;
                                 hasFunctions = true;
-                                if (nr == 0) ribRowPanel = new RibbonRowPanel();
+                                if (nr == 0)
+                                    ribRowPanel = new RibbonRowPanel();
+
                                 // В зависимости от размера
                                 var btnSizeAttr = func.Attribute("WH")?.Value;
-                                if (string.IsNullOrEmpty(btnSizeAttr)) continue;
+                                if (string.IsNullOrEmpty(btnSizeAttr))
+                                    continue;
                                 #region 16
                                 if (btnSizeAttr.Equals("16"))
                                 {
                                     lastWasBig = false;
+
                                     // Если функция имеет "подфункции", то делаем SplitButton
                                     if (func.Elements("SubFunction").Any())
                                     {
@@ -192,20 +209,21 @@
                                             ResizeStyle = RibbonItemResizeStyles.NoResize,
                                             ListStyle = RibbonSplitButtonListStyle.List
                                         };
+
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetSmallIcon(loadedFunction), //loadedFunction.SmallIconUrl,
-                                            GetBigIcon(loadedFunction), //loadedFunction.BigIconUrl,
+                                            GetSmallIcon(loadedFunction),
+                                            GetBigIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                        );
+                                            loadedFunction.ToolTipHelpImage);
 
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
+
                                         // Затем добавляем подфункции
                                         foreach (var subFunc in func.Elements("SubFunction"))
                                         {
@@ -213,21 +231,23 @@
                                             {
                                                 var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions
                                                     .FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
-                                                if (loadedSubFunction == null) continue;
+                                                if (loadedSubFunction == null)
+                                                    continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                     loadedSubFunction.Name,
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
-                                                    GetSmallIcon(loadedSubFunction), // loadedSubFunction.SmallIconUrl,
-                                                    GetBigIcon(loadedSubFunction), // loadedSubFunction.BigIconUrl,
+                                                    GetSmallIcon(loadedSubFunction),
+                                                    GetBigIcon(loadedSubFunction),
                                                     Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
-                                                    loadedSubFunction.ToolTipHelpImage
-                                                    ));
+                                                    loadedSubFunction.ToolTipHelpImage));
                                             }
                                         }
+
                                         ribRowPanel.Items.Add(risSplitBtn);
                                     }
+
                                     // Если в конфигурации меню не прописано наличие подфункций, то проверяем, что они могут быть в самой функции
                                     else if (loadedFunction.SubFunctionsNames.Any())
                                     {
@@ -243,49 +263,52 @@
                                             ResizeStyle = RibbonItemResizeStyles.NoResize,
                                             ListStyle = RibbonSplitButtonListStyle.List
                                         };
+
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetSmallIcon(loadedFunction), // loadedFunction.SmallIconUrl,
-                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
+                                            GetSmallIcon(loadedFunction),
+                                            GetBigIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                        );
+                                            loadedFunction.ToolTipHelpImage);
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
+
                                         // Затем добавляем подфункции
                                         for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                                         {
                                             risSplitBtn.Items.Add(RibbonHelpers.AddButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                GetSmallIconForSubFunction(loadedFunction, i), // loadedFunction.SubSmallIconsUrl[i],
-                                                GetBigIconForSubFunction(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
+                                                GetSmallIconForSubFunction(loadedFunction, i),
+                                                GetBigIconForSubFunction(loadedFunction, i),
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
-                                                loadedFunction.SubHelpImages[i]
-                                                ));
+                                                loadedFunction.SubHelpImages[i]));
                                         }
+
                                         ribRowPanel.Items.Add(risSplitBtn);
                                     }
+
                                     // Иначе просто добавляем маленькую кнопку
                                     else
                                     {
                                         ribRowPanel.Items.Add(RibbonHelpers.AddSmallButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetSmallIcon(loadedFunction), // loadedFunction.SmallIconUrl,
+                                            GetSmallIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                            ));
+                                            loadedFunction.ToolTipHelpImage));
                                     }
+
                                     nr++;
-                                    if (nr == 3 | nr == 6) ribRowPanel.Items.Add(new RibbonRowBreak());
+                                    if (nr == 3 | nr == 6)
+                                        ribRowPanel.Items.Add(new RibbonRowBreak());
                                     if (nr == 9)
                                     {
                                         ribSourcePanel.Items.Add(ribRowPanel);
@@ -293,6 +316,7 @@
                                     }
                                 }
                                 #endregion
+
                                 // Если кнопка большая, то добавляем ее в отдельную Row Panel
                                 #region 32
                                 if (btnSizeAttr.Equals("32"))
@@ -303,7 +327,9 @@
                                         ribSourcePanel.Items.Add(ribRowPanel);
                                         nr = 0;
                                     }
+
                                     ribRowPanel = new RibbonRowPanel();
+
                                     // Если функция имеет "подфункции", то делаем SplitButton
                                     if (func.Elements("SubFunction").Any())
                                     {
@@ -319,38 +345,41 @@
                                             ResizeStyle = RibbonItemResizeStyles.NoResize,
                                             ListStyle = RibbonSplitButtonListStyle.List
                                         };
+
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                        );
+                                            loadedFunction.ToolTipHelpImage);
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
+
                                         // Затем добавляем подфункции
                                         foreach (var subFunc in func.Elements("SubFunction"))
                                         {
                                             if (LoadFunctionsHelper.LoadedFunctions.Any(x => x.Name.Equals(subFunc.Attribute("Name")?.Value)))
                                             {
                                                 var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFunc.Attribute("Name")?.Value));
-                                                if (loadedSubFunction == null) continue;
+                                                if (loadedSubFunction == null)
+                                                    continue;
                                                 risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                     loadedSubFunction.Name,
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
-                                                    GetBigIcon(loadedSubFunction), // loadedSubFunction.BigIconUrl,
+                                                    GetBigIcon(loadedSubFunction),
                                                     Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
-                                                    loadedSubFunction.ToolTipHelpImage
-                                                ));
+                                                    loadedSubFunction.ToolTipHelpImage));
                                             }
                                         }
+
                                         ribRowPanel.Items.Add(risSplitBtn);
                                     }
+
                                     // Если в конфигурации меню не прописано наличие подфункций, то проверяем, что они могут быть в самой функции
                                     else if (loadedFunction.SubFunctionsNames.Any())
                                     {
@@ -366,69 +395,75 @@
                                             ResizeStyle = RibbonItemResizeStyles.NoResize,
                                             ListStyle = RibbonSplitButtonListStyle.List
                                         };
+
                                         // Добавляем в него первую функцию, которую делаем основной
                                         var ribBtn = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                        );
+                                            loadedFunction.ToolTipHelpImage);
                                         risSplitBtn.Items.Add(ribBtn);
                                         risSplitBtn.Current = ribBtn;
-                                        // Затем добавляем подфункции
+
                                         // Затем добавляем подфункции
                                         for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                                         {
                                             risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
-                                                GetBigIconForSubFunction(loadedFunction, i), // loadedFunction.SubBigIconsUrl[i],
+                                                GetBigIconForSubFunction(loadedFunction, i),
                                                 Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
-                                                loadedFunction.SubHelpImages[i]
-                                            ));
+                                                loadedFunction.SubHelpImages[i]));
                                         }
+
                                         ribRowPanel.Items.Add(risSplitBtn);
                                     }
+
                                     // Иначе просто добавляем большую кнопку
                                     else
                                     {
                                         RibbonButton ribbonButton = RibbonHelpers.AddBigButton(
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                                            GetBigIcon(loadedFunction), // loadedFunction.BigIconUrl,
+                                            GetBigIcon(loadedFunction),
                                             Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Vertical,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                                            loadedFunction.ToolTipHelpImage
-                                        );
+                                            loadedFunction.ToolTipHelpImage);
                                         ribRowPanel.Items.Add(ribbonButton);
                                     }
+
                                     ribSourcePanel.Items.Add(ribRowPanel);
                                 }
                                 #endregion
                             }
                         }// foreach functions
+
                         if (ribRowPanel.Items.Any() & !lastWasBig)
                         {
                             ribSourcePanel.Items.Add(ribRowPanel);
                         }
-                        //Если в группе нет функций(например отключены), то не добавляем эту группу
+
+                        // Если в группе нет функций(например отключены), то не добавляем эту группу
                         if (!hasFunctions)
                             ribTab.Panels.Remove(ribPanel);
                     }
                 }
             }
-            catch (Exception exception) { ExceptionBox.Show(exception); }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
         }
 
         private static string GetSmallIcon(LoadedFunction loadedFunction)
         {
-            if (_colorTheme == 0) // dark
+            if (_colorTheme == 0)
             {
                 if (!string.IsNullOrEmpty(loadedFunction.SmallDarkIconUrl))
                     return loadedFunction.SmallDarkIconUrl;
@@ -439,7 +474,7 @@
 
         private static string GetBigIcon(LoadedFunction loadedFunction)
         {
-            if (_colorTheme == 0) // dark
+            if (_colorTheme == 0)
             {
                 if (!string.IsNullOrEmpty(loadedFunction.BigDarkIconUrl))
                     return loadedFunction.BigDarkIconUrl;
@@ -450,7 +485,7 @@
 
         private static string GetSmallIconForSubFunction(LoadedFunction loadedFunction, int i)
         {
-            if (_colorTheme == 0) // dark
+            if (_colorTheme == 0)
             {
                 if (!string.IsNullOrEmpty(loadedFunction.SubSmallDarkIconsUrl[i]))
                     return loadedFunction.SubSmallDarkIconsUrl[i];
@@ -461,7 +496,7 @@
 
         private static string GetBigIconForSubFunction(LoadedFunction loadedFunction, int i)
         {
-            if (_colorTheme == 0) // dark
+            if (_colorTheme == 0)
             {
                 if (!string.IsNullOrEmpty(loadedFunction.SubBigDarkIconsUrl[i]))
                     return loadedFunction.SubBigDarkIconsUrl[i];
@@ -477,6 +512,7 @@
             {
                 Title = "ModPlus"
             };
+
             // now the panel
             var ribPanel = new RibbonPanel
             {
@@ -491,33 +527,30 @@
                     "mpUserInfo",
                     Language.GetItem(LangItem, "h56"),
                     _colorTheme == 1
-                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/UserInfo_32x32.png"
-                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/UserInfo_32x32_dark.png",
+                        ? "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/UserInfo_32x32.png"
+                        : "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/UserInfo_32x32_dark.png",
                     Language.GetItem(LangItem, "h56"),
                     Orientation.Vertical,
                     string.Empty,
                     string.Empty,
-                    "help/userinfo"
-                    ));
+                    "help/userinfo"));
 
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                 "mpSettings",
                 Language.GetItem(LangItem, "h12"),
                 _colorTheme == 1
-                    ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt.png"
-                    : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/HelpBt_dark.png",
+                    ? "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/HelpBt.png"
+                    : "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/HelpBt_dark.png",
                 Language.GetItem(LangItem, "h41"),
                 Orientation.Vertical,
                 Language.GetItem(LangItem, "h42"),
                 string.Empty,
-                "help/mpsettings"
-                ));
+                "help/mpsettings"));
             ribSourcePanel.Items.Add(ribRowPanel);
 
-            // 
             ribRowPanel = new RibbonRowPanel();
-            if (LoadFunctionsHelper.HasmpStampsFunction(_colorTheme, out var icon))
+            if (LoadFunctionsHelper.HasStampsPlugin(_colorTheme, out var icon))
             {
                 ribRowPanel.Items.Add(
                     RibbonHelpers.AddSmallButton(
@@ -526,9 +559,8 @@
                         icon,
                         Language.GetItem(LangItem, "h44"),
                         Language.GetItem(LangItem, "h45"),
-                        "", "autocadplugins/mpstamps"
-                        )
-                    );
+                        string.Empty,
+                        "autocadplugins/mpstamps"));
                 ribRowPanel.Items.Add(new RibbonRowBreak());
             }
 
@@ -537,12 +569,11 @@
                     "mpShowProductIcons",
                     Language.GetItem(LangItem, "h46"),
                     _colorTheme == 1
-                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16.png"
-                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcons_16x16_dark.png",
+                        ? "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/mpShowProductIcons_16x16.png"
+                        : "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/mpShowProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h37"),
                     Language.GetItem(LangItem, "h38"),
-                    "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpShowProductIcon.png", "help/mpsettings"
-                    ));
+                    "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/mpShowProductIcon.png", "help/mpsettings"));
             ribRowPanel.Items.Add(new RibbonRowBreak());
 
             ribRowPanel.Items.Add(
@@ -550,12 +581,12 @@
                     "mpHideProductIcons",
                     Language.GetItem(LangItem, "h47"),
                     _colorTheme == 1
-                        ? "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16.png"
-                        : "pack://application:,,,/Modplus_" + MpVersionData.CurCadVers + ";component/Resources/mpHideProductIcons_16x16_dark.png",
+                        ? "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/mpHideProductIcons_16x16.png"
+                        : "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion + ";component/Resources/mpHideProductIcons_16x16_dark.png",
                     Language.GetItem(LangItem, "h39"),
-                    "",
-                    "", "help/mpsettings"
-                ));
+                    string.Empty,
+                    string.Empty, 
+                    "help/mpsettings"));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
     }

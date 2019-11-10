@@ -1,17 +1,17 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Internal;
-using ModPlusAPI;
-
-namespace ModPlus
+﻿namespace ModPlus
 {
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Input;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.AutoCAD.Internal;
+    using ModPlusAPI;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+
     partial class MpDrawings
     {
         // Переменные
@@ -21,11 +21,13 @@ namespace ModPlus
         {
             if (double.TryParse(Regestry.GetValue("DrawingsWinTop"), out var top))
                 Top = top;
-            else Top = 180;
+            else
+                Top = 180;
 
             if (double.TryParse(Regestry.GetValue("DrawingsWinLeft"), out var left))
                 Left = left;
-            else Left = 60;
+            else
+                Left = 60;
 
             InitializeComponent();
             ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
@@ -77,6 +79,7 @@ namespace ModPlus
                 Drawings.SelectionChanged += Drawings_SelectionChanged;
             }
         }
+
         private void CheckUnused()
         {
             try
@@ -90,21 +93,24 @@ namespace ModPlus
             }
             catch
             {
-                //ignored
+                // ignored
             }
         }
+
         // Чертеж закрыт
-        void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
+        private void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {
             GetDocuments();
             CheckUnused();
         }
+
         // Документ создан/открыт
-        void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
+        private void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
         {
             GetDocuments();
             CheckUnused();
         }
+
         // Наведение мышки на окно
         private void Window_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -115,76 +121,85 @@ namespace ModPlus
                 ExpOpenDrawings.Visibility = Visibility.Visible;
 
                 ExpOpenDrawings.Visibility = Visibility.Visible;
-                    //////////////////////////////////
-                    if (_docs.Count != Drawings.Items.Count)
+                if (_docs.Count != Drawings.Items.Count)
+                {
+                    var names = new string[_docs.Count];
+                    var docnames = new string[_docs.Count];
+                    var i = 0;
+                    foreach (Document doc in _docs)
                     {
-                        var names = new string[_docs.Count];
-                        var docnames = new string[_docs.Count];
-                        var i = 0;
-                        foreach (Document doc in _docs)
-                        {
-                            var filename = Path.GetFileName(doc.Name);
-                            names.SetValue(filename, i);
-                            docnames.SetValue(doc.Name, i);
-                            i++;
-                        }
-                        foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
-                            lbi => !docnames.Contains(lbi.ToolTip)))
-                        {
-                            Drawings.Items.Remove(lbi);
-                            break;
-                        }
+                        var filename = Path.GetFileName(doc.Name);
+                        names.SetValue(filename, i);
+                        docnames.SetValue(doc.Name, i);
+                        i++;
                     }
-                    try
+
+                    foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
+                        lbi => !docnames.Contains(lbi.ToolTip)))
                     {
-                        Drawings.Items.Clear();
-                        foreach (Document doc in _docs)
-                        {
-                            var lbi = new ListBoxItem();
-                            var filename = Path.GetFileName(doc.Name);
-                            lbi.Content = filename;
-                            lbi.ToolTip = doc.Name;
-                            Drawings.Items.Add(lbi);
-                        }
+                        Drawings.Items.Remove(lbi);
+                        break;
                     }
-                    catch
+                }
+
+                try
+                {
+                    Drawings.Items.Clear();
+                    foreach (Document doc in _docs)
                     {
-                        // ignored
+                        var lbi = new ListBoxItem();
+                        var filename = Path.GetFileName(doc.Name);
+                        lbi.Content = filename;
+                        lbi.ToolTip = doc.Name;
+                        Drawings.Items.Add(lbi);
                     }
-                    try
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                try
+                {
+                    foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
+                        lbi => lbi.ToolTip.ToString() == _docs.MdiActiveDocument.Name))
                     {
-                        foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
-                            lbi => lbi.ToolTip.ToString() == _docs.MdiActiveDocument.Name))
-                        {
-                            Drawings.SelectedItem = lbi;
-                            break;
-                        }
+                        Drawings.SelectedItem = lbi;
+                        break;
                     }
-                    catch
-                    {
-                        // ignored
-                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
                 Focus();
             }
         }
+
         // Убирание мышки с окна
         private void Window_MouseLeave(object sender, MouseEventArgs e)
         {
             if (_docs.Count > 0)
                 OnMouseLeaving();
         }
+
         private void OnMouseLeaving()
         {
-            if (Variables.DrawingsFloatMenuCollapseTo.Equals(0)) //icon
+            // icon
+            if (Variables.DrawingsFloatMenuCollapseTo.Equals(0))
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
             }
-            else // header
+
+            // header
+            else
             {
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
             }
+
             ExpOpenDrawings.Visibility = Visibility.Collapsed;
             Utils.SetFocusToDwgView();
         }
@@ -193,6 +208,7 @@ namespace ModPlus
         {
             DragMove();
         }
+
         // Выбор чертежа в списке открытых
         private void Drawings_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -211,6 +227,7 @@ namespace ModPlus
                     {
                         _docs.MdiActiveDocument = doc;
                     }
+
                     break;
                 }
             }
@@ -219,6 +236,7 @@ namespace ModPlus
                 // ignored
             }
         }
+
         // Нажатие кнопки закрытия чертежа
         private void BtCloseDwg_Click(object sender, RoutedEventArgs e)
         {
@@ -236,6 +254,7 @@ namespace ModPlus
                             if (Drawings.Items.Count == 1)
                                 OnMouseLeaving();
                         }
+
                         break;
                     }
                 }
@@ -247,9 +266,11 @@ namespace ModPlus
         }
 
     }
+
     internal static class MpDrawingsFunction
     {
         public static MpDrawings MpDrawingsWin;
+
         /// <summary>
         /// Загрузка основного меню в зависимости от настроек
         /// </summary>
@@ -262,6 +283,7 @@ namespace ModPlus
                     MpDrawingsWin = new MpDrawings();
                     MpDrawingsWin.Closed += MpDrawingsWinClosed;
                 }
+
                 if (MpDrawingsWin.IsLoaded)
                     return;
                 AcApp.ShowModelessWindow(
@@ -273,7 +295,7 @@ namespace ModPlus
             }
         }
 
-        static void MpDrawingsWinClosed(object sender, EventArgs e)
+        private static void MpDrawingsWinClosed(object sender, EventArgs e)
         {
             Regestry.SetValue("DrawingsWinTop", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture));
             Regestry.SetValue("DrawingsWinLeft", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture));

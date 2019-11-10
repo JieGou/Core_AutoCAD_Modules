@@ -19,6 +19,7 @@
     {
         // Переменные
         readonly DocumentCollection _docs = Application.DocumentManager;
+
         // Переменная хранит значение о наличии функции "Поля"
         private bool _hasFieldsFunction;
 
@@ -28,11 +29,13 @@
         {
             if (double.TryParse(Regestry.GetValue("FloatingMenuTop"), out var top))
                 Top = top;
-            else Top = 180;
+            else
+                Top = 180;
 
             if (double.TryParse(Regestry.GetValue("FloatingMenuLeft"), out var left))
                 Left = left;
-            else Left = 60;
+            else
+                Left = 60;
 
             InitializeComponent();
 
@@ -45,6 +48,7 @@
             MouseLeave += Window_MouseLeave;
             MouseLeftButtonDown += Window_MouseLeftButtonDown;
             FillFieldsFunction();
+
             // Заполняем функции
             FillFunctions();
 
@@ -91,8 +95,10 @@
             try
             {
                 var confCuiXel = ModPlusAPI.RegistryData.Adaptation.GetCuiAsXElement("AutoCAD");
+
                 // Проходим по группам
-                if (confCuiXel == null) return;
+                if (confCuiXel == null)
+                    return;
                 foreach (var group in confCuiXel.Elements("Group"))
                 {
                     var exp = new Expander
@@ -108,10 +114,12 @@
                     foreach (var func in group.Elements("Function"))
                     {
                         var funcNameAttr = func.Attribute("Name")?.Value;
-                        if (string.IsNullOrEmpty(funcNameAttr)) continue;
+                        if (string.IsNullOrEmpty(funcNameAttr))
+                            continue;
 
                         var loadedFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(funcNameAttr));
-                        if (loadedFunction == null) continue;
+                        if (loadedFunction == null)
+                            continue;
 
                         expStck.Children.Add(
                             WPFMenuesHelper.AddButton(this,
@@ -139,9 +147,11 @@
                         foreach (var subFunc in func.Elements("SubFunction"))
                         {
                             var subFuncNameAttr = subFunc.Attribute("Name")?.Value;
-                            if (string.IsNullOrEmpty(subFuncNameAttr)) continue;
+                            if (string.IsNullOrEmpty(subFuncNameAttr))
+                                continue;
                             var loadedSubFunction = LoadFunctionsHelper.LoadedFunctions.FirstOrDefault(x => x.Name.Equals(subFuncNameAttr));
-                            if (loadedSubFunction == null) continue;
+                            if (loadedSubFunction == null)
+                                continue;
                             expStck.Children.Add(
                                 WPFMenuesHelper.AddButton(this,
                                 loadedSubFunction.Name,
@@ -153,13 +163,18 @@
                                 );
                         }
                     }
+
                     exp.Content = expStck;
+
                     // Добавляем группу, если заполнились функции!
                     if (expStck.Children.Count > 0)
                         FunctionsPanel.Children.Add(exp);
                 }
             }
-            catch (Exception exception) { ExceptionBox.Show(exception); }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
         }
 
         // Чертеж закрыт
@@ -225,6 +240,7 @@
                             docnames.SetValue(doc.Name, i);
                             i++;
                         }
+
                         foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
                             lbi => !docnames.Contains(lbi.ToolTip)))
                         {
@@ -232,6 +248,7 @@
                             break;
                         }
                     }
+
                     try
                     {
                         Drawings.Items.Clear();
@@ -248,6 +265,7 @@
                     {
                         // ignored
                     }
+
                     try
                     {
                         foreach (var lbi in Drawings.Items.Cast<ListBoxItem>().Where(
@@ -277,7 +295,7 @@
 
         private void OnMouseLeaving()
         {
-            if (Variables.FloatMenuCollapseTo.Equals(0)) //icon
+            if (Variables.FloatMenuCollapseTo.Equals(0)) // icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
@@ -318,6 +336,7 @@
                     {
                         _docs.MdiActiveDocument = doc;
                     }
+
                     break;
                 }
             }
@@ -344,6 +363,7 @@
                             if (Drawings.Items.Count == 1)
                                 OnMouseLeaving();
                         }
+
                         break;
                     }
                 }
@@ -360,15 +380,17 @@
             var win = new MpMainSettings();
             win.ShowDialog();
         }
+
         // start fields function
         private void BtFields_OnClick(object sender, RoutedEventArgs e)
         {
             if (Application.DocumentManager.Count > 0)
                 Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSTAMPFIELDS ", false, false, false);
         }
+
         private void FillFieldsFunction()
         {
-            _hasFieldsFunction = LoadFunctionsHelper.HasmpStampsFunction();
+            _hasFieldsFunction = LoadFunctionsHelper.HasStampsPlugin();
             BtFields.Visibility = _hasFieldsFunction ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -392,6 +414,7 @@
     public static class MpMenuFunction
     {
         public static MpFloatMenu MpMainMenuWin;
+
         /// <summary>
         /// Загрузка основного меню в зависимости от настроек
         /// </summary>

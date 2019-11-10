@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-
-namespace ModPlus.MinFuncWins
+﻿namespace ModPlus.MinFuncWins
 {
+    using System.Collections.Generic;
+    using System.Windows;
+
     internal partial class FastBlockSelection
     {
         private readonly List<string> _validateNames;
@@ -22,16 +22,19 @@ namespace ModPlus.MinFuncWins
                 ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err1"));
                 return;
             }
+
             if (string.IsNullOrEmpty(TbBlockName.Text))
             {
                 ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err2"));
                 return;
             }
+
             if (LbBlocks.SelectedIndex == -1)
             {
                 ModPlusAPI.Windows.MessageBox.Show(ModPlusAPI.Language.GetItem(LangItem, "err3"));
                 return;
             }
+
             DialogResult = true;
         }
 

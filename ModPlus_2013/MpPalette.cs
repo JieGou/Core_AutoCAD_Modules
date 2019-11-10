@@ -42,24 +42,31 @@
                     MpPaletteSet.Visible = true;
                 }
             }
-            catch (System.Exception exception) { ExceptionBox.Show(exception); }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
         }
 
         private static void AddRemovePalettes()
         {
-            if (MpPaletteSet == null) return;
+            if (MpPaletteSet == null)
+                return;
             try
             {
                 var funName = Language.GetItem(LangItem, "h19");
                 var drwName = Language.GetItem(LangItem, "h20");
+
                 // functions
                 if (ModPlusAPI.Variables.FunctionsInPalette)
                 {
                     var hasP = false;
                     foreach (Palette p in MpPaletteSet)
                     {
-                        if (p.Name.Equals(funName)) hasP = true;
+                        if (p.Name.Equals(funName))
+                            hasP = true;
                     }
+
                     if (!hasP)
                     {
                         var palette = new mpPaletteFunctions();
@@ -83,14 +90,17 @@
                         }
                     }
                 }
+
                 // drawings
                 if (ModPlusAPI.Variables.DrawingsInPalette)
                 {
                     var hasP = false;
                     foreach (Palette p in MpPaletteSet)
                     {
-                        if (p.Name.Equals(drwName)) hasP = true;
+                        if (p.Name.Equals(drwName))
+                            hasP = true;
                     }
+
                     if (!hasP)
                     {
                         var palette = new mpPaletteDrawings();
