@@ -1,47 +1,84 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B53AE94-EA10-4549-A871-C6E89E0816A3}</ProjectGuid>
+    <ProjectGuid>{8A5BA515-EA41-4048-8A3C-7E5617B6FD29}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModPlus</RootNamespace>
-    <AssemblyName>ModPlus_2020</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <AssemblyName>ModPlus_2016</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;A2020</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;A2016</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;A2020</DefineConstants>
+    <DefineConstants>TRACE;A2016</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="accoremgd, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2016.0.0\lib\accoremgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcCui, Version=20.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2016.0.0\lib\AcCui.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acdbmgd, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2016.0.0\lib\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2016.0.0\lib\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdWindows, Version=6.3.0.14, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2016.0.0\lib\AdWindows.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlusAPI.1.2.6.7\lib\ModPlusAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusService.Dto, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlusAPI.1.2.6.7\lib\ModPlusService.Dto.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusStyle, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlusStyle.1.2.6.7\lib\ModPlusStyle.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
@@ -49,48 +86,48 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\modplus_2013\app\mpMainSettings.xaml.cs">
+    <Compile Include="..\ModPlus_2013\App\mpMainSettings.xaml.cs">
       <Link>App\mpMainSettings.xaml.cs</Link>
       <DependentUpon>mpMainSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="..\ModPlus_2013\App\MpMainSettingsFunction.cs">
       <Link>App\MpMainSettingsFunction.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\app\MpProductsDrawableOverrule.cs">
+    <Compile Include="..\ModPlus_2013\App\MpProductsDrawableOverrule.cs">
       <Link>App\MpProductsDrawableOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\app\RibbonBuilder.cs">
+    <Compile Include="..\ModPlus_2013\App\RibbonBuilder.cs">
       <Link>App\RibbonBuilder.cs</Link>
     </Compile>
     <Compile Include="..\ModPlus_2013\App\UserInfoCommand.cs">
       <Link>App\UserInfoCommand.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\AutocadHelpers.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\AutocadHelpers.cs">
       <Link>Helpers\AutocadHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\GeometryHelpers.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\GeometryHelpers.cs">
       <Link>Helpers\GeometryHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\GetFromAutoCAD.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\GetFromAutoCAD.cs">
       <Link>Helpers\GetFromAutoCAD.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\InsertToAutoCAD.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\InsertToAutoCAD.cs">
       <Link>Helpers\InsertToAutoCAD.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\LoadFunctionsHelper.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\LoadFunctionsHelper.cs">
       <Link>Helpers\LoadFunctionsHelper.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\RibbonHelpers.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\RibbonHelpers.cs">
       <Link>Helpers\RibbonHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\helpers\XDataHelpers.cs">
+    <Compile Include="..\ModPlus_2013\Helpers\XDataHelpers.cs">
       <Link>Helpers\XDataHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\minfuncwins\FastBlockSelection.xaml.cs">
+    <Compile Include="..\ModPlus_2013\MinFuncWins\FastBlockSelection.xaml.cs">
       <Link>MinFuncWins\FastBlockSelection.xaml.cs</Link>
       <DependentUpon>FastBlockSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\modplus_2013\minfuncwins\FastBlocksSettings.xaml.cs">
+    <Compile Include="..\ModPlus_2013\MinFuncWins\FastBlocksSettings.xaml.cs">
       <Link>MinFuncWins\FastBlocksSettings.xaml.cs</Link>
       <DependentUpon>FastBlocksSettings.xaml</DependentUpon>
     </Compile>
@@ -117,15 +154,15 @@
     <Compile Include="..\ModPlus_2013\VersionData.cs">
       <Link>VersionData.cs</Link>
     </Compile>
-    <Compile Include="..\modplus_2013\windows\MpFloatMenu.xaml.cs">
+    <Compile Include="..\ModPlus_2013\Windows\MpFloatMenu.xaml.cs">
       <Link>Windows\MpFloatMenu.xaml.cs</Link>
       <DependentUpon>MpFloatMenu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\modplus_2013\windows\mpPaletteDrawings.xaml.cs">
+    <Compile Include="..\ModPlus_2013\Windows\mpPaletteDrawings.xaml.cs">
       <Link>Windows\mpPaletteDrawings.xaml.cs</Link>
       <DependentUpon>mpPaletteDrawings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\modplus_2013\windows\mpPaletteFunctions.xaml.cs">
+    <Compile Include="..\ModPlus_2013\Windows\mpPaletteFunctions.xaml.cs">
       <Link>Windows\mpPaletteFunctions.xaml.cs</Link>
       <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
     </Compile>
@@ -145,64 +182,17 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\dwg.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\ModPlus_2013\Resources\forIcon_256.png">
-      <Link>Resources\forIcon_256.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\HelpBt.png">
-      <Link>Resources\HelpBt.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\HelpBt_dark.png">
-      <Link>Resources\HelpBt_dark.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpHideProductIcons_16x16.png">
-      <Link>Resources\mpHideProductIcons_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpHideProductIcons_16x16_dark.png">
-      <Link>Resources\mpHideProductIcons_16x16_dark.png</Link>
-    </Resource>
-    <EmbeddedResource Include="..\ModPlus_2013\Resources\mpIcon.ico">
-      <Link>Resources\mpIcon.ico</Link>
-    </EmbeddedResource>
-    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcon.png">
-      <Link>Resources\mpShowProductIcon.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16.png">
-      <Link>Resources\mpShowProductIcons_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16_dark.png">
-      <Link>Resources\mpShowProductIcons_16x16_dark.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16.png">
-      <Link>Resources\mpStampFields_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16_dark.png">
-      <Link>Resources\mpStampFields_16x16_dark.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\paletteCloseDrawing_16x16.png">
-      <Link>Resources\paletteCloseDrawing_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\paletteNewDrawing_16x16.png">
-      <Link>Resources\paletteNewDrawing_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\ModPlus_2013\Resources\paletteOpenDrawing_16x16.png">
-      <Link>Resources\paletteOpenDrawing_16x16.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\modplus_2013\app\mpMainSettings.xaml">
+    <Page Include="..\ModPlus_2013\App\mpMainSettings.xaml">
       <Link>App\mpMainSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\modplus_2013\minfuncwins\FastBlockSelection.xaml">
+    <Page Include="..\ModPlus_2013\MinFuncWins\FastBlockSelection.xaml">
       <Link>MinFuncWins\FastBlockSelection.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\modplus_2013\minfuncwins\FastBlocksSettings.xaml">
+    <Page Include="..\ModPlus_2013\MinFuncWins\FastBlocksSettings.xaml">
       <Link>MinFuncWins\FastBlocksSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -217,21 +207,86 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\modplus_2013\windows\MpFloatMenu.xaml">
+    <Page Include="..\ModPlus_2013\Windows\MpFloatMenu.xaml">
       <Link>Windows\MpFloatMenu.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\modplus_2013\windows\mpPaletteDrawings.xaml">
+    <Page Include="..\ModPlus_2013\Windows\mpPaletteDrawings.xaml">
       <Link>Windows\mpPaletteDrawings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\modplus_2013\windows\mpPaletteFunctions.xaml">
+    <Page Include="..\ModPlus_2013\Windows\mpPaletteFunctions.xaml">
       <Link>Windows\mpPaletteFunctions.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dwg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\ModPlus_2013\Resources\mpIcon.ico">
+      <Link>Resources\mpIcon.ico</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpHideProductIcons_16x16.png">
+      <Link>Resources\mpHideProductIcons_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcon.png">
+      <Link>Resources\mpShowProductIcon.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16.png">
+      <Link>Resources\mpShowProductIcons_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\forIcon_256.png">
+      <Link>Resources\forIcon_256.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpShowProductIcons_16x16_dark.png">
+      <Link>Resources\mpShowProductIcons_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpHideProductIcons_16x16_dark.png">
+      <Link>Resources\mpHideProductIcons_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\HelpBt.png">
+      <Link>Resources\HelpBt.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\HelpBt_dark.png">
+      <Link>Resources\HelpBt_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16.png">
+      <Link>Resources\mpStampFields_16x16.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\mpStampFields_16x16_dark.png">
+      <Link>Resources\mpStampFields_16x16_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\ModPlus_2013\Resources\paletteCloseDrawing_16x16.png">
+      <Link>Resources\paletteCloseDrawing_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\paletteNewDrawing_16x16.png">
+      <Link>Resources\paletteNewDrawing_16x16.png</Link>
+    </Resource>
+    <Resource Include="..\ModPlus_2013\Resources\paletteOpenDrawing_16x16.png">
+      <Link>Resources\paletteOpenDrawing_16x16.png</Link>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\ModPlus_2013\Resources\UserInfo_32x32.png">
@@ -267,19 +322,11 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ModPlus.AutoCADAPI">
-      <Version>2020.0.0</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="ModPlusStyle">
-      <Version>1.2.6.7</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers">
-      <Version>1.1.118</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -290,4 +337,11 @@ if $(ConfigurationName) == Release (
     "$(ModPlusPostBuild)" "ExtDll" "$(TargetPath)" "s"
 )</PostBuildEvent>
   </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
