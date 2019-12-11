@@ -34,37 +34,40 @@
     <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="accoremgd">
-      <HintPath>C:\_Acad dlls\2018\accoremgd.dll</HintPath>
+    <Reference Include="accoremgd, Version=22.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2018.0.0\lib\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="AcCui">
-      <HintPath>C:\_Acad dlls\2018\AcCui.dll</HintPath>
+    <Reference Include="AcCui, Version=22.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2018.0.0\lib\AcCui.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="acdbmgd">
-      <HintPath>C:\_Acad dlls\2018\acdbmgd.dll</HintPath>
+    <Reference Include="acdbmgd, Version=22.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2018.0.0\lib\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="acmgd">
-      <HintPath>C:\_Acad dlls\2018\acmgd.dll</HintPath>
+    <Reference Include="acmgd, Version=22.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2018.0.0\lib\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="AdWindows">
-      <HintPath>C:\_Acad dlls\2018\AdWindows.dll</HintPath>
+    <Reference Include="AdWindows, Version=2016.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlus.AutoCADAPI.2018.0.0\lib\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ModPlusAPI">
-      <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ModPlusService.Dto">
-      <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusService.Dto.dll</HintPath>
+    <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlusAPI.1.2.6.7\lib\ModPlusAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusService.Dto, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModPlusAPI.1.2.6.7\lib\ModPlusService.Dto.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ModPlusStyle, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ModPlus\Extensions\ModPlusStyle.dll</HintPath>
+      <HintPath>..\packages\ModPlusStyle.1.2.6.7\lib\ModPlusStyle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -73,6 +76,10 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
