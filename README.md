@@ -8,3 +8,6 @@
 The main ModPlus module for AutoCAD, which is loaded first and loads the necessary plugins, databases, auxiliary libraries.
 Also builds tab on the ribbon, the palette, flyout menu.
 The module contains mini-functions and various utilities used by plugins in the context of AutoCAD
+### This project uses
+
+[<img align="left" src="https://raw.githubusercontent.com/ModPlus-Software/Documentation/master/Images/nuke-logo-small.png" />](https://nuke.build/)
