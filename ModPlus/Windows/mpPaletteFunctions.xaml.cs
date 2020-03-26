@@ -59,11 +59,12 @@
                         if (loadedFunction == null)
                             continue;
                         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                        var btn = WPFMenuesHelper.AddButton(this,
+                        var btn = WPFMenuesHelper.AddButton(
+                            this,
                             loadedFunction.Name,
                             ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                             loadedFunction.BigIconUrl,
-                            ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                            ModPlusAPI.Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                             ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                             loadedFunction.ToolTipHelpImage, false);
 
@@ -81,7 +82,7 @@
                                     loadedFunction.SubFunctionsNames[i],
                                     ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                     loadedFunction.SubBigIconsUrl[i],
-                                    ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                    ModPlusAPI.Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                     ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                     loadedFunction.SubHelpImages[i], false);
                                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -105,7 +106,7 @@
                                 loadedSubFunction.Name,
                                 ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
                                 loadedSubFunction.BigIconUrl,
-                                ModPlusAPI.Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                ModPlusAPI.Language.GetFunctionShortDescription(loadedSubFunction.Name, loadedSubFunction.Description),
                                 ModPlusAPI.Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
                                 loadedSubFunction.ToolTipHelpImage, false);
                             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });

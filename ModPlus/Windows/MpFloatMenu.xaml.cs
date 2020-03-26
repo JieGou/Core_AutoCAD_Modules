@@ -122,23 +122,24 @@
                             continue;
 
                         expStck.Children.Add(
-                            WPFMenuesHelper.AddButton(this,
-                            loadedFunction.Name,
-                            ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
-                            loadedFunction.BigIconUrl,
-                            ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
-                            ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
-                            loadedFunction.ToolTipHelpImage, true)
-                        );
+                            WPFMenuesHelper.AddButton(
+                                this,
+                                loadedFunction.Name,
+                                ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
+                                loadedFunction.BigIconUrl,
+                                ModPlusAPI.Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
+                                ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
+                                loadedFunction.ToolTipHelpImage, true));
                         if (loadedFunction.SubFunctionsNames.Any())
                         {
                             for (int i = 0; i < loadedFunction.SubFunctionsNames.Count; i++)
                             {
-                                expStck.Children.Add(WPFMenuesHelper.AddButton(this,
+                                expStck.Children.Add(WPFMenuesHelper.AddButton(
+                                    this,
                                     loadedFunction.SubFunctionsNames[i],
                                     ModPlusAPI.Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                     loadedFunction.SubBigIconsUrl[i],
-                                    ModPlusAPI.Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                    ModPlusAPI.Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                     ModPlusAPI.Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                     loadedFunction.SubHelpImages[i], true));
                             }
@@ -153,14 +154,14 @@
                             if (loadedSubFunction == null)
                                 continue;
                             expStck.Children.Add(
-                                WPFMenuesHelper.AddButton(this,
-                                loadedSubFunction.Name,
-                                ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
-                                loadedSubFunction.BigIconUrl,
-                                ModPlusAPI.Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
-                                ModPlusAPI.Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
-                                loadedSubFunction.ToolTipHelpImage, true)
-                                );
+                                WPFMenuesHelper.AddButton(
+                                    this,
+                                    loadedSubFunction.Name,
+                                    ModPlusAPI.Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
+                                    loadedSubFunction.BigIconUrl,
+                                    ModPlusAPI.Language.GetFunctionShortDescription(loadedSubFunction.Name, loadedSubFunction.Description),
+                                    ModPlusAPI.Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
+                                    loadedSubFunction.ToolTipHelpImage, true));
                         }
                     }
 
@@ -282,7 +283,6 @@
                 }
 
                 Focus();
-
             }
         }
 
@@ -295,7 +295,7 @@
 
         private void OnMouseLeaving()
         {
-            if (Variables.FloatMenuCollapseTo.Equals(0)) // icon
+            if (Variables.FloatMenuCollapseTo.Equals(0)) //// icon
             {
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;

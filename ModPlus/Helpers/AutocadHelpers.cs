@@ -1,7 +1,6 @@
 ﻿namespace ModPlus.Helpers
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -12,6 +11,67 @@
     /// <summary>Различные вспомогательные методы для работы в AutoCAD</summary>
     public static class AutocadHelpers
     {
+        /// <summary>Стандартные стрелки AutoCAD</summary>
+        public enum StandardArrowhead
+        {
+            /// <summary>Заполненная замкнутая</summary>
+            closedFilled,
+
+            /// <summary>Точка</summary>
+            _DOT,
+
+            /// <summary>Малая точка</summary>
+            _DOTSMALL,
+
+            /// <summary>Контурная точка</summary>
+            _DOTBLANK,
+
+            /// <summary>Указатель исходной точки</summary>
+            _ORIGIN,
+
+            /// <summary>Указатель исходной точки 2</summary>
+            _ORIGIN2,
+
+            /// <summary>Разомкнутая</summary>
+            _OPEN,
+
+            /// <summary>Прямой угол</summary>
+            _OPEN90,
+
+            /// <summary>Разомкнутая 30</summary>
+            _OPEN30,
+
+            /// <summary>Замкнутая</summary>
+            _CLOSED,
+
+            /// <summary>Контурная малая точка</summary>
+            _SMALL,
+
+            /// <summary>Ничего</summary>
+            _NONE,
+
+            /// <summary>Засечка</summary>
+            _OBLIQUE,
+
+            /// <summary>Заполненный прямоугольник</summary>
+            _BOXFILLED,
+
+            /// <summary>Прямоугольник</summary>
+            _BOXBLANK,
+
+            /// <summary>Контурная замкнутая</summary>
+            _CLOSEDBLANK,
+
+            /// <summary>Треугольник базы отсчета</summary>
+            _DATUMBLANK,
+
+            /// <summary>Интеграл</summary>
+            _INTEGRAL,
+
+            /// <summary>Двойная засечка</summary>
+            _ARCHTICK
+        }
+
         /// <summary>ObjectId блока для стрелки</summary>
         /// <param name="newArrName">Имя блока для стрелки</param>
         /// <returns>ObjectId нового блока стрелки</returns>
@@ -76,68 +136,6 @@
             }
 
             return arrObjId;
-        }
-
-        /// <summary>Стандартные стрелки AutoCAD</summary>
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public enum StandardArrowhead
-        {
-            /// <summary>Заполненная замкнутая</summary>
-            closedFilled,
-
-            /// <summary>Точка</summary>
-            _DOT,
-
-            /// <summary>Малая точка</summary>
-            _DOTSMALL,
-
-            /// <summary>Контурная точка</summary>
-            _DOTBLANK,
-
-            /// <summary>Указатель исходной точки</summary>
-            _ORIGIN,
-
-            /// <summary>Указатель исходной точки 2</summary>
-            _ORIGIN2,
-
-            /// <summary>Разомкнутая</summary>
-            _OPEN,
-
-            /// <summary>Прямой угол</summary>
-            _OPEN90,
-
-            /// <summary>Разомкнутая 30</summary>
-            _OPEN30,
-
-            /// <summary>Замкнутая</summary>
-            _CLOSED,
-
-            /// <summary>Контурная малая точка</summary>
-            _SMALL,
-
-            /// <summary>Ничего</summary>
-            _NONE,
-
-            /// <summary>Засечка</summary>
-            _OBLIQUE,
-
-            /// <summary>Заполненный прямоугольник</summary>
-            _BOXFILLED,
-
-            /// <summary>Прямоугольник</summary>
-            _BOXBLANK,
-
-            /// <summary>Контурная замкнутая</summary>
-            _CLOSEDBLANK,
-
-            /// <summary>Треугольник базы отсчета</summary>
-            _DATUMBLANK,
-
-            /// <summary>Интеграл</summary>
-            _INTEGRAL,
-
-            /// <summary>Двойная засечка</summary>
-            _ARCHTICK
         }
         
         /// <summary>

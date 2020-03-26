@@ -187,7 +187,7 @@
                     if (MpMenuFunction.MpMainMenuWin != null)
                         MpMenuFunction.MpMainMenuWin.Close();
                 }
-                else // Если включили плавающее меню
+                else //// Если включили плавающее меню
                 {
                     // Если плавающее меню было включено
                     if (MpMenuFunction.MpMainMenuWin != null)
@@ -288,7 +288,6 @@
             {
                 ExceptionBox.Show(ex);
             }
-
         }
 
         private bool IsDifferentLanguage()

@@ -38,7 +38,6 @@
                     ExceptionBox.Show(ex);
                 return double.NaN;
             }
-
         }
 
         /// <summary>Получение суммы длин выбранных примитивов: отрезки, полилинии, дуги, сплайны, эллипсы</summary>

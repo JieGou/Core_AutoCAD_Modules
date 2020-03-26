@@ -78,6 +78,12 @@
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <AssemblyName>$(AssemblyName)_2020</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2021|x64'">
+    <OutputPath>bin\x64\A2021\</OutputPath>
+    <DefineConstants>TRACE;A2021</DefineConstants>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <AssemblyName>$(AssemblyName)_2021</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -288,9 +294,17 @@
         </PackageReference>
       </ItemGroup>
     </When>
-    <When Condition=" '$(Configuration)'=='A2020' or '$(Configuration)'=='Debug' ">
+    <When Condition=" '$(Configuration)'=='A2020' ">
       <ItemGroup>
         <PackageReference Include="ModPlus.AutoCAD.API.2020">
+          <Version>1.0.0</Version>
+          <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(Configuration)'=='A2021' or '$(Configuration)'=='Debug' ">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2021">
           <Version>1.0.0</Version>
           <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
@@ -299,7 +313,7 @@
   </Choose>
   <ItemGroup>
     <PackageReference Include="ModPlusAPI">
-      <Version>1.4.0</Version>
+      <Version>1.6.0</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

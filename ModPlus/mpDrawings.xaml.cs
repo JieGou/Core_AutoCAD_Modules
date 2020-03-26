@@ -264,7 +264,6 @@
                 // ignored
             }
         }
-
     }
 
     internal static class MpDrawingsFunction

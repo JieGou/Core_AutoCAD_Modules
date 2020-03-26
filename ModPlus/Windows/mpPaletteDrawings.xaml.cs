@@ -1,11 +1,11 @@
 ﻿namespace ModPlus.Windows
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
-    using System.IO;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     // ReSharper disable once InconsistentNaming
     internal partial class mpPaletteDrawings 

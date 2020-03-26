@@ -29,6 +29,9 @@
 #elif A2020
         public const string CurrentCadVersion = "2020";
         public const string CurrentCadInternalVersion = "23.1";
+#elif A2021
+        public const string CurrentCadVersion = "2021";
+        public const string CurrentCadInternalVersion = "24.0";
 #endif
     }
 }

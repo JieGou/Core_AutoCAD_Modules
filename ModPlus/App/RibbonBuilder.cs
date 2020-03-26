@@ -216,7 +216,7 @@
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetSmallIcon(loadedFunction),
                                             GetBigIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage);
@@ -238,7 +238,7 @@
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
                                                     GetSmallIcon(loadedSubFunction),
                                                     GetBigIcon(loadedSubFunction),
-                                                    Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                                    Language.GetFunctionShortDescription(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
                                                     loadedSubFunction.ToolTipHelpImage));
@@ -270,7 +270,7 @@
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetSmallIcon(loadedFunction),
                                             GetBigIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage);
@@ -285,7 +285,7 @@
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                                 GetSmallIconForSubFunction(loadedFunction, i),
                                                 GetBigIconForSubFunction(loadedFunction, i),
-                                                Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                                Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                                 loadedFunction.SubHelpImages[i]));
@@ -301,7 +301,7 @@
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetSmallIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage));
                                     }
@@ -351,7 +351,7 @@
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetBigIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage);
@@ -370,7 +370,7 @@
                                                     loadedSubFunction.Name,
                                                     Language.GetFunctionLocalName(loadedSubFunction.Name, loadedSubFunction.LName),
                                                     GetBigIcon(loadedSubFunction),
-                                                    Language.GetFunctionShortDescrition(loadedSubFunction.Name, loadedSubFunction.Description),
+                                                    Language.GetFunctionShortDescription(loadedSubFunction.Name, loadedSubFunction.Description),
                                                     Orientation.Horizontal,
                                                     Language.GetFunctionFullDescription(loadedSubFunction.Name, loadedSubFunction.FullDescription),
                                                     loadedSubFunction.ToolTipHelpImage));
@@ -401,7 +401,7 @@
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetBigIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Horizontal,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage);
@@ -415,7 +415,7 @@
                                                 loadedFunction.SubFunctionsNames[i],
                                                 Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.SubFunctionsLNames[i], i + 1),
                                                 GetBigIconForSubFunction(loadedFunction, i),
-                                                Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
+                                                Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.SubDescriptions[i], i + 1),
                                                 Orientation.Horizontal,
                                                 Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.SubFullDescriptions[i], i + 1),
                                                 loadedFunction.SubHelpImages[i]));
@@ -431,7 +431,7 @@
                                             loadedFunction.Name,
                                             Language.GetFunctionLocalName(loadedFunction.Name, loadedFunction.LName),
                                             GetBigIcon(loadedFunction),
-                                            Language.GetFunctionShortDescrition(loadedFunction.Name, loadedFunction.Description),
+                                            Language.GetFunctionShortDescription(loadedFunction.Name, loadedFunction.Description),
                                             Orientation.Vertical,
                                             Language.GetFunctionFullDescription(loadedFunction.Name, loadedFunction.FullDescription),
                                             loadedFunction.ToolTipHelpImage);

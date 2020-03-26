@@ -15,7 +15,7 @@
         public SelectLayer()
         {
             InitializeComponent();
-            ContentRendered += delegate { FillLayers(); };
+            ContentRendered += (sender, args) => FillLayers();
         }
 
         private void FillLayers()

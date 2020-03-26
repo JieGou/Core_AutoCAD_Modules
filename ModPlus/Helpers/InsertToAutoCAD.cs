@@ -410,7 +410,6 @@
             {
                 return Entity;
             }
-
         }
 
         private class MLeaderJig : DrawJig

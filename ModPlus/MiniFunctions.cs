@@ -1,12 +1,10 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace ModPlus
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -18,6 +16,7 @@ namespace ModPlus
     using MinFuncWins;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using MenuItem = Autodesk.AutoCAD.Windows.MenuItem;
     using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
     using Viewport = Autodesk.AutoCAD.DatabaseServices.Viewport;
@@ -530,7 +529,6 @@ namespace ModPlus
                                     psVpPnts.Add(vert.Position);
                             }
                         }
-
                     }
                     else if (ent is Curve)
                     {
@@ -815,7 +813,6 @@ namespace ModPlus
                                         | UserInputControls.NoNegativeResponseAccepted
                 };
 
-
                 var ppr = prompts.AcquirePoint(ppo);
 
                 if (ppr.Status != PromptStatus.OK)
@@ -1078,11 +1075,12 @@ namespace ModPlus
 
                         // Copy blocks from source to destination database
                         IdMapping mapping = new IdMapping();
-                        sourceDb.WblockCloneObjects(blockIds,
-                                                    destDb.BlockTableId,
-                                                    mapping,
-                                                    DuplicateRecordCloning.Replace,
-                                                    false);
+                        sourceDb.WblockCloneObjects(
+                            blockIds,
+                            destDb.BlockTableId,
+                            mapping,
+                            DuplicateRecordCloning.Replace,
+                            false);
                         sourceDb.Dispose();
 
                         // Вставка
@@ -1091,7 +1089,6 @@ namespace ModPlus
                         {
                             BlockTable bt = (BlockTable)tr.GetObject(destDb.BlockTableId, OpenMode.ForRead, false);
                             BlockTableRecord btr = (BlockTableRecord)tr.GetObject(bt[blockName], OpenMode.ForRead, false);
-
 
                             var blkId = BlockInsertion.InsertBlockRef(0, tr, destDb, ed, bt[blockName]);
 
@@ -1238,7 +1235,6 @@ namespace ModPlus
                             blkref.Position = m_Position.TransformBy(ed.CurrentUserCoordinateSystem);
                             blkref.Rotation = m_Angle;
                             blkref.TransformBy(m_Ucs);
-
                         }
                         catch
                         {
