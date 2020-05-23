@@ -1,4 +1,4 @@
-﻿namespace ModPlus.MinFuncWins
+﻿namespace ModPlus.Windows.MiniPlugins
 {
     using System.Collections.Generic;
     using System.Windows;
@@ -8,6 +8,10 @@
         private readonly List<string> _validateNames;
         private const string LangItem = "AutocadDlls";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FastBlockSelection"/> class.
+        /// </summary>
+        /// <param name="validateNames"></param>
         internal FastBlockSelection(List<string> validateNames)
         {
             _validateNames = validateNames;

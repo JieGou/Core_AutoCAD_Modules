@@ -4,20 +4,25 @@
     using System.Drawing;
     using System.Reflection;
     using System.Windows.Forms.Integration;
-    using Windows;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.Windows;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Windows;
 
     /// <summary>Методы создания и работы с палитрой ModPlus</summary>
     public static class MpPalette
     {
         private const string LangItem = "AutocadDlls";
         public static PaletteSet MpPaletteSet;
-        
+
         [CommandMethod("mpPalette")]
         public static void CreatePalette()
+        {
+            CreatePalette(false);
+        }
+
+        public static void CreatePalette(bool reload)
         {
             try
             {
@@ -39,6 +44,8 @@
                 }
                 else
                 {
+                    if (reload)
+                        AddRemovePalettes();
                     MpPaletteSet.Visible = true;
                 }
             }
@@ -69,7 +76,7 @@
 
                     if (!hasP)
                     {
-                        var palette = new mpPaletteFunctions();
+                        var palette = new PalettePlugins();
                         var host = new ElementHost
                         {
                             AutoSize = true,
@@ -103,7 +110,7 @@
 
                     if (!hasP)
                     {
-                        var palette = new mpPaletteDrawings();
+                        var palette = new PaletteDrawings();
                         var host = new ElementHost
                         {
                             AutoSize = true,

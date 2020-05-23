@@ -2,7 +2,9 @@
 {
     using Autodesk.AutoCAD.Geometry;
 
-    /// <summary>Вспомогательные методы построения геометрии</summary>
+    /// <summary>
+    /// Вспомогательные методы построения геометрии
+    /// </summary>
     public static class GeometryHelpers
     {
         /// <summary>3Д точка по направлению. Направление берется как единичный вектор из точки pt2 к точке pt1, перемножается на указанную
@@ -10,11 +12,11 @@
         /// <param name="pt1">Первая точка для получения единичного вектора</param>
         /// <param name="pt2">Вторая точка для получения единичного вектора</param>
         /// <param name="ptFrom">Точка от которой откладывается расстояние</param>
-        /// <param name="lenght">Расстояние на котором нужно получить точку</param>
+        /// <param name="length">Расстояние на котором нужно получить точку</param>
         /// <returns>3Д точка</returns>
-        public static Point3d Point3dAtDirection(Point3d pt1, Point3d pt2, Point3d ptFrom, double lenght)
+        public static Point3d Point3dAtDirection(Point3d pt1, Point3d pt2, Point3d ptFrom, double length)
         {
-            Point3d pt3 = ptFrom + ((pt2 - pt1).GetNormal() * lenght);
+            var pt3 = ptFrom + ((pt2 - pt1).GetNormal() * length);
             return pt3;
         }
 
@@ -23,11 +25,11 @@
         /// <param name="pt1">Первая точка для получения единичного вектора</param>
         /// <param name="pt2">Вторая точка для получения единичного вектора</param>
         /// <param name="ptFrom">Точка от которой откладывается расстояние</param>
-        /// <param name="lenght">Расстояние на котором нужно получить точку</param>
+        /// <param name="length">Расстояние на котором нужно получить точку</param>
         /// <returns>2Д точка</returns>
-        public static Point2d Point2dAtDirection(Point3d pt1, Point3d pt2, Point3d ptFrom, double lenght)
+        public static Point2d Point2dAtDirection(Point3d pt1, Point3d pt2, Point3d ptFrom, double length)
         {
-            Point3d pt3 = ptFrom + ((pt2 - pt1).GetNormal() * lenght);
+            var pt3 = ptFrom + ((pt2 - pt1).GetNormal() * length);
 
             return ConvertPoint3dToPoint2d(pt3);
         }

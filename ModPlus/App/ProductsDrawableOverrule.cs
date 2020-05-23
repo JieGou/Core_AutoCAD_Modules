@@ -5,19 +5,20 @@ namespace ModPlus.App
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.GraphicsInterface;
-    using Autodesk.AutoCAD.Runtime;
     using ModPlusAPI;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-    public class MpProductsDrawableOverrule : DrawableOverrule
+    /// <inheritdoc />
+    public class ProductsDrawableOverrule : DrawableOverrule
     {
-        public static MpProductsDrawableOverrule MpProductsDrawableOverruleInstance;
+        public static ProductsDrawableOverrule ProductsDrawableOverruleInstance;
 
-        public static MpProductsDrawableOverrule Instance()
+        public static ProductsDrawableOverrule Instance()
         {
-            return MpProductsDrawableOverruleInstance ?? (MpProductsDrawableOverruleInstance = new MpProductsDrawableOverrule());
+            return ProductsDrawableOverruleInstance ?? (ProductsDrawableOverruleInstance = new ProductsDrawableOverrule());
         }
 
+        /// <inheritdoc />
         public override bool WorldDraw(Drawable drawable, WorldDraw wd)
         {
             if (!wd.Context.IsPlotGeneration) // Не в состоянии печати!
@@ -73,37 +74,6 @@ namespace ModPlus.App
             }
 
             return base.WorldDraw(drawable, wd);
-        }
-    }
-
-    public class MpProductIconFunctions
-    {
-        /// <summary>Включить идентификационные иконки для примитивов, имеющих расширенные данные продуктов ModPlus</summary>
-        [CommandMethod("mpShowProductIcons")]
-        public static void ShowIcon()
-        {
-            if (MpProductsDrawableOverrule.MpProductsDrawableOverruleInstance == null)
-            {
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon",
-                    true.ToString(), true);
-                Overrule.AddOverrule(RXObject.GetClass(typeof(Entity)), MpProductsDrawableOverrule.Instance(), true);
-                Overrule.Overruling = true;
-                AcApp.DocumentManager.MdiActiveDocument.Editor.Regen();
-            }
-        }
-
-        /// <summary>Отключить идентификационные иконки для примитивов, имеющих расширенные данные продуктов ModPlus</summary>
-        [CommandMethod("mpHideProductIcons")]
-        public void HideIcon()
-        {
-            if (MpProductsDrawableOverrule.MpProductsDrawableOverruleInstance != null)
-            {
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon",
-                    false.ToString(), true);
-                Overrule.RemoveOverrule(RXObject.GetClass(typeof(Entity)), MpProductsDrawableOverrule.Instance());
-                MpProductsDrawableOverrule.MpProductsDrawableOverruleInstance = null;
-                AcApp.DocumentManager.MdiActiveDocument.Editor.Regen();
-            }
         }
     }
 }

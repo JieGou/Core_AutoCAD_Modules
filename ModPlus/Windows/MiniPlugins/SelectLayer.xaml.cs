@@ -1,4 +1,4 @@
-﻿namespace ModPlus.MinFuncWins
+﻿namespace ModPlus.Windows.MiniPlugins
 {
     using System.Collections.Generic;
     using System.Windows;
@@ -11,7 +11,9 @@
     /// </summary>
     public partial class SelectLayer
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SelectLayer"/> class.
+        /// </summary>
         public SelectLayer()
         {
             InitializeComponent();
@@ -23,13 +25,13 @@
             var doc = AcApp.DocumentManager.MdiActiveDocument;
             var db = doc.Database;
 
-            List<SelLayer> layers = new List<SelLayer>();
+            var layers = new List<SelLayer>();
             using (Transaction tr = db.TransactionManager.StartOpenCloseTransaction())
             {
-                LayerTable lt = tr.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                var lt = tr.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
                 if (lt != null)
                 {
-                    foreach (ObjectId layerId in lt)
+                    foreach (var layerId in lt)
                     {
                         var layer = tr.GetObject(layerId, OpenMode.ForWrite) as LayerTableRecord;
                         if (layer != null)

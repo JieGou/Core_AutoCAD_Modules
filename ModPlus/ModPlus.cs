@@ -1,7 +1,6 @@
 ﻿namespace ModPlus
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -14,20 +13,27 @@
     using Autodesk.AutoCAD.Runtime;
     using Helpers;
     using ModPlusAPI;
+    using ModPlusAPI.Interfaces;
     using ModPlusAPI.LicenseServer;
     using ModPlusAPI.UserInfo;
     using ModPlusAPI.Windows;
     using Windows;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
+    // ReSharper disable once UnusedMember.Global
+
+    /// <inheritdoc />
     public class ModPlus : IExtensionApplication
     {
         private const string LangItem = "AutocadDlls";
-        private static bool _dropNextHelpCall = false; // Flag to tell if the next message from AutoCAD to display it's own help should be ignored
-        private static string _currentTooltip = null; // If not null, this is the HelpTopic of the currently open tooltip. If null, no tooltip is displaying.
+        private static bool _dropNextHelpCall; // Flag to tell if the next message from AutoCAD to display it's own help should be ignored
+        private static string _currentTooltip; // If not null, this is the HelpTopic of the currently open tooltip. If null, no tooltip is displaying.
         private static bool _quiteLoad;
-
-        // Инициализация плагина
+        private static readonly string[] BaseFiles = {
+            "mpBaseInt.dll", "mpMetall.dll", "mpConcrete.dll", "mpMaterial.dll", "mpOther.dll", "mpWood.dll", "mpProductInt.dll"
+        };
+        
+        /// <inheritdoc />
         public void Initialize()
         {
             try
@@ -35,7 +41,7 @@
                 var sw = new Stopwatch();
                 sw.Start();
 
-                // inint lang
+                // init lang
                 if (!Language.Initialize())
                     return;
 
@@ -50,29 +56,29 @@
                 if (!CheckCadVersion())
                 {
                     ed.WriteMessage("\n***************************");
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p1"));
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p2"));
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p3"));
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p1")}");
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p2")}");
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p3")}");
                     ed.WriteMessage("\n***************************");
                     return;
                 }
 
                 Statistic.SendPluginStarting("AutoCAD", VersionData.CurrentCadVersion);
                 ed.WriteMessage("\n***************************");
-                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p4"));
+                ed.WriteMessage($"\n{Language.GetItem(LangItem, "p4")}");
                 if (!_quiteLoad)
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p5"));
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p5")}");
 
                 // Принудительная загрузка сборок
                 LoadAssemblies(ed);
                 if (!_quiteLoad)
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p6"));
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p6")}");
                 LoadBaseAssemblies(ed);
                 if (!_quiteLoad)
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p7"));
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p7")}");
                 UserConfigFile.InitConfigFile();
                 if (!_quiteLoad)
-                    ed.WriteMessage("\n" + Language.GetItem(LangItem, "p8"));
+                    ed.WriteMessage($"\n{Language.GetItem(LangItem, "p8")}");
                 LoadFunctions(ed);
 
                 // check adaptation
@@ -82,10 +88,10 @@
                 // Загрузка ленты
                 Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
                 if (ModPlusAPI.Variables.Palette)
-                    MpPalette.CreatePalette();
+                    MpPalette.CreatePalette(false);
 
                 // Загрузка основного меню (с проверкой значения из файла настроек)
-                MpMenuFunction.LoadMainMenu();
+                FloatMenuCommand.LoadMainMenu();
 
                 // Загрузка окна Чертежи
                 MpDrawingsFunction.LoadMainMenu();
@@ -98,22 +104,21 @@
 
                 // Включение иконок для продуктов
                 var showProductsIcon = 
-                    bool.TryParse(
-                        UserConfigFile.GetValue(
-                            UserConfigFile.ConfigFileZone.Settings, "mpProductInsert", "ShowIcon"),
-                        out var b) && b; // false
+                    bool.TryParse(UserConfigFile.GetValue("mpProductInsert", "ShowIcon"), out var b) && b; // false
                 if (showProductsIcon)
-                    MpProductIconFunctions.ShowIcon();
+                    ProductIconFunctions.ShowIcon();
 
-                var disableConnectionWithLicenseServer =
-                    bool.TryParse(
-                        UserConfigFile.GetValue(
-                            UserConfigFile.ConfigFileZone.Settings, "DisableConnectionWithLicenseServerInAutoCAD"),
-                        out b) && b; // false
+                // license server
+                var disableConnectionWithLicenseServerInAutoCad = 
+                    ModPlusAPI.Variables.DisableConnectionWithLicenseServerInAutoCAD;
 
-                // start license server client
-                if (!disableConnectionWithLicenseServer)
-                    ClientStarter.StartConnection(ProductLicenseType.AutoCAD);
+                if (ModPlusAPI.Variables.IsLocalLicenseServerEnable &&
+                    !disableConnectionWithLicenseServerInAutoCad)
+                    ClientStarter.StartConnection(SupportedProduct.AutoCAD);
+                
+                if (ModPlusAPI.Variables.IsWebLicenseServerEnable &&
+                    !disableConnectionWithLicenseServerInAutoCad)
+                    WebLicenseServerClient.Instance.Start(SupportedProduct.AutoCAD);
 
                 // user info
                 AuthorizationOnStartup();
@@ -124,8 +129,8 @@
                 Autodesk.Windows.ComponentManager.ToolTipClosed += ComponentManager_ToolTipClosed;
 
                 sw.Stop();
-                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p9") + " " + sw.ElapsedMilliseconds);
-                ed.WriteMessage("\n" + Language.GetItem(LangItem, "p10"));
+                ed.WriteMessage($"\n{Language.GetItem(LangItem, "p9")} {sw.ElapsedMilliseconds}");
+                ed.WriteMessage($"\n{Language.GetItem(LangItem, "p10")}");
                 ed.WriteMessage("\n***************************");
             }
             catch (System.Exception exception)
@@ -134,6 +139,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public void Terminate()
         {
             ClientStarter.StopConnection();
@@ -142,15 +148,13 @@
             Autodesk.Windows.ComponentManager.ToolTipClosed -= ComponentManager_ToolTipClosed;
         }
 
-        // проверка соответствия версии автокада
+        // проверка соответствия версии AutoCAD
         private static bool CheckCadVersion()
         {
             var cadVer = AcApp.Version;
             return (cadVer.Major + "." + cadVer.Minor).Equals(VersionData.CurrentCadInternalVersion);
         }
 
-        // Принудительная загрузка сборок
-        // необходимых для работы
         private static void LoadAssemblies(Editor ed)
         {
             try
@@ -158,12 +162,12 @@
                 foreach (var fileName in Constants.ExtensionsLibraries)
                 {
                     var extDll = Path.Combine(Constants.ExtensionsDirectory, fileName);
-                    if (File.Exists(extDll))
-                    {
-                        if (!_quiteLoad)
-                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p11") + " " + fileName);
-                        Assembly.LoadFrom(extDll);
-                    }
+                    if (!File.Exists(extDll))
+                        continue;
+
+                    if (!_quiteLoad)
+                        ed.WriteMessage($"\n* {Language.GetItem(LangItem, "p11")} {fileName}");
+                    Assembly.LoadFrom(extDll);
                 }
             }
             catch (System.Exception exception)
@@ -171,12 +175,6 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-        // Загрузка базы данных
-        private static readonly List<string> BaseFiles = new List<string>
-        {
-            "mpBaseInt.dll", "mpMetall.dll", "mpConcrete.dll", "mpMaterial.dll", "mpOther.dll", "mpWood.dll", "mpProductInt.dll"
-        };
 
         private static void LoadBaseAssemblies(Editor ed)
         {
@@ -191,20 +189,20 @@
                         if (File.Exists(file))
                         {
                             if (!_quiteLoad)
-                                ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p12") + " " + baseFile);
+                                ed.WriteMessage($"\n* {Language.GetItem(LangItem, "p12")} {baseFile}");
                             Assembly.LoadFrom(file);
                         }
                         else
                             if (!_quiteLoad)
                         {
-                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p13") + " " + baseFile);
+                            ed.WriteMessage($"\n* {Language.GetItem(LangItem, "p13")} {baseFile}");
                         }
                     }
                 }
                 else
                 {
                     if (!_quiteLoad)
-                        ed.WriteMessage("\n" + Language.GetItem(LangItem, "p14"));
+                        ed.WriteMessage($"\n{Language.GetItem(LangItem, "p14")}");
                 }
             }
             catch (System.Exception exception)
@@ -217,14 +215,14 @@
         {
             try
             {
-                var funtionsKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus\\Functions");
-                if (funtionsKey == null)
+                var functionsKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("ModPlus\\Functions");
+                if (functionsKey == null)
                     return;
-                using (funtionsKey)
+                using (functionsKey)
                 {
-                    foreach (var functionKeyName in funtionsKey.GetSubKeyNames())
+                    foreach (var functionKeyName in functionsKey.GetSubKeyNames())
                     {
-                        var functionKey = funtionsKey.OpenSubKey(functionKeyName);
+                        var functionKey = functionsKey.OpenSubKey(functionKeyName);
                         if (functionKey == null)
                             continue;
                         foreach (var availPrVersKeyName in functionKey.GetSubKeyNames())
@@ -232,14 +230,14 @@
                             // Если версия продукта не совпадает, то пропускаю
                             if (!availPrVersKeyName.Equals(VersionData.CurrentCadVersion))
                                 continue;
-                            var availPrVersKey = functionKey.OpenSubKey(availPrVersKeyName);
-                            if (availPrVersKey == null)
+                            var availProductVersionKey = functionKey.OpenSubKey(availPrVersKeyName);
+                            if (availProductVersionKey == null)
                                 continue;
 
                             // беру свойства функции из реестра
-                            var file = availPrVersKey.GetValue("File") as string;
-                            var onOff = availPrVersKey.GetValue("OnOff") as string;
-                            var productFor = availPrVersKey.GetValue("ProductFor") as string;
+                            var file = availProductVersionKey.GetValue("File") as string;
+                            var onOff = availProductVersionKey.GetValue("OnOff") as string;
+                            var productFor = availProductVersionKey.GetValue("ProductFor") as string;
                             if (string.IsNullOrEmpty(onOff) || string.IsNullOrEmpty(productFor))
                                 continue;
                             if (!productFor.Equals("AutoCAD"))
@@ -253,18 +251,18 @@
                                 {
                                     // load
                                     if (!_quiteLoad)
-                                        ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
+                                        ed.WriteMessage($"\n* {Language.GetItem(LangItem, "p15")} {functionKeyName}");
                                     var localFuncAssembly = Assembly.LoadFrom(file);
                                     LoadFunctionsHelper.GetDataFromFunctionInterface(localFuncAssembly);
                                 }
                                 else
                                 {
-                                    var findedFile = LoadFunctionsHelper.FindFile(functionKeyName);
-                                    if (!string.IsNullOrEmpty(findedFile) && File.Exists(findedFile))
+                                    var foundedFile = LoadFunctionsHelper.FindFile(functionKeyName);
+                                    if (!string.IsNullOrEmpty(foundedFile) && File.Exists(foundedFile))
                                     {
                                         if (!_quiteLoad)
-                                            ed.WriteMessage("\n* " + Language.GetItem(LangItem, "p15") + " " + functionKeyName);
-                                        var localFuncAssembly = Assembly.LoadFrom(findedFile);
+                                            ed.WriteMessage($"\n* {Language.GetItem(LangItem, "p15")} {functionKeyName}");
+                                        var localFuncAssembly = Assembly.LoadFrom(foundedFile);
                                         LoadFunctionsHelper.GetDataFromFunctionInterface(localFuncAssembly);
                                     }
                                 }
@@ -308,10 +306,10 @@
         {
             try
             {
-                var loadWithWindows = !bool.TryParse(Regestry.GetValue("AutoUpdater", "LoadWithWindows"), out bool b) || b;
+                var loadWithWindows = !bool.TryParse(RegistryUtils.GetValue("AutoUpdater", "LoadWithWindows"), out bool b) || b;
                 if (loadWithWindows)
                 {
-                    // Если "грузить с виндой", то проверяем, что модуль запущен
+                    // Если "грузить с ОС", то проверяем, что модуль запущен
                     // если не запущен - запускаем
                     var isOpen = Process.GetProcesses().Any(t => t.ProcessName == "mpAutoUpdater");
                     if (!isOpen)
@@ -360,18 +358,18 @@
             }
         }
 
-        private async void AuthorizationOnStartup()
+        private static async void AuthorizationOnStartup()
         {
             try
             {
                 await UserInfoService.GetUserInfoAsync();
                 var userInfo = UserInfoService.GetUserInfoResponseFromHash();
-                if (userInfo != null)
+                if (userInfo == null) 
+                    return;
+
+                if (!userInfo.IsLocalData && !await ModPlusAPI.Web.Connection.HasAllConnectionAsync(3))
                 {
-                    if (!userInfo.IsLocalData && !await ModPlusAPI.Web.Connection.HasAllConnectionAsync(3))
-                    {
-                        ModPlusAPI.Variables.UserInfoHash = string.Empty;
-                    }
+                    ModPlusAPI.Variables.UserInfoHash = string.Empty;
                 }
             }
             catch (System.Exception exception)
@@ -405,7 +403,7 @@
                         // Another implementation could be to look up the help topic in an index file matching it to URLs.
                         _dropNextHelpCall = true; // Even though we don't forward this F1 keypress, AutoCAD sends a message to itself to open the AutoCAD help file
                         object nomutt = AcApp.GetSystemVariable("NOMUTT");
-                        string cmd = "._BROWSER " + _currentTooltip + " _NOMUTT " + nomutt + " ";
+                        string cmd = $"._BROWSER {_currentTooltip} _NOMUTT {nomutt} ";
                         AcApp.SetSystemVariable("NOMUTT", 1);
                         AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, false);
                         e.Handled = true;
@@ -443,12 +441,15 @@
 
         #endregion
 
+        /// <inheritdoc />
         internal class WebClientWithTimeout : WebClient
         {
+            /// <inheritdoc/>
             protected override WebRequest GetWebRequest(Uri uri)
             {
-                WebRequest w = base.GetWebRequest(uri);
-                w.Timeout = 3000;
+                var w = base.GetWebRequest(uri);
+                if (w != null) 
+                    w.Timeout = 3000;
                 return w;
             }
         }

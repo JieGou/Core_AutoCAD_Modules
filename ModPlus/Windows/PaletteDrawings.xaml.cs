@@ -8,12 +8,12 @@
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     // ReSharper disable once InconsistentNaming
-    internal partial class mpPaletteDrawings 
+    internal partial class PaletteDrawings 
     {
         // Переменные
         private readonly DocumentCollection _docs = AcApp.DocumentManager;
         
-        internal mpPaletteDrawings()
+        internal PaletteDrawings()
         {
             InitializeComponent();
             ModPlusStyle.ThemeManager.ChangeTheme(Resources, "LightBlue");

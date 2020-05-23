@@ -9,9 +9,9 @@
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     // ReSharper disable once InconsistentNaming
-    internal partial class mpPaletteFunctions
+    internal partial class PalettePlugins
     {
-        internal mpPaletteFunctions()
+        internal PalettePlugins()
         {
             InitializeComponent();
             ModPlusStyle.ThemeManager.ChangeTheme(Resources, "LightBlue");

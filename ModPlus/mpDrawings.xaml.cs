@@ -19,12 +19,12 @@
 
         internal MpDrawings()
         {
-            if (double.TryParse(Regestry.GetValue("DrawingsWinTop"), out var top))
+            if (double.TryParse(RegistryUtils.GetValue("DrawingsWinTop"), out var top))
                 Top = top;
             else
                 Top = 180;
 
-            if (double.TryParse(Regestry.GetValue("DrawingsWinLeft"), out var left))
+            if (double.TryParse(RegistryUtils.GetValue("DrawingsWinLeft"), out var left))
                 Left = left;
             else
                 Left = 60;
@@ -296,8 +296,8 @@
 
         private static void MpDrawingsWinClosed(object sender, EventArgs e)
         {
-            Regestry.SetValue("DrawingsWinTop", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture));
-            Regestry.SetValue("DrawingsWinLeft", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture));
+            RegistryUtils.SetValue("DrawingsWinTop", MpDrawingsWin.Top.ToString(CultureInfo.InvariantCulture));
+            RegistryUtils.SetValue("DrawingsWinLeft", MpDrawingsWin.Left.ToString(CultureInfo.InvariantCulture));
             MpDrawingsWin = null;
         }
     }

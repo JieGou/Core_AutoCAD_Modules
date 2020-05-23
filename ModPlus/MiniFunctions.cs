@@ -13,9 +13,9 @@ namespace ModPlus
     using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.Windows;
-    using MinFuncWins;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Windows.MiniPlugins;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using MenuItem = Autodesk.AutoCAD.Windows.MenuItem;
     using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
@@ -34,28 +34,28 @@ namespace ModPlus
         public static void LoadUnloadContextMenu()
         {
             // ent by block
-            var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "EntByBlockOCM"), out bool b) || b;
+            var entByBlockObjContMen = !bool.TryParse(UserConfigFile.GetValue("EntByBlockOCM"), out bool b) || b;
             if (entByBlockObjContMen)
                 MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Attach();
             else
                 MiniFunctionsContextMenuExtensions.EntByBlockObjectContextMenu.Detach();
 
             // nested ent layer
-            var nestedEntLayerObjContMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "NestedEntLayerOCM"), out b) || b;
+            var nestedEntLayerObjContMen = !bool.TryParse(UserConfigFile.GetValue("NestedEntLayerOCM"), out b) || b;
             if (nestedEntLayerObjContMen)
                 MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Attach();
             else
                 MiniFunctionsContextMenuExtensions.NestedEntLayerObjectContextMenu.Detach();
 
             // Fast block
-            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
+            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue("FastBlocksCM"), out b) || b;
             if (fastBlocksContextMenu)
                 MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Attach();
             else
                 MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
 
             // VP to MS
-            var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "VPtoMS"), out b) || b;
+            var VPtoMSObjConMen = !bool.TryParse(UserConfigFile.GetValue("VPtoMS"), out b) || b;
             if (VPtoMSObjConMen)
                 MiniFunctionsContextMenuExtensions.VPtoMSObjectContextMenu.Attach();
             else
@@ -66,7 +66,7 @@ namespace ModPlus
              * Так как не получается создать контекстное меню конкретно на класс Wipeout (возможно в поздних версиях устранили),
              * то приходится делать через подписку на событие и создание меню у Entity
              */
-            var wipeoutEditOCM = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "WipeoutEditOCM"), out b) || b; // true
+            var wipeoutEditOCM = !bool.TryParse(UserConfigFile.GetValue("WipeoutEditOCM"), out b) || b; // true
             if (wipeoutEditOCM)
             {
                 AcApp.DocumentManager.DocumentCreated += WipeoutEditOCM_Documents_DocumentCreated;
@@ -179,7 +179,7 @@ namespace ModPlus
                 {
                     var pso = new PromptSelectionOptions
                     {
-                        MessageForAdding = "\n" + Language.GetItem(LangItem, "msg2"),
+                        MessageForAdding = $"\n{Language.GetItem(LangItem, "msg2")}",
                         MessageForRemoval = "\n",
                         AllowSubSelections = false,
                         AllowDuplicates = false
@@ -197,9 +197,9 @@ namespace ModPlus
                         foreach (SelectedObject so in selectedObjects.Value)
                         {
                             var selEnt = tr.GetObject(so.ObjectId, OpenMode.ForRead);
-                            if (selEnt is BlockReference)
+                            if (selEnt is BlockReference blockReference)
                             {
-                                ChangeProperties((selEnt as BlockReference).BlockTableRecord);
+                                ChangeProperties(blockReference.BlockTableRecord);
                             }
                         }
 
@@ -266,7 +266,7 @@ namespace ModPlus
                 {
                     var pso = new PromptSelectionOptions
                     {
-                        MessageForAdding = "\n" + Language.GetItem(LangItem, "msg2"),
+                        MessageForAdding = $"\n{Language.GetItem(LangItem, "msg2")}",
                         MessageForRemoval = "\n",
                         AllowSubSelections = false,
                         AllowDuplicates = false
@@ -288,9 +288,9 @@ namespace ModPlus
                             foreach (SelectedObject so in selectedObjects.Value)
                             {
                                 var selEnt = tr.GetObject(so.ObjectId, OpenMode.ForRead);
-                                if (selEnt is BlockReference)
+                                if (selEnt is BlockReference blockReference)
                                 {
-                                    ChangeLayer((selEnt as BlockReference).BlockTableRecord, selectedLayer.LayerId);
+                                    ChangeLayer(blockReference.BlockTableRecord, selectedLayer.LayerId);
                                 }
                             }
 
@@ -343,14 +343,10 @@ namespace ModPlus
         #endregion
         
         #region VP to MS
-#if ac2010
-        [DllImport("acad.exe", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
-        private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
-#else
+
         [DllImport("accore.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         private static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
 
-#endif
         [CommandMethod("ModPlus", "mpVPtoMS", CommandFlags.UsePickSet | CommandFlags.Redraw)]
         public void VPtoMS()
         {
@@ -386,7 +382,7 @@ namespace ModPlus
                 }
                 else
                 {
-                    var peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg3"));
+                    var peo = new PromptEntityOptions($"\n{Language.GetItem(LangItem, "msg3")}");
                     peo.SetRejectMessage("\nReject");
                     peo.AllowNone = false;
                     peo.AllowObjectOnLockedLayer = true;
@@ -512,15 +508,13 @@ namespace ModPlus
                 using (Entity ent = tr.GetObject(viewport.NonRectClipEntityId, OpenMode.ForRead) as Entity)
                 {
                     // Если это полилиния - извлекаем ее точки
-                    if (ent is Polyline)
+                    if (ent is Polyline pline)
                     {
-                        Polyline pline = ent as Polyline;
                         for (int i = 0; i < pline.NumberOfVertices; i++)
                             psVpPnts.Add(pline.GetPoint3dAt(i));
                     }
-                    else if (ent is Polyline2d)
+                    else if (ent is Polyline2d pline2d)
                     {
-                        Polyline2d pline2d = ent as Polyline2d;
                         foreach (ObjectId vertId in pline2d)
                         {
                             using (Vertex2d vert = tr.GetObject(vertId, OpenMode.ForRead) as Vertex2d)
@@ -530,9 +524,8 @@ namespace ModPlus
                             }
                         }
                     }
-                    else if (ent is Curve)
+                    else if (ent is Curve curve)
                     {
-                        Curve curve = ent as Curve;
                         double
                             startParam = curve.StartParam,
                             endParam = curve.EndParam,
@@ -547,9 +540,8 @@ namespace ModPlus
                     }
                     else
                     {
-                        MessageBox.Show(Language.GetItem(LangItem, "msg5")
-                            + "\n" + Language.GetItem(LangItem, "msg6") + viewport.Number + ", " +
-                            Language.GetItem(LangItem, "msg7") + ent + "\n");
+                        MessageBox.Show(
+                            $"{Language.GetItem(LangItem, "msg5")}\n{Language.GetItem(LangItem, "msg6")}{viewport.Number}, {Language.GetItem(LangItem, "msg7")}{ent}\n");
                     }
                 }
             }
@@ -606,7 +598,7 @@ namespace ModPlus
                 var selectedId = ObjectId.Null;
                 if (selectedObjects.Value == null || selectedObjects.Value.Count > 1)
                 {
-                    PromptEntityOptions peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg20") + ":");
+                    PromptEntityOptions peo = new PromptEntityOptions($"\n{Language.GetItem(LangItem, "msg20")}:");
                     peo.SetRejectMessage("\nWrong!");
                     peo.AllowNone = false;
                     peo.AddAllowedClass(typeof(Wipeout), true);
@@ -646,7 +638,7 @@ namespace ModPlus
                 var selectedId = ObjectId.Null;
                 if (selectedObjects.Value == null || selectedObjects.Value.Count > 1)
                 {
-                    PromptEntityOptions peo = new PromptEntityOptions("\n" + Language.GetItem(LangItem, "msg20") + ":");
+                    PromptEntityOptions peo = new PromptEntityOptions($"\n{Language.GetItem(LangItem, "msg20")}:");
                     peo.SetRejectMessage("\nWrong!");
                     peo.AllowNone = false;
                     peo.AddAllowedClass(typeof(Wipeout), true);
@@ -741,7 +733,7 @@ namespace ModPlus
                                     polyline.AddVertexAt(i, new Point2d(points3D[i].X, points3D[i].Y), 0.0, 0.0, 0.0);
                                 }
 
-                                var pickedPt = ed.GetPoint("\n" + Language.GetItem(LangItem, "msg22") + ":");
+                                var pickedPt = ed.GetPoint($"\n{Language.GetItem(LangItem, "msg22")}:");
                                 if (pickedPt.Status != PromptStatus.OK)
                                 {
                                     loop = false;
@@ -803,7 +795,7 @@ namespace ModPlus
 
             protected override SamplerStatus Sampler(JigPrompts prompts)
             {
-                var ppo = new JigPromptPointOptions("\n" + Language.GetItem(LangItem, "msg21") + ":")
+                var ppo = new JigPromptPointOptions($"\n{Language.GetItem(LangItem, "msg21")}:")
                 {
                     BasePoint = _startPoint,
                     UseBasePoint = true,
@@ -1169,7 +1161,8 @@ namespace ModPlus
                         {
                             case 0:
                                 {
-                                    JigPromptPointOptions jigOpts = new JigPromptPointOptions("\n" + Language.GetItem(LangItem, "msg8"));
+                                    JigPromptPointOptions jigOpts = new JigPromptPointOptions(
+                                        $"\n{Language.GetItem(LangItem, "msg8")}");
                                     jigOpts.UserInputControls =
                                     UserInputControls.Accept3dCoordinates |
                                     UserInputControls.NoZeroResponseAccepted |
@@ -1194,7 +1187,8 @@ namespace ModPlus
 
                             case 1:
                                 {
-                                    JigPromptAngleOptions jigOpts = new JigPromptAngleOptions("\n" + Language.GetItem(LangItem, "msg9"));
+                                    JigPromptAngleOptions jigOpts = new JigPromptAngleOptions(
+                                        $"\n{Language.GetItem(LangItem, "msg9")}");
                                     jigOpts.UserInputControls =
                                     UserInputControls.Accept3dCoordinates |
                                     UserInputControls.NoNegativeResponseAccepted |

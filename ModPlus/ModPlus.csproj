@@ -9,6 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModPlus</RootNamespace>
     <AssemblyName>ModPlus</AssemblyName>
+    <DefineConstants>TRACE;DEBUG;A2021</DefineConstants>
+    <OutputPath>bin\x64\Debug\</OutputPath>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -20,7 +22,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;A2020</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;A2021</DefineConstants>
+    <AssemblyName>$(AssemblyName)_2021</AssemblyName>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -98,12 +101,15 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App\mpMainSettings.xaml.cs">
-      <DependentUpon>mpMainSettings.xaml</DependentUpon>
+    <Compile Include="App\MiniPluginsSettingsViewModel.cs" />
+    <Compile Include="App\ProductIconFunctions.cs" />
+    <Compile Include="App\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="App\MpMainSettingsFunction.cs" />
-    <Compile Include="App\MpProductsDrawableOverrule.cs" />
+    <Compile Include="App\MainSettingsCommand.cs" />
+    <Compile Include="App\ProductsDrawableOverrule.cs" />
     <Compile Include="App\RibbonBuilder.cs" />
+    <Compile Include="App\SettingsViewModel.cs" />
     <Compile Include="App\UserInfoCommand.cs" />
     <Compile Include="Helpers\AutocadHelpers.cs" />
     <Compile Include="Helpers\GetFromAutoCAD.cs" />
@@ -111,13 +117,13 @@
     <Compile Include="Helpers\LoadFunctionsHelper.cs" />
     <Compile Include="Helpers\RibbonHelpers.cs" />
     <Compile Include="Helpers\XDataHelpers.cs" />
-    <Compile Include="MinFuncWins\FastBlockSelection.xaml.cs">
+    <Compile Include="Windows\MiniPlugins\FastBlockSelection.xaml.cs">
       <DependentUpon>FastBlockSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MinFuncWins\FastBlocksSettings.xaml.cs">
+    <Compile Include="Windows\MiniPlugins\FastBlocksSettings.xaml.cs">
       <DependentUpon>FastBlocksSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MinFuncWins\SelectLayer.xaml.cs">
+    <Compile Include="Windows\MiniPlugins\SelectLayer.xaml.cs">
       <DependentUpon>SelectLayer.xaml</DependentUpon>
     </Compile>
     <Compile Include="MiniFunctions.cs" />
@@ -127,8 +133,8 @@
       <DependentUpon>mpDrawings.xaml</DependentUpon>
     </Compile>
     <Compile Include="MpPalette.cs" />
-    <Compile Include="Windows\MpFloatMenu.xaml.cs">
-      <DependentUpon>MpFloatMenu.xaml</DependentUpon>
+    <Compile Include="Windows\FloatMenu.xaml.cs">
+      <DependentUpon>FloatMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -137,28 +143,29 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="VersionData.cs" />
-    <Compile Include="Windows\mpPaletteDrawings.xaml.cs">
-      <DependentUpon>mpPaletteDrawings.xaml</DependentUpon>
+    <Compile Include="Windows\FloatMenuCommand.cs" />
+    <Compile Include="Windows\PaletteDrawings.xaml.cs">
+      <DependentUpon>PaletteDrawings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\mpPaletteFunctions.xaml.cs">
-      <DependentUpon>mpPaletteFunctions.xaml</DependentUpon>
+    <Compile Include="Windows\PalettePlugins.xaml.cs">
+      <DependentUpon>PalettePlugins.xaml</DependentUpon>
     </Compile>
     <Compile Include="XDataHelpersForProducts.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="App\mpMainSettings.xaml">
+    <Page Include="App\SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MinFuncWins\FastBlockSelection.xaml">
+    <Page Include="Windows\MiniPlugins\FastBlockSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MinFuncWins\FastBlocksSettings.xaml">
+    <Page Include="Windows\MiniPlugins\FastBlocksSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MinFuncWins\SelectLayer.xaml">
+    <Page Include="Windows\MiniPlugins\SelectLayer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,15 +173,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Windows\MpFloatMenu.xaml">
+    <Page Include="Windows\FloatMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\mpPaletteDrawings.xaml">
+    <Page Include="Windows\PaletteDrawings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\mpPaletteFunctions.xaml">
+    <Page Include="Windows\PalettePlugins.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -313,12 +320,11 @@
   </Choose>
   <ItemGroup>
     <PackageReference Include="ModPlusAPI">
-      <Version>1.6.0</Version>
+      <Version>3.1.0</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ModPlusStyle">
-      <Version>2.0.0</Version>
+      <Version>3.1.0</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="StyleCop.Analyzers">
@@ -327,5 +333,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -30,14 +30,14 @@
         /// <summary>
         /// Чтение данных из интерфейса функции
         /// </summary>
-        /// <param name="loadedFuncAssembly"></param>
+        /// <param name="loadedFuncAssembly">Load assembly</param>
         public static void GetDataFromFunctionInterface(Assembly loadedFuncAssembly)
         {
             // Есть два интерфейса - старый и новый. Нужно учесть оба
             var types = GetLoadableTypes(loadedFuncAssembly);
             foreach (var type in types)
             {
-                var modplusInterface = type.GetInterface(typeof(IModPlusFunctionInterface).Name);
+                var modplusInterface = type.GetInterface(nameof(IModPlusFunctionInterface));
                 if (modplusInterface != null)
                 {
                     if (Activator.CreateInstance(type) is IModPlusFunctionInterface function)
@@ -48,18 +48,16 @@
                             LName = function.LName,
                             Description = function.Description,
                             CanAddToRibbon = function.CanAddToRibbon,
-                            SmallIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                           ";component/Resources/" + function.Name +
-                                           "_16x16.png",
+                            SmallIconUrl =
+                                $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/{function.Name}_16x16.png",
                             SmallDarkIconUrl = GetSmallDarkIcon(loadedFuncAssembly, function.Name),
-                            BigIconUrl = "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                         ";component/Resources/" + function.Name +
-                                         "_32x32.png",
+                            BigIconUrl =
+                                $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/{function.Name}_32x32.png",
                             BigDarkIconUrl = GetBigDarkIcon(loadedFuncAssembly, function.Name),
                             AvailProductExternalVersion = VersionData.CurrentCadVersion,
                             FullDescription = function.FullDescription,
                             ToolTipHelpImage = !string.IsNullOrEmpty(function.ToolTipHelpImage)
-                            ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName + ";component/Resources/Help/" + function.ToolTipHelpImage
+                            ? $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/Help/{function.ToolTipHelpImage}"
                             : string.Empty,
                             SubFunctionsNames = function.SubFunctionsNames,
                             SubFunctionsLNames = function.SubFunctionsLames,
@@ -74,13 +72,11 @@
                         {
                             foreach (var subFunctionsName in function.SubFunctionsNames)
                             {
-                                lf.SubSmallIconsUrl.Add("pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                                        ";component/Resources/" + subFunctionsName +
-                                                        "_16x16.png");
+                                lf.SubSmallIconsUrl.Add(
+                                    $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/{subFunctionsName}_16x16.png");
                                 lf.SubSmallDarkIconsUrl.Add(GetSmallDarkIcon(loadedFuncAssembly, subFunctionsName));
-                                lf.SubBigIconsUrl.Add("pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                                        ";component/Resources/" + subFunctionsName +
-                                                        "_32x32.png");
+                                lf.SubBigIconsUrl.Add(
+                                    $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/{subFunctionsName}_32x32.png");
                                 lf.SubBigDarkIconsUrl.Add(GetBigDarkIcon(loadedFuncAssembly, subFunctionsName));
                             }
                         }
@@ -91,8 +87,7 @@
                             {
                                 lf.SubHelpImages.Add(
                                     !string.IsNullOrEmpty(helpImage)
-                                    ? "pack://application:,,,/" + loadedFuncAssembly.GetName().FullName +
-                                    ";component/Resources/Help/" + helpImage
+                                    ? $"pack://application:,,,/{loadedFuncAssembly.GetName().FullName};component/Resources/Help/{helpImage}"
                                     : string.Empty);
                             }
                         }
@@ -110,7 +105,7 @@
             var iconUri = string.Empty;
             var iconName = funcName + "_16x16_dark.png";
             if (ResourceExists(funcAssembly, iconName))
-                iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
+                iconUri = $"pack://application:,,,/{funcAssembly.GetName().FullName};component/Resources/{iconName}";
             return iconUri;
         }
 
@@ -119,7 +114,7 @@
             var iconUri = string.Empty;
             var iconName = funcName + "_32x32_dark.png";
             if (ResourceExists(funcAssembly, iconName))
-                iconUri = "pack://application:,,,/" + funcAssembly.GetName().FullName + ";component/Resources/" + iconName;
+                iconUri = $"pack://application:,,,/{funcAssembly.GetName().FullName};component/Resources/{iconName}";
             return iconUri;
         }
 
@@ -165,19 +160,19 @@
         /// <summary>
         /// Поиск файла функции, если в файле конфигурации вдруг нет атрибута
         /// </summary>
-        /// <param name="functionName"></param>
+        /// <param name="pluginName">Plugin name</param>
         /// <returns></returns>
-        public static string FindFile(string functionName)
+        public static string FindFile(string pluginName)
         {
             var fileName = string.Empty;
 
-            var funcDir = Path.Combine(Constants.CurrentDirectory, "Functions", functionName);
+            var funcDir = Path.Combine(Constants.CurrentDirectory, "Functions", pluginName);
             if (Directory.Exists(funcDir))
             {
                 foreach (var file in Directory.GetFiles(funcDir, "*.dll", SearchOption.TopDirectoryOnly))
                 {
                     var fileInfo = new FileInfo(file);
-                    if (fileInfo.Name.Equals(functionName + "_" + VersionData.CurrentCadVersion + ".dll"))
+                    if (fileInfo.Name.Equals(pluginName + "_" + VersionData.CurrentCadVersion + ".dll"))
                     {
                         fileName = file;
                         break;
@@ -197,13 +192,13 @@
                 {
                     if (colorTheme == 1)
                     {
-                        icon = "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion +
-                               ";component/Resources/mpStampFields_16x16.png";
+                        icon =
+                            $"pack://application:,,,/Modplus_{VersionData.CurrentCadVersion};component/Resources/mpStampFields_16x16.png";
                     }
                     else
                     {
-                        icon = "pack://application:,,,/Modplus_" + VersionData.CurrentCadVersion +
-                                ";component/Resources/mpStampFields_16x16_dark.png";
+                        icon =
+                            $"pack://application:,,,/Modplus_{VersionData.CurrentCadVersion};component/Resources/mpStampFields_16x16_dark.png";
                     }
 
                     return true;

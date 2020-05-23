@@ -1,38 +1,37 @@
 ﻿namespace ModPlus.Windows
 {
     using System;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using App;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Internal;
+    using Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-    using App;
-    using Helpers;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-    partial class MpFloatMenu : Window
+    partial class FloatMenu : Window
     {
         // Переменные
-        readonly DocumentCollection _docs = Application.DocumentManager;
+        readonly DocumentCollection _docs = AcApp.DocumentManager;
 
         // Переменная хранит значение о наличии функции "Поля"
         private bool _hasFieldsFunction;
 
         private const string LangItem = "AutocadDlls";
 
-        public MpFloatMenu()
+        public FloatMenu()
         {
-            if (double.TryParse(Regestry.GetValue("FloatingMenuTop"), out var top))
+            if (double.TryParse(RegistryUtils.GetValue("FloatingMenuTop"), out var top))
                 Top = top;
             else
                 Top = 180;
 
-            if (double.TryParse(Regestry.GetValue("FloatingMenuLeft"), out var left))
+            if (double.TryParse(RegistryUtils.GetValue("FloatingMenuLeft"), out var left))
                 Left = left;
             else
                 Left = 60;
@@ -55,8 +54,8 @@
             if (Variables.DrawingsInFloatMenu)
             {
                 // Подключение обработчиков событий для создания и закрытия чертежей
-                Application.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
-                Application.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
+                AcApp.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
+                AcApp.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
                 try
                 {
                     Drawings.Items.Clear();
@@ -78,11 +77,11 @@
             else
             {
                 // Подключение и отключение (чтобы не было ошибки) обработчиков событий для создания и закрытия чертежей
-                Application.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
-                Application.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
+                AcApp.DocumentManager.DocumentCreated += DocumentManager_DocumentCreated;
+                AcApp.DocumentManager.DocumentDestroyed += DocumentManager_DocumentDestroyed;
                 ///////////////////////////
-                Application.DocumentManager.DocumentCreated -= DocumentManager_DocumentCreated;
-                Application.DocumentManager.DocumentDestroyed -= DocumentManager_DocumentDestroyed;
+                AcApp.DocumentManager.DocumentCreated -= DocumentManager_DocumentCreated;
+                AcApp.DocumentManager.DocumentDestroyed -= DocumentManager_DocumentDestroyed;
             }
 
             // Обрабатываем событие покидания мышкой окна
@@ -179,7 +178,7 @@
         }
 
         // Чертеж закрыт
-        void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
+        private void DocumentManager_DocumentDestroyed(object sender, DocumentDestroyedEventArgs e)
         {
             try
             {
@@ -197,7 +196,7 @@
         }
 
         // Документ создан/открыт
-        void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
+        private void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
         {
             try
             {
@@ -300,7 +299,7 @@
                 ImgIcon.Visibility = Visibility.Visible;
                 TbHeader.Visibility = Visibility.Collapsed;
             }
-            else // header
+            else //// header
             {
                 ImgIcon.Visibility = Visibility.Collapsed;
                 TbHeader.Visibility = Visibility.Visible;
@@ -358,7 +357,7 @@
                     {
                         if (_docs.MdiActiveDocument == doc)
                         {
-                            Application.DocumentManager.
+                            AcApp.DocumentManager.
                                 MdiActiveDocument.SendStringToExecute("_CLOSE ", true, false, false);
                             if (Drawings.Items.Count == 1)
                                 OnMouseLeaving();
@@ -377,15 +376,15 @@
         // Вызов окна настроек ModPlus
         private void BtMpSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            var win = new MpMainSettings();
+            var win = new SettingsWindow();
             win.ShowDialog();
         }
 
         // start fields function
         private void BtFields_OnClick(object sender, RoutedEventArgs e)
         {
-            if (Application.DocumentManager.Count > 0)
-                Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSTAMPFIELDS ", false, false, false);
+            if (AcApp.DocumentManager.Count > 0)
+                AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPSTAMPFIELDS ", false, false, false);
         }
 
         private void FillFieldsFunction()
@@ -401,56 +400,13 @@
                 MouseEnter -= Window_MouseEnter;
                 MouseLeave -= Window_MouseLeave;
                 MouseLeftButtonDown -= Window_MouseLeftButtonDown;
-                Application.DocumentManager.DocumentCreated -= DocumentManager_DocumentCreated;
-                Application.DocumentManager.DocumentDestroyed -= DocumentManager_DocumentDestroyed;
+                AcApp.DocumentManager.DocumentCreated -= DocumentManager_DocumentCreated;
+                AcApp.DocumentManager.DocumentDestroyed -= DocumentManager_DocumentDestroyed;
             }
             catch
             {
                 // ignore
             }
-        }
-    }
-
-    public static class MpMenuFunction
-    {
-        public static MpFloatMenu MpMainMenuWin;
-
-        /// <summary>
-        /// Загрузка основного меню в зависимости от настроек
-        /// </summary>
-        public static void LoadMainMenu()
-        {
-            try
-            {
-                if (Variables.FloatMenu)
-                {
-                    if (MpMainMenuWin == null)
-                    {
-                        MpMainMenuWin = new MpFloatMenu();
-                        MpMainMenuWin.Closed += mpMainMenuWin_Closed;
-                    }
-
-                    if (MpMainMenuWin.IsLoaded)
-                        return;
-
-                    Application.ShowModelessWindow(Application.MainWindow.Handle, MpMainMenuWin);
-                }
-                else
-                {
-                    MpMainMenuWin?.Close();
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
-
-        static void mpMainMenuWin_Closed(object sender, EventArgs e)
-        {
-            Regestry.SetValue("FloatingMenuTop", MpMainMenuWin.Top.ToString(CultureInfo.InvariantCulture));
-            Regestry.SetValue("FloatingMenuLeft", MpMainMenuWin.Left.ToString(CultureInfo.InvariantCulture));
-            MpMainMenuWin = null;
         }
     }
 }

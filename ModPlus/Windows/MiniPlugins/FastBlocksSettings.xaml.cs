@@ -1,4 +1,4 @@
-﻿namespace ModPlus.MinFuncWins
+﻿namespace ModPlus.Windows.MiniPlugins
 {
     using System;
     using System.Collections.Generic;
@@ -18,17 +18,9 @@
         private static string _langItem = "AutocadDlls";
         private List<FastBlock> _fastBlocks;
 
-        private class FastBlock
-        {
-            public string Name { get; set; }
-
-            public string File { get; set; }
-
-            public string BlockName { get; set; }
-
-            public Visibility FileAsBlockVisibility { get; set; }
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FastBlocksSettings"/> class.
+        /// </summary>
         public FastBlocksSettings()
         {
             InitializeComponent();
@@ -40,8 +32,7 @@
         private static void FastBlocksSettings_Closed(object sender, EventArgs e)
         {
             // off/on menu
-            bool b;
-            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "FastBlocksCM"), out b) || b;
+            var fastBlocksContextMenu = !bool.TryParse(UserConfigFile.GetValue("FastBlocksCM"), out var b) || b;
             if (fastBlocksContextMenu)
             {
                 MiniFunctions.MiniFunctionsContextMenuExtensions.FastBlockContextMenu.Detach();
@@ -61,7 +52,7 @@
         {
             if (File.Exists(UserConfigFile.FullFileName))
             {
-                XElement configXml = UserConfigFile.ConfigFileXml;
+                var configXml = UserConfigFile.ConfigFileXml;
                 if (configXml != null)
                 {
                     var settingsXml = configXml.Element("Settings");
@@ -214,6 +205,17 @@
             {
                 ExceptionBox.Show(exception);
             }
+        }
+
+        private class FastBlock
+        {
+            public string Name { get; set; }
+
+            public string File { get; set; }
+
+            public string BlockName { get; set; }
+
+            public Visibility FileAsBlockVisibility { get; set; }
         }
     }
 }
